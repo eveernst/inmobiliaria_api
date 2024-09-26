@@ -1,5 +1,6 @@
-import { Entity, Column } from "typeorm";
+import { Entity, Column, OneToMany } from "typeorm";
 import { BaseEntity } from "src/shared/entities/base.entity";
+import { PropertyPlan } from "src/modules/property-plan/entities/record.entity";
 
 @Entity()
 export class Plan extends BaseEntity {
@@ -86,4 +87,8 @@ export class Plan extends BaseEntity {
 
     @Column()
     contacts: string;
+
+    // Un plan puede tener muchas propiedades
+    @OneToMany(() => PropertyPlan, propertyPlan => propertyPlan.plan)
+    propertyPlans: PropertyPlan[];
 }

@@ -2,7 +2,7 @@ import { Entity, Column, OneToMany, JoinColumn, ManyToOne, PrimaryColumn } from 
 import { BaseEntity } from "src/shared/entities/base.entity";
 import { Classification } from "src/modules/classification/entities/classification.entity";
 import { User } from "src/modules/users/entities/user.entity";
-import { Record } from "src/modules/record/entities/record.entity";
+// import { Record } from "src/modules/property-plan/entities/record.entity";
 import { Notification } from "src/modules/notification/entities/notification.entity";
 import { Installation } from "src/modules/installation/entities/installation.entity";
 
@@ -51,11 +51,11 @@ export class Property extends BaseEntity {
   // Muchas propiedades pertenecen a un usuario
   @ManyToOne(() => User, user => user.property)
   @JoinColumn({ name: 'user_id' }) // Especifica el nombre de la FK en la tabla property
-  user: User; 
+  user: User;
 
   // Una propiedad puede tener muchos documentos
-  @OneToMany(() => Record, record => record.property)
-  records: Record[];
+  // @OneToMany(() => Record, record => record.property)
+  // records: Record[];
 
   // Una propiedad puede tener muchas notificaciones
   @OneToMany(() => Notification, notification => notification.property)

@@ -1,3 +1,5 @@
+// crear demonio "cron" para enviar notificaciones a los usuarios
+
 import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from 'src/shared/entities/base.entity';
 import { Property } from 'src/modules/property/entities/property.entity';
