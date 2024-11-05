@@ -1,5 +1,6 @@
-import { Entity, Column } from "typeorm";
+import { Entity, Column, ManyToMany, ManyToOne, JoinColumn } from "typeorm";
 import { BaseEntity } from "src/shared/entities/base.entity";
+import { Property } from "src/modules/property/entities/property.entity";
 
 @Entity()
 export class Insurance extends BaseEntity {
@@ -57,4 +58,9 @@ export class Insurance extends BaseEntity {
 
     @Column()
     observations: string;
+
+    // Muchos seguros pueden pertenecer a una propiedad
+    @ManyToOne(() => Property, property => property.insurances)
+    @JoinColumn({ name: 'property_id' })
+    properties: Property;
 }

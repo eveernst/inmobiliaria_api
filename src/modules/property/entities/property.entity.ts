@@ -5,6 +5,10 @@ import { User } from "src/modules/users/entities/user.entity";
 // import { Record } from "src/modules/property-plan/entities/record.entity";
 import { Notification } from "src/modules/notification/entities/notification.entity";
 import { Installation } from "src/modules/installation/entities/installation.entity";
+import { Plan } from "src/modules/plan-record/entities/plan.entity";
+import { Rented } from "src/modules/rented-record/entities/rented.entity";
+import { Writing } from "src/modules/writing-record/entities/writing.entity";
+import { Insurance } from "src/modules/insurance-record/entities/insurance.entity";
 
 @Entity()
 export class Property extends BaseEntity {
@@ -64,4 +68,20 @@ export class Property extends BaseEntity {
   // Una propiedad puede tener muchas instalaciones
   @OneToMany(() => Installation, installation => installation.property)
   installation: Installation[];
+
+  // Una propiedad puede tener muchos planos
+  @OneToMany(() => Plan, plan => plan.property)
+  plan: Plan[];
+
+  // Una propiedad puede tener muchos alquileres
+  @OneToMany(() => Rented, rented => rented.property)
+  renteds: Rented[];
+
+  // Una propiedad puede tener muchos escrituras
+  @OneToMany(() => Writing, writing => writing.property)
+  writings: Writing[];
+
+  // Una propiedad puede tener muchos seguros
+  @OneToMany(() => Insurance, insurance => insurance.property)
+  insurances: Insurance[];
 }

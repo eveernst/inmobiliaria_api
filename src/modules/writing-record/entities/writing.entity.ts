@@ -1,5 +1,6 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from 'src/shared/entities/base.entity';
+import { Property } from 'src/modules/property/entities/property.entity';
 
 @Entity()
 export class Writing extends BaseEntity {
@@ -80,4 +81,9 @@ export class Writing extends BaseEntity {
 
   @Column()
   detailSpaces: string;
+
+  // Una escritura puede pertenecer a una propiedad
+  @ManyToOne(() => Property, property => property.writings)
+  @JoinColumn({ name: 'property_id'})
+  property: Property;  
 }
