@@ -22,12 +22,7 @@ export class InsuranceController {
     return new GenericResponse<ReadInsuranceDto>(response);
   }
 
-  @Post()
-  async create(@Body() insuranceData: CreateInsuranceDto): Promise<GenericResponse<ReadInsuranceDto>> {
-    const insurance = await this.insuranceService.create(insuranceData);
-    const response = plainToClass(ReadInsuranceDto, insurance);
-    return new GenericResponse<ReadInsuranceDto>(response);
-  }
+
 
   @Put(':id')
   update(@Param('id') id: number, @Body() insuranceData: Partial<Insurance>): Promise<Insurance> {

@@ -17,7 +17,7 @@ export class Rented extends BaseEntity {
     renterDetails: string;
 
     @Column({ length: 100 })
-    adress: string;
+    address: string;
 
     @Column({ length: 100 })
     renterContact: string;

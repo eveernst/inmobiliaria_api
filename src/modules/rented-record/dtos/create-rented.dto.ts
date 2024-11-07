@@ -27,7 +27,7 @@ export class CreateRentedDto {
     @IsString()
     @IsNotEmpty()
     @IsRequired()
-    adress: string;
+    address: string;
 
     @IsString()
     @IsNotEmpty()

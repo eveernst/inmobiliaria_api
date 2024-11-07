@@ -15,6 +15,13 @@ export class PropertyController {
     return this.propertyService.findAll();
   }
 
+  @Post()
+  async create(@Body() propertyData: CreatePropertyDto): Promise<GenericResponse<ReadPropertyDto>> {
+    const property = await this.propertyService.create(propertyData);
+    const response = plainToClass(ReadPropertyDto, property);
+    return new GenericResponse<ReadPropertyDto>(response);
+  }
+  
   @Get(':id')
   async findOne(@Param('id') id: number): Promise<GenericResponse<ReadPropertyDto>> {
     const property = await this.propertyService.findOne(id);
@@ -22,12 +29,6 @@ export class PropertyController {
     return new GenericResponse<ReadPropertyDto>(response);
   }
 
-  @Post()
-  async create(@Body() propertyData: CreatePropertyDto): Promise<GenericResponse<ReadPropertyDto>> {
-    const property = await this.propertyService.create(propertyData);
-    const response = plainToClass(ReadPropertyDto, property);
-    return new GenericResponse<ReadPropertyDto>(response);
-  }
 
   @Put(':id')
   update(@Param('id') id: number, @Body() propertyData: Partial<Property>): Promise<Property> {

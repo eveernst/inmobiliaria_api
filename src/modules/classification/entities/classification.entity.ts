@@ -9,12 +9,10 @@ export class Classification extends BaseEntity {
     @Column({ length: 100 })
     name: string;
 
-    // Muchas clasificaciones pueden pertenecer a una propiedad
-    @ManyToOne(() => Property, property => property.classifications)
-    @JoinColumn({ name: 'property_id' })
-    property: Property;
+    @OneToMany(() => Property, property => property.classification)
+    properties: Property[];
 
     // Una clasificacion puede tener muchas instalaciones
-    @OneToMany(() => Classification, classification => classification.installation)
-    installation: Installation[];
+    @OneToMany(() => Classification, classification => classification.installations)
+    installations: Installation[];
 }

@@ -2,7 +2,7 @@ import { Expose } from "class-transformer";
 
 export class ReadPropertyDto {
     @Expose()
-    adress: string;
+    address: string;
 
     @Expose()
     classification: string;

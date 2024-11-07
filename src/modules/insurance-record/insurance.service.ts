@@ -18,12 +18,7 @@ export class InsuranceService {
     findOne(id: number): Promise<Insurance> {
         return this.insuranceRepository.findOne({ where: { id } });
     }
-    
-    async create(insuranceData: CreateInsuranceDto): Promise<Insurance> {
-        const insurance = this.insuranceRepository.create(insuranceData);
-        return await this.insuranceRepository.save(insurance);
-    }
-    
+        
     async update(id: number, insuranceData: Partial<Insurance>): Promise<Insurance> {
         await this.insuranceRepository.update(id, insuranceData);
         return this.findOne(id);

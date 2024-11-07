@@ -22,13 +22,6 @@ export class ClassificationController {
     return new GenericResponse<ReadClassificationDto>(response);
   }
 
-  @Post()
-  async create(@Body() classificationData: CreateClassificationDto): Promise<GenericResponse<ReadClassificationDto>> {
-    const classification = await this.classificationService.create(classificationData);
-    const response = plainToClass(ReadClassificationDto, classification);
-    return new GenericResponse<ReadClassificationDto>(response);
-  }
-
   @Put(':id')
   update(@Param('id') id: number, @Body() classificationData: Partial<Classification>): Promise<Classification> {
     return this.classificationService.update(id, classificationData);

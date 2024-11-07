@@ -22,18 +22,6 @@ export class ClassificationService {
     return this.classificationRepository.findOne({ where: { id } });
   }
 
-  async create(classificationData: CreateClassificationDto): Promise<Classification> {
-    const property = await this.propertyRepository.findOne({ where: { id: classificationData.property_id } });
-    if (!property) {
-      throw new Error('Property not found');
-    }
-    const classification = this.classificationRepository.create({
-      ...classificationData,
-      property,
-    });
-    return await this.classificationRepository.save(classification);
-  }
-
   async update(id: number, classificationData: Partial<Classification>): Promise<Classification> {
     await this.classificationRepository.update(id, classificationData);
     return this.findOne(id);

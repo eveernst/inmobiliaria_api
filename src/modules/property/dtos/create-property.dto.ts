@@ -4,11 +4,7 @@ import { IsRequired } from "../../../shared/decorators/is-required.decorator";
 export class CreatePropertyDto {
     @IsString()
     @IsRequired()
-    adress: string;
-
-    @IsString()
-    @IsRequired()
-    classification: string;
+    address: string;
    
     @IsString()
     @IsRequired()
@@ -25,6 +21,10 @@ export class CreatePropertyDto {
     // @IsNumber()
     // @IsRequired()
     // idUser: number;
+
+    @IsNumber()
+    @IsRequired()
+    classification: number;
 
     @IsNumber()
     @IsRequired()

@@ -90,7 +90,7 @@ export class Plan extends BaseEntity {
     contacts: string;
 
     // Un plan puede tener muchas propiedades
-    @ManyToOne(() => Property, property => property.plan)
+    @ManyToOne(() => Property, property => property.plans)
     @JoinColumn({ name: 'property_id' })
     property: Property;
 }

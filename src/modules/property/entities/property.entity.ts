@@ -13,7 +13,7 @@ import { Insurance } from "src/modules/insurance-record/entities/insurance.entit
 @Entity()
 export class Property extends BaseEntity {
   @Column({ length: 100 })
-  adress: string;
+  address: string;
 
   @Column({ length: 100 })
   destiny: string;
@@ -48,18 +48,14 @@ export class Property extends BaseEntity {
   @Column({ length: 100 })
   destinyUse: string;
 
-  // Una propiedad puede tener muchas clasificaciones
-  @OneToMany(() => Classification, classification => classification.property)
-  classifications: Classification[];
-
   // Muchas propiedades pertenecen a un usuario
   @ManyToOne(() => User, user => user.property)
   @JoinColumn({ name: 'user_id' }) // Especifica el nombre de la FK en la tabla property
   user: User;
 
-  // Una propiedad puede tener muchos documentos
-  // @OneToMany(() => Record, record => record.property)
-  // records: Record[];
+  @ManyToOne(() => Classification, classification => classification.properties)
+  @JoinColumn({ name: 'classification_id' }) // Especifica el nombre de la FK en la tabla property
+  classification: Classification;
 
   // Una propiedad puede tener muchas notificaciones
   @OneToMany(() => Notification, notification => notification.property)
@@ -67,11 +63,11 @@ export class Property extends BaseEntity {
   
   // Una propiedad puede tener muchas instalaciones
   @OneToMany(() => Installation, installation => installation.property)
-  installation: Installation[];
+  installations: Installation[];
 
   // Una propiedad puede tener muchos planos
   @OneToMany(() => Plan, plan => plan.property)
-  plan: Plan[];
+  plans: Plan[];
 
   // Una propiedad puede tener muchos alquileres
   @OneToMany(() => Rented, rented => rented.property)

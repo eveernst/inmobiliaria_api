@@ -25,9 +25,6 @@ export class Insurance extends BaseEntity {
     insuranceASE: boolean;
 
     @Column()
-    property: boolean;
-
-    @Column()
     team: boolean;
 
     @Column()
@@ -62,5 +59,5 @@ export class Insurance extends BaseEntity {
     // Muchos seguros pueden pertenecer a una propiedad
     @ManyToOne(() => Property, property => property.insurances)
     @JoinColumn({ name: 'property_id' })
-    properties: Property;
+    property: Property;
 }

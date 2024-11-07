@@ -7,6 +7,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './modules/users/users.module';
+import { Property } from './modules/property/entities/property.entity';
+import { PropertyModule } from './modules/property/property.module';
+import { InstallationModule } from './modules/installation/installation.module';
+import { ClassificationModule } from './modules/classification/classification.module';
 
 @Module({
     imports: [
@@ -19,6 +23,9 @@ import { UsersModule } from './modules/users/users.module';
         }),
         DatabaseModule,
         UsersModule,
+        PropertyModule,
+        InstallationModule,
+        ClassificationModule,
         // ServeStaticModule.forRoot({
         //     rootPath: join(__dirname, '../..', 'public'),
         //     serveRoot: '/api',

@@ -16,7 +16,7 @@ export class ReadRentedDto {
     renterDetails: string;
 
     @Expose()
-    adress: string;
+    address: string;
 
     @Expose()
     renterContact: string;
