@@ -18,16 +18,16 @@ export class Property extends BaseEntity {
   @Column({ length: 100 })
   destiny: string;
 
-  @Column({ length: 100 })
+  @Column({ length: 500 })
   detailsMaintenance: string;
 
-  @Column({ length: 100 })
+  @Column({ length: 255 })
   file: string;
 
   @Column()
   goodUseCode: number;
 
-  @Column({ length: 100 })
+  @Column({ length: 500 })
   description: string;
 
   @Column({ length: 100 })
@@ -37,7 +37,10 @@ export class Property extends BaseEntity {
   locality: string;
 
   @Column({ length: 100 })
-  betweenStreets: string;
+  betweenStreets1: string;
+
+  @Column({ length: 100 })
+  betweenStreets2: string;
 
   @Column()
   postalCode: number;
@@ -47,6 +50,15 @@ export class Property extends BaseEntity {
 
   @Column({ length: 100 })
   destinyUse: string;
+
+  @Column()
+  clfc: string;
+
+  @Column()
+  state: number; // 1: alquilado, 2: disponible, 3: vendido, etc
+
+  @Column()
+  active: boolean;
 
   // Muchas propiedades pertenecen a un usuario
   @ManyToOne(() => User, user => user.property)
