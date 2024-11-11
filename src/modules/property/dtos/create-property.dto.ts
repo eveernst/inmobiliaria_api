@@ -1,11 +1,13 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsNumber, IsString, IsBoolean } from "class-validator";
 import { IsRequired } from "../../../shared/decorators/is-required.decorator";
+import { Installation } from "src/modules/installation/entities/installation.entity";
+import { ReadInstallationDto } from "src/modules/installation/dtos/read-installation.dto";
 
 export class CreatePropertyDto {
     @IsString()
     @IsRequired()
     address: string;
-   
+
     @IsString()
     @IsRequired()
     destiny: string;
@@ -18,13 +20,9 @@ export class CreatePropertyDto {
     @IsRequired()
     file: string;
 
-    // @IsNumber()
-    // @IsRequired()
-    // idUser: number;
-
     @IsNumber()
     @IsRequired()
-    classification: number;
+    classification: number;  // El ID de Classification
 
     @IsNumber()
     @IsRequired()
@@ -58,9 +56,9 @@ export class CreatePropertyDto {
     @IsRequired()
     destinyUse: string;
 
-    @IsString()
+    @IsBoolean()
     @IsRequired()
-    status: string;
+    active: boolean;
 
     @IsString()
     @IsRequired()
@@ -70,9 +68,9 @@ export class CreatePropertyDto {
     @IsRequired()
     securityCodeARM: string;
 
-    @IsString()
+    @IsNumber()
     @IsRequired()
-    state: string;
+    state: number;
 
     @IsString()
     @IsRequired()
@@ -81,4 +79,6 @@ export class CreatePropertyDto {
     @IsString()
     @IsRequired()
     outerImage: string;
+
+    installations?: ReadInstallationDto[];
 }

@@ -5,6 +5,7 @@ import { Classification } from "src/modules/classification/entities/classificati
 
 @Entity()
 export class Installation extends BaseEntity {
+    
     @Column({ length: 100 })
     file: string;
 
