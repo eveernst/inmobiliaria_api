@@ -5,15 +5,17 @@ import { Classification } from "src/modules/classification/entities/classificati
 
 @Entity()
 export class Installation extends BaseEntity {
+    @Column({ length: 100 })
+    name: string;
+    
+    @Column()
+    quantity: number;
     
     @Column({ length: 100 })
     file: string;
 
-    @Column()
-    quantity: number;
-
-    @Column({ length: 100 })
-    name: string;
+    @Column({ length: 500 })
+    details: string;
 
     // Muchas instalacion puede tener una propiedad
     @ManyToOne(() => Property, property => property.installations)

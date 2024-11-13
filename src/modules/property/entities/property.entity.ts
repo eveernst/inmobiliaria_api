@@ -12,53 +12,56 @@ import { Insurance } from "src/modules/insurance-record/entities/insurance.entit
 
 @Entity()
 export class Property extends BaseEntity {
-  @Column({ length: 100 })
-  address: string;
-
-  @Column({ length: 100 })
-  destiny: string;
-
-  @Column({ length: 500 })
-  detailsMaintenance: string;
-
-  @Column({ length: 255 })
-  file: string;
-
   @Column()
   goodUseCode: number;
 
-  @Column({ length: 500 })
-  description: string;
+  @Column()
+  innerImage: string;
+
+  @Column()
+  outerImage: string;
+
+  @Column({ length: 255 })
+  file: string;
 
   @Column({ length: 100 })
   province: string;
 
   @Column({ length: 100 })
   locality: string;
-
+ 
   @Column({ length: 100 })
-  betweenStreets1: string;
-
-  @Column({ length: 100 })
-  betweenStreets2: string;
-
+  address: string;
+  
   @Column()
   postalCode: number;
-
+  
+  @Column({ length: 100 })
+  betweenStreets1: string;
+  
+  @Column({ length: 100 })
+  betweenStreets2: string;
+  
   @Column({ length: 100 })
   district: string;
 
   @Column({ length: 100 })
-  destinyUse: string;
-
-  @Column()
-  clfc: string;
+  destiny: string;
 
   @Column()
   state: number; // 1: alquilado, 2: disponible, 3: vendido, etc
-
+  
   @Column()
   active: boolean;
+  
+  @Column()
+  clfc: string;
+
+  @Column({ length: 500 })
+  detailsMaintenance: string;
+
+  @Column({ length: 500 })
+  description: string;
 
   // Muchas propiedades pertenecen a un usuario
   @ManyToOne(() => User, user => user.property)

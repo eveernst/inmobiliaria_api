@@ -5,7 +5,7 @@ export class CreateInstallationDto {
     @IsString()
     @IsNotEmpty()
     @IsRequired()
-    file: string;
+    name: string;
 
     @IsNumber()
     @IsNotEmpty()
@@ -15,5 +15,10 @@ export class CreateInstallationDto {
     @IsString()
     @IsNotEmpty()
     @IsRequired()
-    name: string;
+    file: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @IsRequired()
+    details: string;
 }

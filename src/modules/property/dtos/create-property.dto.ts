@@ -4,33 +4,17 @@ import { Installation } from "src/modules/installation/entities/installation.ent
 import { ReadInstallationDto } from "src/modules/installation/dtos/read-installation.dto";
 
 export class CreatePropertyDto {
-    @IsString()
-    @IsRequired()
-    address: string;
-
-    @IsString()
-    @IsRequired()
-    destiny: string;
-
-    @IsString()
-    @IsRequired()
-    detailsMaintenance: string;
-
-    @IsString()
-    @IsRequired()
-    file: string;
-
-    @IsNumber()
-    @IsRequired()
-    classification: number;  // El ID de Classification
-
     @IsNumber()
     @IsRequired()
     goodUseCode: number;
 
     @IsString()
     @IsRequired()
-    description: string;
+    innerImage: string;
+
+    @IsString()
+    @IsRequired()
+    outerImage: string;
 
     @IsString()
     @IsRequired()
@@ -39,10 +23,10 @@ export class CreatePropertyDto {
     @IsString()
     @IsRequired()
     locality: string;
-
+    
     @IsString()
     @IsRequired()
-    betweenStreets: string;
+    address: string;
 
     @IsNumber()
     @IsRequired()
@@ -50,11 +34,23 @@ export class CreatePropertyDto {
 
     @IsString()
     @IsRequired()
+    betweenStreets1: string;
+
+    @IsString()
+    @IsRequired()
+    betweenStreets2: string;
+
+    @IsString()
+    @IsRequired()
     district: string;
 
     @IsString()
     @IsRequired()
-    destinyUse: string;
+    destiny: string; // hablar cpn ale
+
+    @IsNumber()
+    @IsRequired()
+    state: number;
 
     @IsBoolean()
     @IsRequired()
@@ -64,21 +60,21 @@ export class CreatePropertyDto {
     @IsRequired()
     clfc: string;
 
-    @IsNumber()
+    @IsString()
     @IsRequired()
-    securityCodeARM: string;
-
-    @IsNumber()
-    @IsRequired()
-    state: number;
+    detailsMaintenance: string;
 
     @IsString()
     @IsRequired()
-    innerImage: string;
+    description: string;
 
     @IsString()
     @IsRequired()
-    outerImage: string;
+    file: string;
+
+    @IsNumber()
+    @IsRequired()
+    classification: number;  // El ID de Classification
 
     installations?: ReadInstallationDto[];
 }
