@@ -8,13 +8,13 @@ export class CreatePropertyDto {
     @IsRequired()
     goodUseCode: number;
 
-    @IsString()
-    @IsRequired()
-    innerImage: string;
+    // @IsString()
+    // @IsRequired()
+    // innerImage: string;
 
-    @IsString()
-    @IsRequired()
-    outerImage: string;
+    // @IsString()
+    // @IsRequired()
+    // outerImage: string;
 
     @IsString()
     @IsRequired()
@@ -69,8 +69,7 @@ export class CreatePropertyDto {
     description: string;
 
     @IsString()
-    @IsRequired()
-    file: string;
+    file?: string;
 
     @IsNumber()
     @IsRequired()

@@ -35,23 +35,23 @@ export class Insurance extends BaseEntity {
 
     // formulario del seguro
     @Column()
-    insuranceLink: string;
+    insuranceLink?: string;
 
     @Column()
-    insuranceImage: string;
+    insuranceImage?: string;
 
     @Column()
-    insuranceDate: Date;
+    insuranceDate?: Date;
 
     // formulario anual
     @Column()
-    AnualFormLink: string;
+    AnualFormLink?: string;
 
     @Column()
-    AnualFormImage: string;
+    AnualFormImage?: string;
 
     @Column()
-    AnualFormDate: Date;
+    AnualFormDate?: Date;
 
     @Column()
     observations: string;

@@ -12,7 +12,7 @@ export class Installation extends BaseEntity {
     quantity: number;
     
     @Column({ length: 100 })
-    file: string;
+    file?: string;
 
     @Column({ length: 500 })
     details: string;

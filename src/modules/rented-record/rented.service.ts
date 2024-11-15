@@ -3,10 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Rented } from './entities/rented.entity';
 import { CreateRentedDto } from './dtos/create-rented.dto';
+import { Property } from '../property/entities/property.entity';
 
 @Injectable()
 export class RentedService {
   constructor(
+    @InjectRepository(Property)
+    private readonly propertyRepository: Repository<Property>,
     @InjectRepository(Rented)
     private readonly rentedRepository: Repository<Rented>,
   ) {}
@@ -19,11 +22,6 @@ export class RentedService {
     return this.rentedRepository.findOne({ where: { id } });
   }
 
-  async create(rentedData: CreateRentedDto): Promise<Rented> {
-    const rented = this.rentedRepository.create(rentedData);
-    return await this.rentedRepository.save(rented);
-  }
-
   async update(id: number, rentedData: Partial<Rented>): Promise<Rented> {
     await this.rentedRepository.update(id, rentedData);
     return this.findOne(id);
@@ -32,4 +30,16 @@ export class RentedService {
   async remove(id: number): Promise<void> {
     await this.rentedRepository.delete(id);
   }
+
+  async create(createRentedDto: CreateRentedDto): Promise<Rented> {
+    const property = await this.propertyRepository.findOne({
+        where: { id: createRentedDto.property },
+    });
+    const rented = this.rentedRepository.create({
+        ...createRentedDto,
+        property,
+    });
+    await this.rentedRepository.save(rented);
+    return rented;
+}
 }

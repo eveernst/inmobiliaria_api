@@ -4,14 +4,14 @@ export class ReadPropertyDto {
     @Expose()
     goodUseCode: number;
 
-    @Expose()
-    innerImage: string;
+    // @Expose()
+    // innerImage: string;
+
+    // @Expose()
+    // outerImage: string;
 
     @Expose()
-    outerImage: string;
-
-    @Expose()
-    file: string;
+    file?: string;
 
     @Expose()
     province: string;

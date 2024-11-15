@@ -13,9 +13,7 @@ export class CreateInstallationDto {
     quantity: number;
 
     @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    file: string;
+    file?: string;
 
     @IsString()
     @IsNotEmpty()

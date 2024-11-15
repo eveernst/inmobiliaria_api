@@ -11,7 +11,7 @@ export class ReadInstallationDto {
     quantity: number;
     
     @Expose()
-    file: string;
+    file?: string;
 
     @Expose()
     details: string;

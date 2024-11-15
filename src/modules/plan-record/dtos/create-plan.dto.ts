@@ -18,9 +18,7 @@ export class CreatePlanDto {
     year: number;
 
     @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    planImage: string;
+    planImage?: string;
 
     // plano estructura
     @IsBoolean()
@@ -28,9 +26,7 @@ export class CreatePlanDto {
     structurePlan: boolean;
 
     @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    structureImage: string;
+    structureImage?: string;
 
     // plano gas
     @IsBoolean()
@@ -38,9 +34,7 @@ export class CreatePlanDto {
     gasPlan: boolean;
 
     @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    gasImage: string;
+    gasImage?: string;
 
     // plano agua
     @IsBoolean()
@@ -48,9 +42,7 @@ export class CreatePlanDto {
     waterPlan: boolean;
 
     @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    waterImage: string;
+    waterImage?: string;
 
     // plano luz
     @IsBoolean()
@@ -58,9 +50,7 @@ export class CreatePlanDto {
     lightPlan: boolean;
 
     @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    lightImage: string;
+    lightImage?: string;
 
     // ante proyecto
     @IsBoolean()
@@ -68,9 +58,7 @@ export class CreatePlanDto {
     projectPlan: boolean;
 
     @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    projectImage: string;
+    projectImage?: string;
 
     // final de obra
     @IsBoolean()
@@ -78,9 +66,7 @@ export class CreatePlanDto {
     finalPlan: boolean;
 
     @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    finalImage: string;
+    finalImage?: string;
 
     // actualizacion
     @IsString()
@@ -99,9 +85,7 @@ export class CreatePlanDto {
     yearUpdate: string;
 
     @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    stateImage: string;
+    stateImage?: string;
 
     @IsString()
     @IsNotEmpty()
@@ -126,9 +110,7 @@ export class CreatePlanDto {
     numberVisado: number;
 
     @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    imageVisado: string;
+    imageVisado?: string;
 
     @IsString()
     @IsNotEmpty()
@@ -144,4 +126,7 @@ export class CreatePlanDto {
     @IsNotEmpty()
     @IsRequired()
     contacts: string;
+
+    @IsNumber()
+    property: number;
 }

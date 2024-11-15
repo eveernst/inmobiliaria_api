@@ -1,4 +1,5 @@
 import { IsBoolean, IsDate, IsEmail, IsNotEmpty, IsNumber, isString, IsString } from "class-validator";
+import { Property } from "src/modules/property/entities/property.entity";
 import { IsRequired } from "src/shared/decorators/is-required.decorator";
 
 export class CreateInsuranceDto {
@@ -36,10 +37,8 @@ export class CreateInsuranceDto {
     @IsRequired()
     insuranceASE: boolean;
 
-    @IsBoolean()
-    @IsNotEmpty()
     @IsRequired()
-    property: boolean;
+    property: number;
 
     @IsBoolean()
     @IsNotEmpty()
@@ -57,36 +56,26 @@ export class CreateInsuranceDto {
     values: boolean;
 
     // formulario del seguro
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    insuranceLink: string;
+    // @IsString()
+    // insuranceLink?: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    insuranceImage: string;
+    // @IsString()
+    // insuranceImage?: string;
 
-    @IsDate()
-    @IsNotEmpty()
-    @IsRequired()
-    insuranceDate: Date;
+    // @IsDate()
+    // insuranceDate?: Date;
 
-    // formulario anual
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    AnualFormLink: string;
+    // // formulario anual
+    // @IsString()
+    // AnualFormLink?: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    AnualFormImage: string;
+    // @IsString()
+    // AnualFormImage?: string;
 
-    @IsDate()
-    @IsNotEmpty()
-    @IsRequired()
-    AnualFormDate: Date;
+    // @IsDate()
+    // @IsNotEmpty()
+    // @IsRequired()
+    // AnualFormDate?: Date;
 
     @IsString()
     @IsNotEmpty()

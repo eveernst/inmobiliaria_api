@@ -22,7 +22,7 @@ export class ReadInsuranceDto {
     insuranceASE: boolean;
 
     @Expose()
-    property: boolean;
+    property: number;
 
     @Expose()
     team: boolean;

@@ -67,7 +67,8 @@ export class CreateRentedDto {
     adjustmentType: string;
 
     @IsString()
-    @IsNotEmpty()
+    contractImage?: string;
+
     @IsRequired()
-    contractImage: string;
+    property: number;
 }

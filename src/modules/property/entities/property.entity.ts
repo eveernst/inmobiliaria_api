@@ -15,14 +15,14 @@ export class Property extends BaseEntity {
   @Column()
   goodUseCode: number;
 
-  @Column()
-  innerImage: string;
+  // @Column()
+  // innerImage: string;
 
-  @Column()
-  outerImage: string;
+  // @Column()
+  // outerImage: string;
 
   @Column({ length: 255 })
-  file: string;
+  file?: string;
 
   @Column({ length: 100 })
   province: string;

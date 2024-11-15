@@ -126,4 +126,6 @@ export class CreateWritingDto {
     @IsString()
     detailSpaces: string;
 
+    @IsRequired()
+    property: number;
 }

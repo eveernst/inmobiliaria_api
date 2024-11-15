@@ -11,6 +11,8 @@ import { Property } from './modules/property/entities/property.entity';
 import { PropertyModule } from './modules/property/property.module';
 import { InstallationModule } from './modules/installation/installation.module';
 import { ClassificationModule } from './modules/classification/classification.module';
+import { InsuranceModule } from './modules/insurance-record/insurance.module';
+import { PlanModule } from './modules/plan-record/plan.module';
 
 @Module({
     imports: [
@@ -26,6 +28,8 @@ import { ClassificationModule } from './modules/classification/classification.mo
         PropertyModule,
         InstallationModule,
         ClassificationModule,
+        InsuranceModule,
+        PlanModule,
         // ServeStaticModule.forRoot({
         //     rootPath: join(__dirname, '../..', 'public'),
         //     serveRoot: '/api',

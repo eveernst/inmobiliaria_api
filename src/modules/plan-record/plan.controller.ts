@@ -23,10 +23,8 @@ export class PlanController {
   }
 
   @Post()
-  async create(@Body() planData: CreatePlanDto): Promise<GenericResponse<ReadPlanDto>> {
-    const plan = await this.planService.create(planData);
-    const response = plainToClass(ReadPlanDto, plan);
-    return new GenericResponse<ReadPlanDto>(response);
+  create(@Body() planData: CreatePlanDto): Promise<Plan> {
+    return this.planService.create(planData);
   }
 
   @Put(':id')

@@ -18,6 +18,18 @@ export class Plan extends BaseEntity {
     planImage: string;
 
     @Column()
+    profesional: string;
+
+    @Column()
+    professionalContact: string;
+
+    @Column()
+    numberVisado: number;
+
+    @Column()
+    dateVisado: Date;
+
+    @Column()
     structurePlan: boolean;
 
     @Column()
@@ -64,18 +76,6 @@ export class Plan extends BaseEntity {
 
     @Column()
     stateImage: string;
-
-    @Column()
-    profesional: string;
-
-    @Column()
-    professionalContact: string;
-
-    @Column()
-    dateVisado: Date;
-
-    @Column()
-    numberVisado: number;
 
     @Column()
     imageVisado: string;

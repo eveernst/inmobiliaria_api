@@ -22,7 +22,10 @@ export class InsuranceController {
     return new GenericResponse<ReadInsuranceDto>(response);
   }
 
-
+  @Post()
+  create(@Body() insuranceData: CreateInsuranceDto): Promise<Insurance> {
+    return this.insuranceService.create(insuranceData);
+  }
 
   @Put(':id')
   update(@Param('id') id: number, @Body() insuranceData: Partial<Insurance>): Promise<Insurance> {

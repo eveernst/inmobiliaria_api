@@ -39,7 +39,7 @@ export class PropertyService {
         ...createPropertyDto,
         classification,
     });
-
+ console.log(property);
     await this.propertyRepository.save(property);
 
     // Guardar las instalaciones de esta propiedad
@@ -56,8 +56,6 @@ export class PropertyService {
 
     return property;
 }
-
-  
 
   async update(id: number, propertyData: Partial<Property>): Promise<Property> {
     await this.propertyRepository.update(id, propertyData);

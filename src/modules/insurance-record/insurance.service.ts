@@ -3,12 +3,15 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Insurance } from "./entities/insurance.entity";
 import { CreateInsuranceDto } from "./dtos/create-insurance.dto";
+import { Property } from "../property/entities/property.entity";
 
 @Injectable()
 export class InsuranceService {
     constructor(
         @InjectRepository(Insurance)
         private readonly insuranceRepository: Repository<Insurance>,
+        @InjectRepository(Property)
+        private readonly propertyRepository: Repository<Property>,
     ) {}
     
     findAll(): Promise<Insurance[]> {
@@ -26,5 +29,17 @@ export class InsuranceService {
     
     async remove(id: number): Promise<void> {
         await this.insuranceRepository.delete(id);
+    }
+
+    async create(createInsuranceDto: CreateInsuranceDto): Promise<Insurance> {
+        const property = await this.propertyRepository.findOne({
+            where: { id: createInsuranceDto.property },
+        });
+        const insurance = this.insuranceRepository.create({
+            ...createInsuranceDto,
+            property,
+        });
+        await this.insuranceRepository.save(insurance);
+        return insurance;
     }
 }
