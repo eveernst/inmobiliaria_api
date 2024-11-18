@@ -65,11 +65,11 @@ export class Property extends BaseEntity {
 
   // Muchas propiedades pertenecen a un usuario
   @ManyToOne(() => User, user => user.property)
-  @JoinColumn({ name: 'user_id' }) // Especifica el nombre de la FK en la tabla property
+  @JoinColumn({ name: 'userId' }) // Especifica el nombre de la FK en la tabla property
   user: User;
 
   @ManyToOne(() => Classification, classification => classification.properties)
-  @JoinColumn({ name: 'classification_id' }) // Especifica el nombre de la FK en la tabla property
+  @JoinColumn({ name: 'classificationId' }) // Especifica el nombre de la FK en la tabla property
   classification: Classification;
 
   // Una propiedad puede tener muchas notificaciones

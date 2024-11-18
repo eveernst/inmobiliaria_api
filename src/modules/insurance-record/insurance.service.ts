@@ -32,8 +32,9 @@ export class InsuranceService {
     }
 
     async create(createInsuranceDto: CreateInsuranceDto): Promise<Insurance> {
+        
         const property = await this.propertyRepository.findOne({
-            where: { id: createInsuranceDto.property },
+            where: { id: createInsuranceDto.propertyId },
         });
         const insurance = this.insuranceRepository.create({
             ...createInsuranceDto,

@@ -58,6 +58,6 @@ export class Insurance extends BaseEntity {
 
     // Muchos seguros pueden pertenecer a una propiedad
     @ManyToOne(() => Property, property => property.insurances)
-    @JoinColumn({ name: 'property_id' })
+    @JoinColumn({ name: 'propertyId' })
     property: Property;
 }

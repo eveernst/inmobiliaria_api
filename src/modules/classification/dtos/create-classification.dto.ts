@@ -8,5 +8,5 @@ export class CreateClassificationDto {
 
     @IsNumber()
     @IsRequired()
-    property_id: number;
+    propertyId: number;
 }

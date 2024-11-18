@@ -91,6 +91,6 @@ export class Plan extends BaseEntity {
 
     // Un plan puede tener muchas propiedades
     @ManyToOne(() => Property, property => property.plans)
-    @JoinColumn({ name: 'property_id' })
+    @JoinColumn({ name: 'propertyId' })
     property: Property;
 }

@@ -2,7 +2,7 @@ import { Expose } from "class-transformer";
 
 export class ReadNotificationDto {
     @Expose()
-    user_id: number;
+    userId: number;
 
     @Expose()
     message: string;

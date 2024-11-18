@@ -19,11 +19,11 @@ export class Installation extends BaseEntity {
 
     // Muchas instalacion puede tener una propiedad
     @ManyToOne(() => Property, property => property.installations)
-    @JoinColumn({ name: 'property_id' })
+    @JoinColumn({ name: 'propertyId' })
     property: Property;
 
     // Muchas instalaciones pueden tener una clasificacion
     @ManyToOne(() => Classification, classification => classification.installations)
-    @JoinColumn({ name: 'classification_id' })
+    @JoinColumn({ name: 'classificationId' })
     classification: Classification;
 }

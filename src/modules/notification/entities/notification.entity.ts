@@ -18,11 +18,11 @@ export class Notification extends BaseEntity {
 
     // Muchas notificaciones pueden pertenecer a una propiedad
     @ManyToOne(() => Property, property => property.notifications)
-    @JoinColumn({ name: 'property_id' })
+    @JoinColumn({ name: 'propertyId' })
     property: Property;
 
     // Muchas notificaciones pueden pertenecer a un usuario
     @ManyToOne(() => User, user => user.notifications)
-    @JoinColumn({ name: 'user_id' })
+    @JoinColumn({ name: 'userId' })
     user: User;
 }

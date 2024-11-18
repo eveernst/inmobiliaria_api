@@ -81,4 +81,9 @@ export class CreateInsuranceDto {
     @IsNotEmpty()
     @IsRequired()
     observations: string;
+
+    @IsNumber()
+    @IsNotEmpty()
+    @IsRequired()
+    propertyId: number;
 }

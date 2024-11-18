@@ -1,4 +1,5 @@
 import { Expose } from "class-transformer";
+import { Classification } from "src/modules/classification/entities/classification.entity";
 
 export class ReadPropertyDto {
     @Expose()
@@ -51,4 +52,7 @@ export class ReadPropertyDto {
 
     @Expose()
     description: string;
+
+    @Expose()
+    classification: Classification;
 }

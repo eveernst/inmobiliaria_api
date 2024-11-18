@@ -45,6 +45,6 @@ export class Rented extends BaseEntity {
 
     // Muchos alquileres pueden pertenecer a una propiedad
     @ManyToOne(() => Property, property => property.renteds)
-    @JoinColumn({ name: 'property_id' })
+    @JoinColumn({ name: 'propertyId' })
     property: Property;
 }
