@@ -18,9 +18,7 @@ export class CreateWritingDto {
     voteDateJDAAC: Date;
 
     @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    imageJDAAC: string;
+    imageJDAAC?: string;
 
     @IsNumber()
     @IsNotEmpty()
@@ -33,9 +31,7 @@ export class CreateWritingDto {
     voteDateJDUA: Date;
 
     @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    imageJDUA: string;
+    imageJDUA?: string;
 
     @IsString()
     @IsNotEmpty()
@@ -108,14 +104,10 @@ export class CreateWritingDto {
     notaryContact: number;
 
     @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    interiorImage: string;
+    interiorImage?: string;
 
     @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    exteriorImage: string;
+    exteriorImage?: string;
 
     @IsString()
     formalities: string;

@@ -13,6 +13,8 @@ import { InstallationModule } from './modules/installation/installation.module';
 import { ClassificationModule } from './modules/classification/classification.module';
 import { InsuranceModule } from './modules/insurance-record/insurance.module';
 import { PlanModule } from './modules/plan-record/plan.module';
+import { RentedModule } from './modules/rented-record/rented.module';
+import { WritingModule } from './modules/writing-record/writing.module';
 
 @Module({
     imports: [
@@ -30,6 +32,8 @@ import { PlanModule } from './modules/plan-record/plan.module';
         ClassificationModule,
         InsuranceModule,
         PlanModule,
+        RentedModule,
+        WritingModule,
         // ServeStaticModule.forRoot({
         //     rootPath: join(__dirname, '../..', 'public'),
         //     serveRoot: '/api',

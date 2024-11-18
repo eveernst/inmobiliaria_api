@@ -23,10 +23,8 @@ export class RentedController {
   }
 
   @Post()
-  async create(@Body() rentedData: CreateRentedDto): Promise<GenericResponse<ReadRentedDto>> {
-    const rented = await this.rentedService.create(rentedData);
-    const response = plainToClass(ReadRentedDto, rented);
-    return new GenericResponse<ReadRentedDto>(response);
+  create(@Body() rentedData: CreateRentedDto): Promise<Rented> {
+    return this.rentedService.create(rentedData);
   }
 
   @Put(':id')

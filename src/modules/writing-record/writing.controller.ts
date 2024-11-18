@@ -23,10 +23,8 @@ export class WritingController {
   }
 
   @Post()
-  async create(@Body() writingData: CreateWritingDto): Promise<GenericResponse<ReadWritingDto>> {
-    const writing = await this.writingService.create(writingData);
-    const response = plainToClass(ReadWritingDto, writing);
-    return new GenericResponse<ReadWritingDto>(response);
+  create(@Body() writingData: CreateWritingDto): Promise<Writing> {
+    return this.writingService.create(writingData);
   }
 
   @Put(':id')

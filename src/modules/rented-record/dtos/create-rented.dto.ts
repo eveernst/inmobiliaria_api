@@ -1,4 +1,4 @@
-import { IsDate, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { IsRequired } from 'src/shared/decorators/is-required.decorator';
 
 export class CreateRentedDto {
@@ -69,6 +69,5 @@ export class CreateRentedDto {
     @IsString()
     contractImage?: string;
 
-    @IsRequired()
     property: number;
 }
