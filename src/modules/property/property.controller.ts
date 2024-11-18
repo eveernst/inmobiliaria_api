@@ -5,14 +5,20 @@ import { CreatePropertyDto } from './dtos/create-property.dto';
 import { GenericResponse } from 'src/shared/generic-response.dto';
 import { plainToClass } from 'class-transformer';
 import { ReadPropertyDto } from './dtos/read-property.dto';
+import { ReadPropertyInstallationDto } from './dtos/read-property-installation.dto';
 
 @Controller('property')
 export class PropertyController {
   constructor(private readonly propertyService: PropertyService) {}
 
   @Get()
-  findAll(): Promise<Property[]> {
+  findAll(): Promise<ReadPropertyDto[]> {
     return this.propertyService.findAll();
+  }
+  
+  @Get(':id')
+  async findOne(@Param('id') id: number): Promise<ReadPropertyInstallationDto> {
+    return await this.propertyService.findOne(id);
   }
 
   @Post()
@@ -22,16 +28,8 @@ export class PropertyController {
     return new GenericResponse<ReadPropertyDto>(response);
   }
   
-  @Get(':id')
-  async findOne(@Param('id') id: number): Promise<GenericResponse<ReadPropertyDto>> {
-    const property = await this.propertyService.findOne(id);
-    const response = plainToClass(ReadPropertyDto, property);
-    return new GenericResponse<ReadPropertyDto>(response);
-  }
-
-
   @Put(':id')
-  update(@Param('id') id: number, @Body() propertyData: Partial<Property>): Promise<Property> {
+  update(@Param('id') id: number, @Body() propertyData: Partial<Property>): Promise<ReadPropertyInstallationDto> {
     return this.propertyService.update(id, propertyData);
   }
 

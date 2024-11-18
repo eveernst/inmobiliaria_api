@@ -1,6 +1,7 @@
 import { Expose, Type } from "class-transformer";
-import { ReadClassificationDto } from "../../classification/dtos/read-classification.dto";
-export class ReadPropertyDto {
+import { ReadClassificationDto } from "src/modules/classification/dtos/read-classification.dto";
+import { ReadInstallationDto } from "src/modules/installation/dtos/read-installation.dto";
+export class ReadPropertyInstallationDto {
     @Expose()
     goodUseCode: number;
 
@@ -49,6 +50,10 @@ export class ReadPropertyDto {
     @Expose()
     @Type(() => ReadClassificationDto) // Mapeará automáticamente al sub-DTO
     classification: ReadClassificationDto;
+    
+    @Expose()
+    @Type(() => ReadInstallationDto) // Mapeará automáticamente al sub-DTO
+    installations: ReadInstallationDto[];
 
     @Expose()
     id: number;
