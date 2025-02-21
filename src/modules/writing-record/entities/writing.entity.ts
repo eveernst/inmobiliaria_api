@@ -84,6 +84,6 @@ export class Writing extends BaseEntity {
 
   // Una escritura puede pertenecer a una propiedad
   @ManyToOne(() => Property, property => property.writings)
-  @JoinColumn({ name: 'propertyId'})
-  property: Property;  
+  @JoinColumn({ name: 'propertyId' })
+  property: Property;
 }

@@ -8,10 +8,10 @@ import { Property } from '../property/entities/property.entity';
 @Injectable()
 export class RentedService {
   constructor(
-    @InjectRepository(Property)
-    private readonly propertyRepository: Repository<Property>,
     @InjectRepository(Rented)
     private readonly rentedRepository: Repository<Rented>,
+    @InjectRepository(Property)
+    private readonly propertyRepository: Repository<Property>,
   ) {}
 
   findAll(): Promise<Rented[]> {
@@ -33,13 +33,16 @@ export class RentedService {
 
   async create(createRentedDto: CreateRentedDto): Promise<Rented> {
     const property = await this.propertyRepository.findOne({
-        where: { id: createRentedDto.property },
+        where: { id: createRentedDto.propertyId },
     });
+    if (!property) {
+      throw new Error('Property not found');
+    }
     const rented = this.rentedRepository.create({
         ...createRentedDto,
         property,
     });
     await this.rentedRepository.save(rented);
     return rented;
-}
+  }
 }

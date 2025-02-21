@@ -19,4 +19,9 @@ export class CreateInstallationDto {
     @IsNotEmpty()
     @IsRequired()
     details: string;
+
+    @IsNumber()
+    @IsNotEmpty()
+    @IsRequired()
+    classificationId: number;
 }

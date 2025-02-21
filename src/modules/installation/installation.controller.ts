@@ -11,7 +11,7 @@ export class InstallationController {
   constructor(private readonly installationService: InstallationService) {}
 
   @Get()
-  findAll(): Promise<Installation[]> {
+  findAll(): Promise<ReadInstallationDto[]> {
     return this.installationService.findAll();
   }
 

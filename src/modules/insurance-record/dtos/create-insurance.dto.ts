@@ -1,4 +1,4 @@
-import { IsBoolean, IsDate, IsEmail, IsNotEmpty, IsNumber, isString, IsString } from "class-validator";
+import { IsBoolean, IsDate, IsEmail, IsNotEmpty, IsNumber, IsPhoneNumber, isString, IsString } from "class-validator";
 import { Property } from "src/modules/property/entities/property.entity";
 import { IsRequired } from "src/shared/decorators/is-required.decorator";
 

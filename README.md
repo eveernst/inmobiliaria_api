@@ -1,3 +1,10 @@
+hay que agregar los carteles en el front avisando el error o porque no se puede guardar.
+- cuando faltan datos
+- cuando un dato esta fuera de rango
+- cuando ya fue usado un mail
+- si en la documentacion se puede usar mas de una vez el mismo mail habria que arreglarlo, pq en este moment no see puede repetir el mismo mail.
+
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>

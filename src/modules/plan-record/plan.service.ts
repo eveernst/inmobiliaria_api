@@ -8,10 +8,10 @@ import { Property } from "../property/entities/property.entity"
 @Injectable()
 export class PlanService {
     constructor(
-        @InjectRepository(Property)
-        private readonly propertyRepository: Repository<Property>,
         @InjectRepository(Plan)
         private readonly planRepository: Repository<Plan>,
+        @InjectRepository(Property)
+        private readonly propertyRepository: Repository<Property>,
     ) {}
 
     findAll(): Promise<Plan[]> {
@@ -31,9 +31,15 @@ export class PlanService {
         await this.planRepository.delete(id)
     }
 
-    async create(planData: CreatePlanDto): Promise<Plan> {
-        const property = await this.propertyRepository.findOne({ where: { id: planData.property } })
-        const plan = this.planRepository.create({ ...planData, property })
-        return this.planRepository.save(plan)
+    async create(createPlanDto: CreatePlanDto): Promise<Plan> {
+        const property = await this.propertyRepository.findOne({ 
+            where: { id: createPlanDto.propertyId } 
+        });
+        const plan = this.planRepository.create({ 
+            ...createPlanDto, 
+            property, 
+        });
+        await this.planRepository.save(plan);
+        return plan;
     }
 }

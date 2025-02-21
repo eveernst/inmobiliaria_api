@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
 import { RentedService } from './rented.service';
-import { Rented } from './entities/rented.entity';
 import { CreateRentedDto } from './dtos/create-rented.dto';
 import { ReadRentedDto } from './dtos/read-rented.dto';
 import { GenericResponse } from 'src/shared/generic-response.dto';
 import { plainToClass } from 'class-transformer';
+import { Rented } from './entities/rented.entity';
 
 @Controller('rented')
 export class RentedController {

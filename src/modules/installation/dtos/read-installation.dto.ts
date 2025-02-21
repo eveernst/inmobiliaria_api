@@ -1,4 +1,5 @@
-import { Expose } from "class-transformer";
+import { Expose, Type } from "class-transformer";
+import { ReadClassificationDto } from "src/modules/classification/dtos/read-classification.dto";
 
 export class ReadInstallationDto {
     @Expose()
@@ -15,4 +16,8 @@ export class ReadInstallationDto {
 
     @Expose()
     details: string;
+
+    @Expose()
+    @Type(() => ReadClassificationDto)
+    classification: ReadClassificationDto;
 }

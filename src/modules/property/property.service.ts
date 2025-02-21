@@ -35,7 +35,7 @@ export class PropertyService {
   async findOne(id: number): Promise<ReadPropertyInstallationDto> {
     const property = await this.propertyRepository.findOne({
       where: { id },
-      relations: ['classification', 'installations'], // Incluye las relaciones necesarias
+      relations: ['classification', 'installations', 'installations.classification'], // Incluye las relaciones necesarias
     });
 
     return plainToInstance(ReadPropertyInstallationDto, property, {
@@ -73,10 +73,62 @@ export class PropertyService {
     return property;
 }
 
-  async update(id: number, propertyData: Partial<Property>): Promise<ReadPropertyInstallationDto> {
-    await this.propertyRepository.update(id, propertyData);
-    return this.findOne(id);
+async update(id: number, propertyData: Partial<Property>): Promise<ReadPropertyInstallationDto> {
+  // Buscar la propiedad con sus relaciones necesarias
+  const property = await this.propertyRepository.findOne({
+      where: { id },
+      relations: ['classification', 'installations'],
+  });
+
+  if (!property) {
+      throw new Error('Property not found');
   }
+
+  // Verificar y asignar la nueva clasificación
+  if (propertyData.classification?.id) {
+      const classification = await this.classificationRepository.findOne({
+          where: { id: propertyData.classification.id },
+      });
+
+      if (!classification) {
+          throw new Error('Classification not found');
+      }
+
+      property.classification = classification;
+  }
+
+  // Actualizar los campos de la propiedad (sin relaciones)
+  const { installations, classification, ...propertyFields } = propertyData;
+  await this.propertyRepository.update(id, propertyFields); // Solo actualiza los campos simples
+
+  // Actualizar las instalaciones
+  if (installations && installations.length > 0) {
+      // Eliminar instalaciones existentes
+      await this.installationRepository.delete({ property: { id } });
+
+      // Crear nuevas instalaciones asociadas a la propiedad
+      const newInstallations = installations.map(installation =>
+          this.installationRepository.create({
+              ...installation,
+              property: { id }, // Asociar solo el ID de la propiedad
+          }),
+      );
+
+      await this.installationRepository.save(newInstallations);
+  }
+
+  // Retornar la propiedad actualizada con relaciones
+  const updatedProperty = await this.propertyRepository.findOne({
+      where: { id },
+      relations: ['classification', 'installations'],
+  });
+
+  if (!updatedProperty) {
+      throw new Error('Error retrieving updated property');
+  }
+
+  return updatedProperty;
+}
 
   async remove(id: number): Promise<void> {
     await this.propertyRepository.delete(id);

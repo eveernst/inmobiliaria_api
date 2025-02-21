@@ -118,6 +118,8 @@ export class CreateWritingDto {
     @IsString()
     detailSpaces: string;
 
+    @IsNumber()
+    @IsNotEmpty()
     @IsRequired()
-    property: number;
+    propertyId: number;
 }

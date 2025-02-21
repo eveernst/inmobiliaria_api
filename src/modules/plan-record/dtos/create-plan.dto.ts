@@ -128,5 +128,7 @@ export class CreatePlanDto {
     contacts: string;
 
     @IsNumber()
-    property: number;
+    @IsNotEmpty()
+    @IsRequired()
+    propertyId: number;
 }

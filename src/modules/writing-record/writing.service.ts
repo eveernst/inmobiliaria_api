@@ -8,10 +8,10 @@ import { Property } from "../property/entities/property.entity";
 @Injectable()
 export class WritingService {
   constructor(
+    @InjectRepository(Writing)
+    private readonly writingRepository: Repository<Writing>,
     @InjectRepository(Property)
     private readonly propertyRepository: Repository<Property>,
-    @InjectRepository(Writing)
-    private readonly writingRepository: Repository<Writing>
   ) {}
 
   findAll(): Promise<Writing[]> {
@@ -32,14 +32,15 @@ export class WritingService {
   }
 
   async create(createWritingDto: CreateWritingDto): Promise<Writing> {
+          
     const property = await this.propertyRepository.findOne({
-        where: { id: createWritingDto.property },
-    });
+      where: { id: createWritingDto.propertyId },
+      });
     const writing = this.writingRepository.create({
-        ...createWritingDto,
-        property,
-    });
+      ...createWritingDto,
+      property,
+      });
     await this.writingRepository.save(writing);
     return writing;
-}
+    }
 }
