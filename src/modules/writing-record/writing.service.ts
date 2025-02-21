@@ -32,7 +32,7 @@ export class WritingService {
   }
 
   async create(createWritingDto: CreateWritingDto): Promise<Writing> {
-          
+        
     const property = await this.propertyRepository.findOne({
       where: { id: createWritingDto.propertyId },
       });
