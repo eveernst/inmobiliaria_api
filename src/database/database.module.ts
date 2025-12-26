@@ -1,8 +1,32 @@
+// import { Module } from '@nestjs/common';
+// import { databaseProviders } from './database.service';
+
+// @Module({
+//     imports: [...databaseProviders],
+//     exports: [...databaseProviders],
+// })
+// export class DatabaseModule {}
 import { Module } from '@nestjs/common';
-import { databaseProviders } from './database.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
-    imports: [...databaseProviders],
-    exports: [...databaseProviders],
+  imports: [
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        type: 'mysql',
+        host: config.get('DB_HOST'),
+        port: Number(config.get('DB_PORT')),
+        username: config.get('DB_USER'),
+        password: config.get('DB_PASSWORD'),
+        database: config.get('DB_NAME'),
+        autoLoadEntities: true,
+        synchronize: true, // ⚠️ solo en desarrollo: 
+                           // cuando este en produccion hay que cambiarlo a false
+      }),
+    }),
+  ],
 })
 export class DatabaseModule {}

@@ -1,4 +1,5 @@
 import { Expose } from "class-transformer";
+import { Property } from "src/modules/property/entities/property.entity";
 
 export class ReadInsuranceDto {
     @Expose()
@@ -22,37 +23,37 @@ export class ReadInsuranceDto {
     insuranceASE: boolean;
 
     @Expose()
-    property: number;
-
-    @Expose()
     team: boolean;
-
+    
     @Expose()
     content: boolean;
-
+    
     @Expose()
     values: boolean;
-
+    
     // formulario del seguro
     @Expose()
-    insuranceLink: string;
-
+    insuranceLink?: string;
+    
     @Expose()
-    insuranceImage: string;
-
+    insuranceImage?: string;
+    
     @Expose()
-    insuranceDate: Date;
-
+    insuranceDate?: Date;
+    
     // formulario anual
     @Expose()
-    AnualFormLink: string;
-
+    AnualFormLink?: string;
+    
     @Expose()
-    AnualFormImage: string;
-
+    AnualFormImage?: string;
+    
     @Expose()
-    AnualFormDate: Date;
-
+    AnualFormDate?: Date;
+    
     @Expose()
     observations: string;
+    
+    @Expose()
+    property: Property;
 }

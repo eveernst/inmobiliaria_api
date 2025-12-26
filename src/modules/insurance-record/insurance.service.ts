@@ -15,11 +15,14 @@ export class InsuranceService {
     ) {}
     
     findAll(): Promise<Insurance[]> {
-        return this.insuranceRepository.find();
+        return this.insuranceRepository.find({ relations: ['property'] });
     }
     
     findOne(id: number): Promise<Insurance> {
-        return this.insuranceRepository.findOne({ where: { id } });
+        return this.insuranceRepository.findOne({ 
+            where: { id },
+            relations: ['property'],
+        });
     }
         
     async update(id: number, insuranceData: Partial<Insurance>): Promise<Insurance> {

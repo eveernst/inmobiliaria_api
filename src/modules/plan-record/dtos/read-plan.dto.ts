@@ -62,7 +62,7 @@ export class ReadPlanDto {
     stateImage: string;
 
     @Expose()
-    professional: string;
+    profesional: string;
 
     @Expose()
     professionalContact: string;

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { Property } from "./entities/property.entity";
 import { CreatePropertyDto } from "./dtos/create-property.dto";
 import { Classification } from "../classification/entities/classification.entity";
@@ -9,6 +9,10 @@ import { Installation } from "../installation/entities/installation.entity";
 import { ReadPropertyDto } from "./dtos/read-property.dto";
 import { plainToInstance } from "class-transformer";
 import { ReadPropertyInstallationDto } from "./dtos/read-property-installation.dto";
+import { Insurance } from "../insurance-record/entities/insurance.entity";
+import { Plan } from "../plan-record/entities/plan.entity";
+import { Rented } from "../rented-record/entities/rented.entity";
+import { Writing } from "../writing-record/entities/writing.entity";
 
 @Injectable()
 export class PropertyService {
@@ -18,12 +22,28 @@ export class PropertyService {
     @InjectRepository(Classification)
     private readonly classificationRepository: Repository<Classification>,
     @InjectRepository(Installation)
-    private readonly installationRepository: Repository<Installation>
+    private readonly installationRepository: Repository<Installation>,
+    @InjectRepository(Insurance)
+    private readonly insuranceRepository: Repository<Insurance>,
+    @InjectRepository(Plan)
+    private readonly planRepository: Repository<Plan>,
+    @InjectRepository(Rented)
+    private readonly rentedRepository: Repository<Rented>,
+    @InjectRepository(Writing)
+    private readonly writingRepository: Repository<Writing>,
   ) {}
 
   async findAll(): Promise<ReadPropertyDto[]> {
     const properties = await this.propertyRepository.find({
-      relations: ['classification'], // Incluye la relación necesaria
+      relations: [
+        'classification',
+        'installations',
+        'installations.classification',
+        'writings',
+        'renteds',
+        'insurances',
+        'plans',
+      ], // Incluye la relación necesaria
     });
 
     // Transforma las entidades en instancias de ReadPropertyDto
@@ -35,8 +55,20 @@ export class PropertyService {
   async findOne(id: number): Promise<ReadPropertyInstallationDto> {
     const property = await this.propertyRepository.findOne({
       where: { id },
-      relations: ['classification', 'installations', 'installations.classification'], // Incluye las relaciones necesarias
+      relations: [
+        'classification', 
+        'installations',
+        // 'installations.classification',
+        'writings',
+        'renteds',
+        'insurances',
+        'plans',
+      ], // Incluye las relaciones necesarias
     });
+
+    if (!property) {
+      throw new Error('Property not found');
+    }
 
     return plainToInstance(ReadPropertyInstallationDto, property, {
       excludeExtraneousValues: true, // Solo incluye campos marcados con @Expose
@@ -77,7 +109,7 @@ async update(id: number, propertyData: Partial<Property>): Promise<ReadPropertyI
   // Buscar la propiedad con sus relaciones necesarias
   const property = await this.propertyRepository.findOne({
       where: { id },
-      relations: ['classification', 'installations'],
+      relations: ['classification', 'installations', 'insurances', 'plans', 'renteds', 'writings'],
   });
 
   if (!property) {
@@ -120,7 +152,7 @@ async update(id: number, propertyData: Partial<Property>): Promise<ReadPropertyI
   // Retornar la propiedad actualizada con relaciones
   const updatedProperty = await this.propertyRepository.findOne({
       where: { id },
-      relations: ['classification', 'installations'],
+      relations: ['classification', 'installations', 'insurances', 'plans', 'renteds', 'writings'],
   });
 
   if (!updatedProperty) {
