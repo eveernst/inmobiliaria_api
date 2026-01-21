@@ -45,8 +45,8 @@ export class Property extends BaseEntity {
   @Column({ length: 100 })
   district: string;
 
-  @Column({ length: 100 })
-  destiny: string;
+  @Column()
+  destiny: number;
 
   @Column()
   state: number; // 1: alquilado, 2: disponible, 3: vendido, etc

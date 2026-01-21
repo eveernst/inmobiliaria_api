@@ -48,9 +48,9 @@ export class CreatePropertyDto {
     @IsRequired()
     district: string;
 
-    @IsString()
+    @IsNumber()
     @IsRequired()
-    destiny: string; // hablar cpn ale
+    destiny: number; 
 
     @IsNumber()
     @IsRequired()

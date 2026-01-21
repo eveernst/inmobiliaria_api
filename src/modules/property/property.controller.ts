@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, ParseIntPipe } from '@nestjs/common';
 import { PropertyService } from './property.service';
 import { Property } from './entities/property.entity';
 import { CreatePropertyDto } from './dtos/create-property.dto';
@@ -17,7 +17,7 @@ export class PropertyController {
   }
   
   @Get(':id')
-  async findOne(@Param('id') id: number): Promise<ReadPropertyInstallationDto> {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<ReadPropertyInstallationDto> {
     return await this.propertyService.findOne(id);
   }
 
@@ -29,12 +29,12 @@ export class PropertyController {
   }
   
   @Put(':id')
-  update(@Param('id') id: number, @Body() propertyData: Partial<Property>): Promise<ReadPropertyInstallationDto> {
+  update(@Param('id', ParseIntPipe) id: number, @Body() propertyData: Partial<Property>): Promise<ReadPropertyInstallationDto> {
     return this.propertyService.update(id, propertyData);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number): Promise<void> {
+  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.propertyService.remove(id);
   }
 }

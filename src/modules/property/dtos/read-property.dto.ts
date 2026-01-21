@@ -29,7 +29,7 @@ export class ReadPropertyDto {
     district: string;
 
     @Expose()
-    destiny: string;
+    destiny: number;
 
     @Expose()
     state: number; // 1: alquilado, 2: disponible, 3: vendido, etc
