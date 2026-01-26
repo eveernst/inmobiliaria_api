@@ -21,7 +21,7 @@ export class Property extends BaseEntity {
   // @Column()
   // outerImage: string;
 
-  @Column({ length: 255 })
+  @Column({ length: 255, nullable: true })
   file?: string;
 
   @Column({ length: 100 })
@@ -64,9 +64,9 @@ export class Property extends BaseEntity {
   description: string;
 
   // Muchas propiedades pertenecen a un usuario
-  @ManyToOne(() => User, user => user.property)
+  @ManyToOne(() => User, user => user.property, { nullable: true })
   @JoinColumn({ name: 'userId' }) // Especifica el nombre de la FK en la tabla property
-  user: User;
+  user?: User;
 
   @ManyToOne(() => Classification, classification => classification.properties)
   @JoinColumn({ name: 'classificationId' }) // Especifica el nombre de la FK en la tabla property

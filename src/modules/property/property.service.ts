@@ -117,21 +117,33 @@ async update(id: number, propertyData: Partial<Property>): Promise<ReadPropertyI
   }
 
   // Verificar y asignar la nueva clasificación
-  if (propertyData.classification?.id) {
+  const classificationId = typeof propertyData.classification === 'object' 
+    ? propertyData.classification?.id 
+    : parseInt(propertyData.classification as any);
+
+  let classificationToSave = null;
+  if (classificationId && !isNaN(classificationId)) {
       const classification = await this.classificationRepository.findOne({
-          where: { id: propertyData.classification.id },
+          where: { id: classificationId },
       });
 
       if (!classification) {
           throw new Error('Classification not found');
       }
 
-      property.classification = classification;
+      classificationToSave = classification;
   }
 
   // Actualizar los campos de la propiedad (sin relaciones)
-  const { installations, classification, ...propertyFields } = propertyData;
-  await this.propertyRepository.update(id, propertyFields); // Solo actualiza los campos simples
+  const { installations, classification, user, insurances, plans, renteds, writings, id: propertyId, ...propertyFields } = propertyData as any;
+  
+  // Actualizar campos simples
+  await this.propertyRepository.update(id, propertyFields);
+  
+  // Actualizar clasificación si existe
+  if (classificationToSave) {
+    await this.propertyRepository.update(id, { classification: classificationToSave });
+  }
 
   // Actualizar las instalaciones
   if (installations && installations.length > 0) {

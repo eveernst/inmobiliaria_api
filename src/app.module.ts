@@ -8,6 +8,7 @@ import { AppService } from './app.service';
 
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './modules/users/users.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { PropertyModule } from './modules/property/property.module';
 import { InstallationModule } from './modules/installation/installation.module';
 import { ClassificationModule } from './modules/classification/classification.module';
@@ -30,6 +31,7 @@ import { WritingModule } from './modules/writing-record/writing.module';
         DatabaseModule,
         NotificationModule,
         UsersModule,
+        AuthModule,
         PropertyModule,
         InstallationModule,
         ClassificationModule,
