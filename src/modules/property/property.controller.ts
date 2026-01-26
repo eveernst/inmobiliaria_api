@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { PropertyService } from './property.service';
 import { Property } from './entities/property.entity';
 import { CreatePropertyDto } from './dtos/create-property.dto';
@@ -22,7 +22,7 @@ export class PropertyController {
   }
   
   @Get(':id')
-  async findOne(@Param('id') id: number): Promise<ReadPropertyInstallationDto> {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<ReadPropertyInstallationDto> {
     return await this.propertyService.findOne(id);
   }
 
@@ -36,7 +36,7 @@ export class PropertyController {
   
   @Put(':id')
   @Roles(UserRole.ADMIN)
-  update(@Param('id') id: number, @Body() propertyData: Partial<Property>): Promise<ReadPropertyInstallationDto> {
+  update(@Param('id', ParseIntPipe) id: number, @Body() propertyData: Partial<Property>): Promise<ReadPropertyInstallationDto> {
     console.log('=== UPDATE PROPERTY ===');
     console.log('ID:', id);
     console.log('Data received:', JSON.stringify(propertyData, null, 2));
@@ -45,7 +45,7 @@ export class PropertyController {
 
   @Delete(':id')
   @Roles(UserRole.ADMIN)
-  remove(@Param('id') id: number): Promise<void> {
+  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.propertyService.remove(id);
   }
 }
