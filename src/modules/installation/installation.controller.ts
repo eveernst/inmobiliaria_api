@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { InstallationService } from './installation.service';
 import { Installation } from './entities/installation.entity';
 import { CreateInstallationDto } from './dtos/create-installation.dto';
@@ -16,21 +24,29 @@ export class InstallationController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number): Promise<GenericResponse<ReadInstallationDto>> {
+  async findOne(
+    @Param('id') id: number,
+  ): Promise<GenericResponse<ReadInstallationDto>> {
     const installation = await this.installationService.findOne(id);
     const response = plainToClass(ReadInstallationDto, installation);
     return new GenericResponse<ReadInstallationDto>(response);
   }
 
   @Post()
-  async create(@Body() installationData: CreateInstallationDto): Promise<GenericResponse<ReadInstallationDto>> {
-    const installation = await this.installationService.create(installationData);
+  async create(
+    @Body() installationData: CreateInstallationDto,
+  ): Promise<GenericResponse<ReadInstallationDto>> {
+    const installation =
+      await this.installationService.create(installationData);
     const response = plainToClass(ReadInstallationDto, installation);
     return new GenericResponse<ReadInstallationDto>(response);
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() installationData: Partial<Installation>): Promise<Installation> {
+  update(
+    @Param('id') id: number,
+    @Body() installationData: Partial<Installation>,
+  ): Promise<Installation> {
     return this.installationService.update(id, installationData);
   }
 

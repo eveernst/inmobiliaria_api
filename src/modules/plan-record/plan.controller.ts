@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { PlanService } from './plan.service';
 import { Plan } from './entities/plan.entity';
 import { CreatePlanDto } from './dtos/create-plan.dto';
@@ -16,7 +24,9 @@ export class PlanController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number): Promise<GenericResponse<ReadPlanDto>> {
+  async findOne(
+    @Param('id') id: number,
+  ): Promise<GenericResponse<ReadPlanDto>> {
     const plan = await this.planService.findOne(id);
     const response = plainToClass(ReadPlanDto, plan);
     return new GenericResponse<ReadPlanDto>(response);
@@ -28,7 +38,10 @@ export class PlanController {
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() planData: Partial<Plan>): Promise<Plan> {
+  update(
+    @Param('id') id: number,
+    @Body() planData: Partial<Plan>,
+  ): Promise<Plan> {
     return this.planService.update(id, planData);
   }
 

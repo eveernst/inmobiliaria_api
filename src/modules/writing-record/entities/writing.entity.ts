@@ -5,15 +5,15 @@ import { Property } from 'src/modules/property/entities/property.entity';
 @Entity()
 export class Writing extends BaseEntity {
   @Column()
-    writingNumber: number;
+  writingNumber: number;
 
   @Column()
-   voteNumberJDAAC: number;
+  voteNumberJDAAC: number;
 
   @Column()
   voteDateJDAAC: Date;
 
-  @Column()
+  @Column({ length: 1024, nullable: true })
   imageJDAAC: string;
 
   @Column()
@@ -22,7 +22,7 @@ export class Writing extends BaseEntity {
   @Column()
   voteDateJDUA: Date;
 
-  @Column()
+  @Column({ length: 1024, nullable: true })
   imageJDUA: string;
 
   @Column()
@@ -30,7 +30,7 @@ export class Writing extends BaseEntity {
 
   @Column()
   folio: string;
-    
+
   @Column()
   tomo: string;
 
@@ -55,10 +55,10 @@ export class Writing extends BaseEntity {
   @Column()
   cadastralNomenclature: string;
 
-  @Column()
+  @Column({ length: 1024, nullable: true })
   ubicationMap: string;
 
-  @Column()
+  @Column({ length: 1024, nullable: true })
   cadastralInform: string;
 
   @Column()
@@ -67,10 +67,10 @@ export class Writing extends BaseEntity {
   @Column()
   notaryContact: number;
 
-  @Column()
+  @Column({ length: 1024, nullable: true })
   interiorImage: string;
 
-  @Column()
+  @Column({ length: 1024, nullable: true })
   exteriorImage: string;
 
   @Column()
@@ -83,7 +83,9 @@ export class Writing extends BaseEntity {
   detailSpaces: string;
 
   // Una escritura puede pertenecer a una propiedad
-  @ManyToOne(() => Property, property => property.writings)
+  @ManyToOne(() => Property, (property) => property.writings, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'propertyId' })
   property: Property;
 }

@@ -1,9 +1,13 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { Writing } from "./entities/writing.entity";
-import { CreateWritingDto } from "./dtos/create-writing.dto";
-import { Property } from "../property/entities/property.entity";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Writing } from './entities/writing.entity';
+import { CreateWritingDto } from './dtos/create-writing.dto';
+import { Property } from '../property/entities/property.entity';
 
 @Injectable()
 export class WritingService {
@@ -15,11 +19,14 @@ export class WritingService {
   ) {}
 
   findAll(): Promise<Writing[]> {
-    return this.writingRepository.find();
+    return this.writingRepository.find({ relations: ['property'] });
   }
 
   findOne(id: number): Promise<Writing> {
-    return this.writingRepository.findOne({ where: { id } });
+    return this.writingRepository.findOne({
+      where: { id },
+      relations: ['property'],
+    });
   }
 
   async update(id: number, writingData: Partial<Writing>): Promise<Writing> {
@@ -32,15 +39,21 @@ export class WritingService {
   }
 
   async create(createWritingDto: CreateWritingDto): Promise<Writing> {
-        
+    if (!createWritingDto.propertyId) {
+      throw new BadRequestException('propertyId is required');
+    }
+
     const property = await this.propertyRepository.findOne({
       where: { id: createWritingDto.propertyId },
-      });
+    });
+    if (!property) {
+      throw new NotFoundException('Property not found');
+    }
     const writing = this.writingRepository.create({
       ...createWritingDto,
       property,
-      });
+    });
     await this.writingRepository.save(writing);
     return writing;
-    }
+  }
 }

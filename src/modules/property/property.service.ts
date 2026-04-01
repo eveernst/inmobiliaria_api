@@ -1,18 +1,18 @@
-import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository } from "typeorm";
-import { Property } from "./entities/property.entity";
-import { CreatePropertyDto } from "./dtos/create-property.dto";
-import { Classification } from "../classification/entities/classification.entity";
-import { ReadInstallationDto } from "../installation/dtos/read-installation.dto";
-import { Installation } from "../installation/entities/installation.entity";
-import { ReadPropertyDto } from "./dtos/read-property.dto";
-import { plainToInstance } from "class-transformer";
-import { ReadPropertyInstallationDto } from "./dtos/read-property-installation.dto";
-import { Insurance } from "../insurance-record/entities/insurance.entity";
-import { Plan } from "../plan-record/entities/plan.entity";
-import { Rented } from "../rented-record/entities/rented.entity";
-import { Writing } from "../writing-record/entities/writing.entity";
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Property } from './entities/property.entity';
+import { CreatePropertyDto } from './dtos/create-property.dto';
+import { Classification } from '../classification/entities/classification.entity';
+import { Installation } from '../installation/entities/installation.entity';
+import { ReadPropertyDto } from './dtos/read-property.dto';
+import { plainToInstance } from 'class-transformer';
+import { ReadPropertyInstallationDto } from './dtos/read-property-installation.dto';
+import { Insurance } from '../insurance-record/entities/insurance.entity';
+import { Plan } from '../plan-record/entities/plan.entity';
+import { Rented } from '../rented-record/entities/rented.entity';
+import { Writing } from '../writing-record/entities/writing.entity';
+import { Notification } from '../notification/entities/notification.entity';
 
 @Injectable()
 export class PropertyService {
@@ -31,6 +31,8 @@ export class PropertyService {
     private readonly rentedRepository: Repository<Rented>,
     @InjectRepository(Writing)
     private readonly writingRepository: Repository<Writing>,
+    @InjectRepository(Notification)
+    private readonly notificationRepository: Repository<Notification>,
   ) {}
 
   async findAll(): Promise<ReadPropertyDto[]> {
@@ -50,13 +52,13 @@ export class PropertyService {
     return plainToInstance(ReadPropertyDto, properties, {
       excludeExtraneousValues: true, // Solo incluye campos marcados con @Expose
     });
-  } 
+  }
 
   async findOne(id: number): Promise<ReadPropertyInstallationDto> {
     const property = await this.propertyRepository.findOne({
       where: { id },
       relations: [
-        'classification', 
+        'classification',
         'installations',
         // 'installations.classification',
         'writings',
@@ -77,104 +79,145 @@ export class PropertyService {
 
   async create(createPropertyDto: CreatePropertyDto): Promise<Property> {
     const classification = await this.classificationRepository.findOne({
-        where: { id: createPropertyDto.classification },
+      where: { id: createPropertyDto.classification },
     });
 
     if (!classification) {
-        throw new Error('Classification not found');
+      throw new Error('Classification not found');
     }
 
     const property = this.propertyRepository.create({
-        ...createPropertyDto,
-        classification,
+      ...createPropertyDto,
+      classification,
     });
- console.log(property);
+    console.log(property);
     await this.propertyRepository.save(property);
 
     // Guardar las instalaciones de esta propiedad
     if (createPropertyDto.installations) {
-        // Crear las instalaciones en la base de datos y asociarlas a la propiedad
-        const installations = createPropertyDto.installations.map(installation => {
-            return this.installationRepository.create({
-                ...installation,
-                property,
-            });
-        });
-        await this.installationRepository.save(installations);
+      // Crear las instalaciones en la base de datos y asociarlas a la propiedad
+      const installations = createPropertyDto.installations.map(
+        (installation) => {
+          return this.installationRepository.create({
+            ...installation,
+            property,
+          });
+        },
+      );
+      await this.installationRepository.save(installations);
     }
     return property;
-}
-
-async update(id: number, propertyData: Partial<Property>): Promise<ReadPropertyInstallationDto> {
-  // Buscar la propiedad con sus relaciones necesarias
-  const property = await this.propertyRepository.findOne({
-      where: { id },
-      relations: ['classification', 'installations', 'insurances', 'plans', 'renteds', 'writings'],
-  });
-
-  if (!property) {
-      throw new Error('Property not found');
   }
 
-  // Verificar y asignar la nueva clasificación
-  const classificationId = typeof propertyData.classification === 'object' 
-    ? propertyData.classification?.id 
-    : parseInt(propertyData.classification as any);
+  async update(
+    id: number,
+    propertyData: Partial<Property>,
+  ): Promise<ReadPropertyInstallationDto> {
+    // Buscar la propiedad con sus relaciones necesarias
+    const property = await this.propertyRepository.findOne({
+      where: { id },
+      relations: [
+        'classification',
+        'installations',
+        'insurances',
+        'plans',
+        'renteds',
+        'writings',
+      ],
+    });
 
-  let classificationToSave = null;
-  if (classificationId && !isNaN(classificationId)) {
+    if (!property) {
+      throw new Error('Property not found');
+    }
+
+    // Verificar y asignar la nueva clasificación
+    const classificationId =
+      typeof propertyData.classification === 'object'
+        ? propertyData.classification?.id
+        : parseInt(propertyData.classification as any);
+
+    let classificationToSave = null;
+    if (classificationId && !isNaN(classificationId)) {
       const classification = await this.classificationRepository.findOne({
-          where: { id: classificationId },
+        where: { id: classificationId },
       });
 
       if (!classification) {
-          throw new Error('Classification not found');
+        throw new Error('Classification not found');
       }
 
       classificationToSave = classification;
-  }
+    }
 
-  // Actualizar los campos de la propiedad (sin relaciones)
-  const { installations, classification, user, insurances, plans, renteds, writings, id: propertyId, ...propertyFields } = propertyData as any;
-  
-  // Actualizar campos simples
-  await this.propertyRepository.update(id, propertyFields);
-  
-  // Actualizar clasificación si existe
-  if (classificationToSave) {
-    await this.propertyRepository.update(id, { classification: classificationToSave });
-  }
+    // Actualizar los campos de la propiedad (sin relaciones)
+    const { installations, ...propertyFields } = propertyData as any;
 
-  // Actualizar las instalaciones
-  if (installations && installations.length > 0) {
+    delete propertyFields.classification;
+    delete propertyFields.user;
+    delete propertyFields.insurances;
+    delete propertyFields.plans;
+    delete propertyFields.renteds;
+    delete propertyFields.writings;
+    delete propertyFields.id;
+
+    // Actualizar campos simples
+    await this.propertyRepository.update(id, propertyFields);
+
+    // Actualizar clasificación si existe
+    if (classificationToSave) {
+      await this.propertyRepository.update(id, {
+        classification: classificationToSave,
+      });
+    }
+
+    // Actualizar las instalaciones
+    if (installations && installations.length > 0) {
       // Eliminar instalaciones existentes
       await this.installationRepository.delete({ property: { id } });
 
       // Crear nuevas instalaciones asociadas a la propiedad
-      const newInstallations = installations.map(installation =>
-          this.installationRepository.create({
-              ...installation,
-              property: { id }, // Asociar solo el ID de la propiedad
-          }),
+      const newInstallations = installations.map((installation) =>
+        this.installationRepository.create({
+          ...installation,
+          property: { id }, // Asociar solo el ID de la propiedad
+        }),
       );
 
       await this.installationRepository.save(newInstallations);
-  }
+    }
 
-  // Retornar la propiedad actualizada con relaciones
-  const updatedProperty = await this.propertyRepository.findOne({
+    // Retornar la propiedad actualizada con relaciones
+    const updatedProperty = await this.propertyRepository.findOne({
       where: { id },
-      relations: ['classification', 'installations', 'insurances', 'plans', 'renteds', 'writings'],
-  });
+      relations: [
+        'classification',
+        'installations',
+        'insurances',
+        'plans',
+        'renteds',
+        'writings',
+      ],
+    });
 
-  if (!updatedProperty) {
+    if (!updatedProperty) {
       throw new Error('Error retrieving updated property');
-  }
+    }
 
-  return updatedProperty;
-}
+    return updatedProperty;
+  }
 
   async remove(id: number): Promise<void> {
+    const property = await this.propertyRepository.findOne({ where: { id } });
+    if (!property) {
+      throw new Error('Property not found');
+    }
+
+    await this.notificationRepository.delete({ property: { id } });
+    await this.installationRepository.delete({ property: { id } });
+    await this.insuranceRepository.delete({ property: { id } });
+    await this.planRepository.delete({ property: { id } });
+    await this.rentedRepository.delete({ property: { id } });
+    await this.writingRepository.delete({ property: { id } });
     await this.propertyRepository.delete(id);
   }
 }

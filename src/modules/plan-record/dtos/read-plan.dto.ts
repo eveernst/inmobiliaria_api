@@ -1,87 +1,87 @@
-import { Expose } from "class-transformer";
+import { Expose } from 'class-transformer';
 
 export class ReadPlanDto {
-    @Expose()
-    generalPlan: boolean;
+  @Expose()
+  generalPlan: boolean;
 
-    @Expose()
-    planNumber: number;
+  @Expose()
+  planNumber: number;
 
-    @Expose()
-    year: number;
+  @Expose()
+  year: number;
 
-    @Expose()
-    planImage: string;
+  @Expose()
+  planImage: string;
 
-    @Expose()
-    structurePlan: boolean;
+  @Expose()
+  structurePlan: boolean;
 
-    @Expose()
-    structureImage: string;
+  @Expose()
+  structureImage: string;
 
-    @Expose()
-    gasPlan: boolean;
+  @Expose()
+  gasPlan: boolean;
 
-    @Expose()
-    gasImage: string;
+  @Expose()
+  gasImage: string;
 
-    @Expose()
-    waterPlan: boolean;
+  @Expose()
+  waterPlan: boolean;
 
-    @Expose()
-    waterImage: string;
+  @Expose()
+  waterImage: string;
 
-    @Expose()
-    lightPlan: boolean;
+  @Expose()
+  lightPlan: boolean;
 
-    @Expose()
-    lightImage: string;
+  @Expose()
+  lightImage: string;
 
-    @Expose()
-    projectPlan: boolean;
+  @Expose()
+  projectPlan: boolean;
 
-    @Expose()
-    projectImage: string;
+  @Expose()
+  projectImage: string;
 
-    @Expose()
-    finalPlan: boolean;
+  @Expose()
+  finalPlan: boolean;
 
-    @Expose()
-    finalImage: string;
+  @Expose()
+  finalImage: string;
 
-    @Expose()
-    planType: string;
+  @Expose()
+  planType: string;
 
-    @Expose()
-    planNumberUpdate: number;
+  @Expose()
+  planNumberUpdate: number;
 
-    @Expose()
-    yearUpdate: string;
+  @Expose()
+  yearUpdate: number;
 
-    @Expose()
-    stateImage: string;
+  @Expose()
+  stateImage: string;
 
-    @Expose()
-    profesional: string;
+  @Expose()
+  professional: string;
 
-    @Expose()
-    professionalContact: string;
+  @Expose()
+  professionalContact: string;
 
-    @Expose()
-    dateVisado: Date;
+  @Expose()
+  dateVisado: Date;
 
-    @Expose()
-    numberVisado: number;
+  @Expose()
+  numberVisado: number;
 
-    @Expose()
-    imageVisado: string;
+  @Expose()
+  imageVisado: string;
 
-    @Expose()
-    formalities: string;
+  @Expose()
+  formalities: string;
 
-    @Expose()
-    documentation: string;
+  @Expose()
+  documentation: string;
 
-    @Expose()
-    contacts: string;
+  @Expose()
+  contacts: string;
 }

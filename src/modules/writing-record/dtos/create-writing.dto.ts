@@ -1,125 +1,125 @@
-import { IsDate, IsNotEmpty, IsNumber, IsString } from "class-validator";
-import { IsRequired } from "../../../shared/decorators/is-required.decorator";
+import { IsDate, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsRequired } from '../../../shared/decorators/is-required.decorator';
 
 export class CreateWritingDto {
-    @IsNumber()
-    @IsNotEmpty()
-    @IsRequired()
-    writingNumber: number;
+  @IsNumber()
+  @IsNotEmpty()
+  @IsRequired()
+  writingNumber: number;
 
-    @IsNumber()
-    @IsNotEmpty()
-    @IsRequired()
-    voteNumberJDAAC: number;
+  @IsNumber()
+  @IsNotEmpty()
+  @IsRequired()
+  voteNumberJDAAC: number;
 
-    @IsDate()
-    @IsNotEmpty()
-    @IsRequired()
-    voteDateJDAAC: Date;
+  @IsDate()
+  @IsNotEmpty()
+  @IsRequired()
+  voteDateJDAAC: Date;
 
-    @IsString()
-    imageJDAAC?: string;
+  @IsString()
+  imageJDAAC?: string;
 
-    @IsNumber()
-    @IsNotEmpty()
-    @IsRequired()
-    voteNumberJDUA: number;
+  @IsNumber()
+  @IsNotEmpty()
+  @IsRequired()
+  voteNumberJDUA: number;
 
-    @IsDate()
-    @IsNotEmpty()
-    @IsRequired()
-    voteDateJDUA: Date;
+  @IsDate()
+  @IsNotEmpty()
+  @IsRequired()
+  voteDateJDUA: Date;
 
-    @IsString()
-    imageJDUA?: string;
+  @IsString()
+  imageJDUA?: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    domain: string;
+  @IsString()
+  @IsNotEmpty()
+  @IsRequired()
+  domain: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    folio: string;
+  @IsString()
+  @IsNotEmpty()
+  @IsRequired()
+  folio: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    tomo: string;
+  @IsString()
+  @IsNotEmpty()
+  @IsRequired()
+  tomo: string;
 
-    @IsNumber()
-    @IsNotEmpty()
-    @IsRequired()
-    year: number;
+  @IsNumber()
+  @IsNotEmpty()
+  @IsRequired()
+  year: number;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    department: string;
+  @IsString()
+  @IsNotEmpty()
+  @IsRequired()
+  department: string;
 
-    @IsNumber()
-    @IsNotEmpty()
-    @IsRequired()
-    totalSurface: number;
+  @IsNumber()
+  @IsNotEmpty()
+  @IsRequired()
+  totalSurface: number;
 
-    @IsNumber()
-    @IsNotEmpty()
-    @IsRequired()
-    coveredSurface: number;
+  @IsNumber()
+  @IsNotEmpty()
+  @IsRequired()
+  coveredSurface: number;
 
-    @IsNumber()
-    @IsNotEmpty()
-    @IsRequired()
-    improvementSurface: number;
+  @IsNumber()
+  @IsNotEmpty()
+  @IsRequired()
+  improvementSurface: number;
 
-    @IsNumber()
-    @IsNotEmpty()
-    @IsRequired()
-    improvementValue: number;
+  @IsNumber()
+  @IsNotEmpty()
+  @IsRequired()
+  improvementValue: number;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    cadastralNomenclature: string;
+  @IsString()
+  @IsNotEmpty()
+  @IsRequired()
+  cadastralNomenclature: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    ubicationMap: string;
+  @IsString()
+  @IsNotEmpty()
+  @IsRequired()
+  ubicationMap: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    cadastralInform: string;
+  @IsString()
+  @IsNotEmpty()
+  @IsRequired()
+  cadastralInform: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    actingNotary: string;
+  @IsString()
+  @IsNotEmpty()
+  @IsRequired()
+  actingNotary: string;
 
-    @IsNumber()
-    @IsNotEmpty()
-    @IsRequired()
-    notaryContact: number;
+  @IsNumber()
+  @IsNotEmpty()
+  @IsRequired()
+  notaryContact: number;
 
-    @IsString()
-    interiorImage?: string;
+  @IsString()
+  interiorImage?: string;
 
-    @IsString()
-    exteriorImage?: string;
+  @IsString()
+  exteriorImage?: string;
 
-    @IsString()
-    formalities: string;
+  @IsString()
+  formalities: string;
 
-    @IsString()
-    documentation: string;
+  @IsString()
+  documentation: string;
 
-    @IsString()
-    detailSpaces: string;
+  @IsString()
+  detailSpaces: string;
 
-    @IsNumber()
-    @IsNotEmpty()
-    @IsRequired()
-    propertyId: number;
+  @IsNumber()
+  @IsNotEmpty()
+  @IsRequired()
+  propertyId: number;
 }

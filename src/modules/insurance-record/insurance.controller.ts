@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { InsuranceService } from './insurance.service';
 import { Insurance } from './entities/insurance.entity';
 import { CreateInsuranceDto } from './dtos/create-insurance.dto';
@@ -16,7 +24,9 @@ export class InsuranceController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number): Promise<GenericResponse<ReadInsuranceDto>> {
+  async findOne(
+    @Param('id') id: number,
+  ): Promise<GenericResponse<ReadInsuranceDto>> {
     const insurance = await this.insuranceService.findOne(id);
     const response = plainToClass(ReadInsuranceDto, insurance);
     return new GenericResponse<ReadInsuranceDto>(response);
@@ -28,7 +38,10 @@ export class InsuranceController {
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() insuranceData: Partial<Insurance>): Promise<Insurance> {
+  update(
+    @Param('id') id: number,
+    @Body() insuranceData: Partial<Insurance>,
+  ): Promise<Insurance> {
     return this.insuranceService.update(id, insuranceData);
   }
 

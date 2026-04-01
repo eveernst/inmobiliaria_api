@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { RentedService } from './rented.service';
 import { CreateRentedDto } from './dtos/create-rented.dto';
 import { ReadRentedDto } from './dtos/read-rented.dto';
@@ -16,7 +24,9 @@ export class RentedController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number): Promise<GenericResponse<ReadRentedDto>> {
+  async findOne(
+    @Param('id') id: number,
+  ): Promise<GenericResponse<ReadRentedDto>> {
     const rented = await this.rentedService.findOne(id);
     const response = plainToClass(ReadRentedDto, rented);
     return new GenericResponse<ReadRentedDto>(response);
@@ -28,7 +38,10 @@ export class RentedController {
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() rentedData: Partial<Rented>): Promise<Rented> {
+  update(
+    @Param('id') id: number,
+    @Body() rentedData: Partial<Rented>,
+  ): Promise<Rented> {
     return this.rentedService.update(id, rentedData);
   }
 

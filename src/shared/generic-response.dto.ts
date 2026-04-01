@@ -7,12 +7,12 @@ export class GenericResponse<T> {
   @ApiProperty()
   status: string;
 
-  @ApiProperty({ type: () => ({} as T) })
+  @ApiProperty({ type: () => ({}) as T })
   data: T;
 
   constructor(data: T, statusCode = 200, status = 'success') {
     this.statusCode = statusCode;
     this.status = status;
-    this.data = data;
-  }
+    this.data = data;
+  }
 }

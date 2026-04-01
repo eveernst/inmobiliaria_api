@@ -1,134 +1,139 @@
-import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsString } from "class-validator";
-import { IsRequired } from "src/shared/decorators/is-required.decorator";
+import {
+  IsBoolean,
+  IsDate,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
+import { IsRequired } from 'src/shared/decorators/is-required.decorator';
 
 export class CreatePlanDto {
-    // plano general
-    @IsBoolean()
-    @IsNotEmpty()
-    generalPlan: boolean;
+  // plano general
+  @IsBoolean()
+  @IsNotEmpty()
+  generalPlan: boolean;
 
-    @IsNumber()
-    @IsNotEmpty()
-    @IsRequired()
-    planNumber: number;
+  @IsNumber()
+  @IsNotEmpty()
+  @IsRequired()
+  planNumber: number;
 
-    @IsNumber()
-    @IsNotEmpty()
-    @IsRequired()
-    year: number;
+  @IsNumber()
+  @IsNotEmpty()
+  @IsRequired()
+  year: number;
 
-    @IsString()
-    planImage?: string;
+  @IsString()
+  planImage?: string;
 
-    // plano estructura
-    @IsBoolean()
-    @IsNotEmpty()
-    structurePlan: boolean;
+  // plano estructura
+  @IsBoolean()
+  @IsNotEmpty()
+  structurePlan: boolean;
 
-    @IsString()
-    structureImage?: string;
+  @IsString()
+  structureImage?: string;
 
-    // plano gas
-    @IsBoolean()
-    @IsNotEmpty()
-    gasPlan: boolean;
+  // plano gas
+  @IsBoolean()
+  @IsNotEmpty()
+  gasPlan: boolean;
 
-    @IsString()
-    gasImage?: string;
+  @IsString()
+  gasImage?: string;
 
-    // plano agua
-    @IsBoolean()
-    @IsNotEmpty()
-    waterPlan: boolean;
+  // plano agua
+  @IsBoolean()
+  @IsNotEmpty()
+  waterPlan: boolean;
 
-    @IsString()
-    waterImage?: string;
+  @IsString()
+  waterImage?: string;
 
-    // plano luz
-    @IsBoolean()
-    @IsNotEmpty()
-    lightPlan: boolean;
+  // plano luz
+  @IsBoolean()
+  @IsNotEmpty()
+  lightPlan: boolean;
 
-    @IsString()
-    lightImage?: string;
+  @IsString()
+  lightImage?: string;
 
-    // ante proyecto
-    @IsBoolean()
-    @IsNotEmpty()
-    projectPlan: boolean;
+  // ante proyecto
+  @IsBoolean()
+  @IsNotEmpty()
+  projectPlan: boolean;
 
-    @IsString()
-    projectImage?: string;
+  @IsString()
+  projectImage?: string;
 
-    // final de obra
-    @IsBoolean()
-    @IsNotEmpty()
-    finalPlan: boolean;
+  // final de obra
+  @IsBoolean()
+  @IsNotEmpty()
+  finalPlan: boolean;
 
-    @IsString()
-    finalImage?: string;
+  @IsString()
+  finalImage?: string;
 
-    // actualizacion
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    planType: string;
+  // actualizacion
+  @IsString()
+  @IsNotEmpty()
+  @IsRequired()
+  planType: string;
 
-    @IsNumber()
-    @IsNotEmpty()
-    @IsRequired()
-    planNumberUpdate: number;
+  @IsNumber()
+  @IsNotEmpty()
+  @IsRequired()
+  planNumberUpdate: number;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    yearUpdate: string;
+  @IsNumber()
+  @IsNotEmpty()
+  @IsRequired()
+  yearUpdate: number;
 
-    @IsString()
-    stateImage?: string;
+  @IsString()
+  stateImage?: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    professional: string;
+  @IsString()
+  @IsNotEmpty()
+  @IsRequired()
+  professional: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    professionalContact: string;
+  @IsString()
+  @IsNotEmpty()
+  @IsRequired()
+  professionalContact: string;
 
-    // visado municipal
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    @IsDate()
-    dateVisado: Date;
+  // visado municipal
+  @IsDate()
+  @IsNotEmpty()
+  @IsRequired()
+  dateVisado: Date;
 
-    @IsNumber()
-    @IsNotEmpty()
-    @IsRequired()
-    numberVisado: number;
+  @IsNumber()
+  @IsNotEmpty()
+  @IsRequired()
+  numberVisado: number;
 
-    @IsString()
-    imageVisado?: string;
+  @IsString()
+  imageVisado?: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    formalities: string;
+  @IsString()
+  @IsNotEmpty()
+  @IsRequired()
+  formalities: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    documentation: string;
+  @IsString()
+  @IsNotEmpty()
+  @IsRequired()
+  documentation: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @IsRequired()
-    contacts: string;
+  @IsString()
+  @IsNotEmpty()
+  @IsRequired()
+  contacts: string;
 
-    @IsNumber()
-    @IsNotEmpty()
-    @IsRequired()
-    propertyId: number;
+  @IsNumber()
+  @IsNotEmpty()
+  @IsRequired()
+  propertyId: number;
 }

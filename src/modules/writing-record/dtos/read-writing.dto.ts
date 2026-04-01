@@ -1,81 +1,81 @@
-import { Expose } from "class-transformer";
+import { Expose } from 'class-transformer';
 
 export class ReadWritingDto {
-    @Expose()
-    writingNumber: number;
+  @Expose()
+  writingNumber: number;
 
-    @Expose()
-    voteNumberJDAAC: number;
+  @Expose()
+  voteNumberJDAAC: number;
 
-    @Expose()
-    voteDateJDAAC: Date;
+  @Expose()
+  voteDateJDAAC: Date;
 
-    @Expose()
-    imageJDAAC: string;
+  @Expose()
+  imageJDAAC: string;
 
-    @Expose()
-    voteNumberJDUA: number;
+  @Expose()
+  voteNumberJDUA: number;
 
-    @Expose()
-    voteDateJDUA: Date;
+  @Expose()
+  voteDateJDUA: Date;
 
-    @Expose()
-    imageJDUA: string;
+  @Expose()
+  imageJDUA: string;
 
-    @Expose()
-    domain: string;
+  @Expose()
+  domain: string;
 
-    @Expose()
-    folio: string;
-    
-    @Expose()
-    tomo: string;
+  @Expose()
+  folio: string;
 
-    @Expose()
-    year: number;
+  @Expose()
+  tomo: string;
 
-    @Expose()
-    department: string;
+  @Expose()
+  year: number;
 
-    @Expose()
-    totalSurface: number;
+  @Expose()
+  department: string;
 
-    @Expose()
-    coveredSurface: number;
+  @Expose()
+  totalSurface: number;
 
-    @Expose()
-    improvementSurface: number;
+  @Expose()
+  coveredSurface: number;
 
-    @Expose()
-    improvementValue: number;
+  @Expose()
+  improvementSurface: number;
 
-    @Expose()
-    cadastralNomenclature: string;
+  @Expose()
+  improvementValue: number;
 
-    @Expose()
-    ubicationMap: string;
+  @Expose()
+  cadastralNomenclature: string;
 
-    @Expose()
-    cadastralInform: string;
+  @Expose()
+  ubicationMap: string;
 
-    @Expose()
-    actingNotary: string;
+  @Expose()
+  cadastralInform: string;
 
-    @Expose()
-    notaryContact: number;
+  @Expose()
+  actingNotary: string;
 
-    @Expose()
-    interiorImage: string;
+  @Expose()
+  notaryContact: number;
 
-    @Expose()
-    exteriorImage: string;
+  @Expose()
+  interiorImage: string;
 
-    @Expose()
-    formalities: string;
+  @Expose()
+  exteriorImage: string;
 
-    @Expose()
-    documentation: string;
+  @Expose()
+  formalities: string;
 
-    @Expose()
-    detailSpaces: string;
+  @Expose()
+  documentation: string;
+
+  @Expose()
+  detailSpaces: string;
 }

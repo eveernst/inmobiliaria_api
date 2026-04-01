@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Rented } from './entities/rented.entity';
@@ -15,11 +19,14 @@ export class RentedService {
   ) {}
 
   findAll(): Promise<Rented[]> {
-    return this.rentedRepository.find();
+    return this.rentedRepository.find({ relations: ['property'] });
   }
 
   findOne(id: number): Promise<Rented> {
-    return this.rentedRepository.findOne({ where: { id } });
+    return this.rentedRepository.findOne({
+      where: { id },
+      relations: ['property'],
+    });
   }
 
   async update(id: number, rentedData: Partial<Rented>): Promise<Rented> {
@@ -32,15 +39,19 @@ export class RentedService {
   }
 
   async create(createRentedDto: CreateRentedDto): Promise<Rented> {
+    if (!createRentedDto.propertyId) {
+      throw new BadRequestException('propertyId is required');
+    }
+
     const property = await this.propertyRepository.findOne({
-        where: { id: createRentedDto.propertyId },
+      where: { id: createRentedDto.propertyId },
     });
     if (!property) {
-      throw new Error('Property not found');
+      throw new NotFoundException('Property not found');
     }
     const rented = this.rentedRepository.create({
-        ...createRentedDto,
-        property,
+      ...createRentedDto,
+      property,
     });
     await this.rentedRepository.save(rented);
     return rented;

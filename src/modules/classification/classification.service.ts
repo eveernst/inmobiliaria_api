@@ -2,16 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Classification } from './entities/classification.entity';
-import { CreateClassificationDto } from './dtos/create-classification.dto';
-import { Property } from '../property/entities/property.entity';
 
 @Injectable()
 export class ClassificationService {
   constructor(
     @InjectRepository(Classification)
     private readonly classificationRepository: Repository<Classification>,
-    @InjectRepository(Property)
-    private readonly propertyRepository: Repository<Property>,
   ) {}
 
   findAll(): Promise<Classification[]> {
@@ -22,7 +18,10 @@ export class ClassificationService {
     return this.classificationRepository.findOne({ where: { id } });
   }
 
-  async update(id: number, classificationData: Partial<Classification>): Promise<Classification> {
+  async update(
+    id: number,
+    classificationData: Partial<Classification>,
+  ): Promise<Classification> {
     await this.classificationRepository.update(id, classificationData);
     return this.findOne(id);
   }

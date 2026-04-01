@@ -1,7 +1,6 @@
-import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Body, Param, Delete, Put } from '@nestjs/common';
 import { ClassificationService } from './classification.service';
 import { Classification } from './entities/classification.entity';
-import { CreateClassificationDto } from './dtos/create-classification.dto';
 import { ReadClassificationDto } from './dtos/read-classification.dto';
 import { GenericResponse } from 'src/shared/generic-response.dto';
 import { plainToClass } from 'class-transformer';
@@ -16,14 +15,19 @@ export class ClassificationController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number): Promise<GenericResponse<ReadClassificationDto>> {
+  async findOne(
+    @Param('id') id: number,
+  ): Promise<GenericResponse<ReadClassificationDto>> {
     const classification = await this.classificationService.findOne(id);
     const response = plainToClass(ReadClassificationDto, classification);
     return new GenericResponse<ReadClassificationDto>(response);
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() classificationData: Partial<Classification>): Promise<Classification> {
+  update(
+    @Param('id') id: number,
+    @Body() classificationData: Partial<Classification>,
+  ): Promise<Classification> {
     return this.classificationService.update(id, classificationData);
   }
 

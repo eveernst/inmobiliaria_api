@@ -1,44 +1,44 @@
-import { Expose } from "class-transformer";
+import { Expose } from 'class-transformer';
 
 export class ReadRentedDto {
-    // datos del propietario
-    @Expose()
-    ownerDetails: string;   
+  // datos del propietario
+  @Expose()
+  ownerDetails: string;
 
-    @Expose()
-    affectation: string;
+  @Expose()
+  affectation: string;
 
-    @Expose()
-    ownerContact: string;
+  @Expose()
+  ownerContact: string;
 
-    // datos del inquilino
-    @Expose()
-    renterDetails: string;
+  // datos del inquilino
+  @Expose()
+  renterDetails: string;
 
-    @Expose()
-    address: string;
+  @Expose()
+  address: string;
 
-    @Expose()
-    renterContact: string;
+  @Expose()
+  renterContact: string;
 
-    @Expose()
-    locality: string;
+  @Expose()
+  locality: string;
 
-    @Expose()
-    contratStartDate: Date;
+  @Expose()
+  contratStartDate: Date;
 
-    @Expose()
-    contratEndDate: Date;
+  @Expose()
+  contratEndDate: Date;
 
-    @Expose()
-    province: string;
+  @Expose()
+  province: string;
 
-    @Expose()
-    price: number;
+  @Expose()
+  price: number;
 
-    @Expose()
-    adjustmentType: string;
+  @Expose()
+  adjustmentType: string;
 
-    @Expose()
-    contractImage: string;
+  @Expose()
+  contractImage: string;
 }

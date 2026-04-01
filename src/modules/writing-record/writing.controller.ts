@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+} from '@nestjs/common';
 import { WritingService } from './writing.service';
 import { Writing } from './entities/writing.entity';
 import { CreateWritingDto } from './dtos/create-writing.dto';
@@ -16,7 +24,9 @@ export class WritingController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number): Promise<GenericResponse<ReadWritingDto>> {
+  async findOne(
+    @Param('id') id: number,
+  ): Promise<GenericResponse<ReadWritingDto>> {
     const writing = await this.writingService.findOne(id);
     const response = plainToClass(ReadWritingDto, writing);
     return new GenericResponse<ReadWritingDto>(response);
@@ -28,7 +38,10 @@ export class WritingController {
   }
 
   @Put(':id')
-  update(@Param('id') id: number, @Body() writingData: Partial<Writing>): Promise<Writing> {
+  update(
+    @Param('id') id: number,
+    @Body() writingData: Partial<Writing>,
+  ): Promise<Writing> {
     return this.writingService.update(id, writingData);
   }
 

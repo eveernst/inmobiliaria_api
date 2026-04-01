@@ -33,22 +33,26 @@ export const databaseProviders = [
   TypeOrmModule.forRootAsync({
     inject: [ConfigService],
     useFactory: async (configService: ConfigService) => {
-
-      console.log('DB_HOST:', configService.get('DB_HOST'));
-      console.log('DB_USER:', configService.get('DB_USER'));
-      console.log('DB_PASSWORD:', configService.get('DB_PASSWORD'));
-      console.log('DB_NAME:', configService.get('DB_NAME'));
+      const isProduction = configService.get('NODE_ENV') === 'production';
 
       return {
-        type: 'mysql',
+        type: 'postgres',
         host: configService.get<string>('DB_HOST'),
-        port: configService.get<number>('DB_PORT'),
+        port: configService.get<number>('DB_PORT', 5432),
         username: configService.get<string>('DB_USER'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
         entities: [__dirname + '/../**/*.entity.{js,ts}'],
-        synchronize: true, // ⚠️ solo en desarrollo
-        logging: true,
+        synchronize: !isProduction,
+        logging: !isProduction,
+        ssl: isProduction ? { rejectUnauthorized: false } : false,
+        extra: isProduction
+          ? {
+              max: 10,
+              idleTimeoutMillis: 30000,
+              connectionTimeoutMillis: 2000,
+            }
+          : {},
       } as DataSourceOptions;
     },
   }),

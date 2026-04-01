@@ -1,83 +1,78 @@
-import { IsNumber, IsString, IsBoolean } from "class-validator";
-import { IsRequired } from "../../../shared/decorators/is-required.decorator";
-import { Installation } from "src/modules/installation/entities/installation.entity";
-import { ReadInstallationDto } from "src/modules/installation/dtos/read-installation.dto";
-import { ReadInsuranceDto } from "src/modules/insurance-record/dtos/read-insurance.dto";
-import { ReadPlanDto } from "src/modules/plan-record/dtos/read-plan.dto";
-import { ReadRentedDto } from "src/modules/rented-record/dtos/read-rented.dto";
-import { ReadWritingDto } from "src/modules/writing-record/dtos/read-writing.dto";
+import { IsNumber, IsString, IsBoolean } from 'class-validator';
+import { IsRequired } from '../../../shared/decorators/is-required.decorator';
+import { ReadInstallationDto } from 'src/modules/installation/dtos/read-installation.dto';
 
 export class CreatePropertyDto {
-    @IsNumber()
-    @IsRequired()
-    goodUseCode: number;
+  @IsNumber()
+  @IsRequired()
+  goodUseCode: number;
 
-    // @IsString()
-    // @IsRequired()
-    // innerImage: string;
+  // @IsString()
+  // @IsRequired()
+  // innerImage: string;
 
-    // @IsString()
-    // @IsRequired()
-    // outerImage: string;
+  // @IsString()
+  // @IsRequired()
+  // outerImage: string;
 
-    @IsString()
-    @IsRequired()
-    province: string;
+  @IsString()
+  @IsRequired()
+  province: string;
 
-    @IsString()
-    @IsRequired()
-    locality: string;
-    
-    @IsString()
-    @IsRequired()
-    address: string;
+  @IsString()
+  @IsRequired()
+  locality: string;
 
-    @IsNumber()
-    @IsRequired()
-    postalCode: number;
+  @IsString()
+  @IsRequired()
+  address: string;
 
-    @IsString()
-    @IsRequired()
-    betweenStreets1: string;
+  @IsNumber()
+  @IsRequired()
+  postalCode: number;
 
-    @IsString()
-    @IsRequired()
-    betweenStreets2: string;
+  @IsString()
+  @IsRequired()
+  betweenStreets1: string;
 
-    @IsString()
-    @IsRequired()
-    district: string;
+  @IsString()
+  @IsRequired()
+  betweenStreets2: string;
 
-    @IsNumber()
-    @IsRequired()
-    destiny: number; 
+  @IsString()
+  @IsRequired()
+  district: string;
 
-    @IsNumber()
-    @IsRequired()
-    state: number;
+  @IsNumber()
+  @IsRequired()
+  destiny: number;
 
-    @IsBoolean()
-    @IsRequired()
-    active: boolean;
+  @IsNumber()
+  @IsRequired()
+  state: number;
 
-    @IsString()
-    @IsRequired()
-    clfc: string;
+  @IsBoolean()
+  @IsRequired()
+  active: boolean;
 
-    @IsString()
-    @IsRequired()
-    detailsMaintenance: string;
+  @IsString()
+  @IsRequired()
+  clfc: string;
 
-    @IsString()
-    @IsRequired()
-    description: string;
+  @IsString()
+  @IsRequired()
+  detailsMaintenance: string;
 
-    @IsString()
-    file?: string;
+  @IsString()
+  @IsRequired()
+  description: string;
 
-    @IsNumber()
-    @IsRequired()
-    classification: number;  // El ID de Classification
+  @IsString()
+  file?: string;
 
-    installations?: ReadInstallationDto[];
+  @IsNumber()
+  @IsRequired()
+  classification: number; // El ID de Classification
+
+  installations?: ReadInstallationDto[];
 }

@@ -1,9 +1,9 @@
-import { Expose } from "class-transformer";
+import { Expose } from 'class-transformer';
 
 export class ReadClassificationDto {
-    @Expose()
-    name: string;
+  @Expose()
+  name: string;
 
-    @Expose()
-    id: number;
+  @Expose()
+  id: number;
 }

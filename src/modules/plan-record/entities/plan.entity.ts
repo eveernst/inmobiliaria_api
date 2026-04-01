@@ -1,96 +1,98 @@
-import { Entity, Column, OneToMany, JoinColumn, ManyToOne } from "typeorm";
-import { BaseEntity } from "src/shared/entities/base.entity";
+import { Entity, Column, JoinColumn, ManyToOne } from 'typeorm';
+import { BaseEntity } from 'src/shared/entities/base.entity';
 // import { PropertyPlan } from "src/modules/property-plan/entities/record.entity";
-import { Property } from "src/modules/property/entities/property.entity";
+import { Property } from 'src/modules/property/entities/property.entity';
 
 @Entity()
 export class Plan extends BaseEntity {
-    @Column()
-    generalPlan: boolean;
+  @Column()
+  generalPlan: boolean;
 
-    @Column()
-    planNumber: number;
+  @Column()
+  planNumber: number;
 
-    @Column()
-    year: number;
+  @Column()
+  year: number;
 
-    @Column()
-    planImage: string;
+  @Column({ nullable: true, length: 1024 })
+  planImage: string;
 
-    @Column()
-    profesional: string;
+  @Column({ name: 'profesional' })
+  professional: string;
 
-    @Column()
-    professionalContact: string;
+  @Column()
+  professionalContact: string;
 
-    @Column()
-    numberVisado: number;
+  @Column()
+  numberVisado: number;
 
-    @Column()
-    dateVisado: Date;
+  @Column()
+  dateVisado: Date;
 
-    @Column()
-    structurePlan: boolean;
+  @Column()
+  structurePlan: boolean;
 
-    @Column()
-    structureImage: string;
+  @Column({ nullable: true, length: 1024 })
+  structureImage: string;
 
-    @Column()
-    gasPlan: boolean;
+  @Column()
+  gasPlan: boolean;
 
-    @Column()
-    gasImage: string;
+  @Column({ nullable: true, length: 1024 })
+  gasImage: string;
 
-    @Column()
-    waterPlan: boolean;
+  @Column()
+  waterPlan: boolean;
 
-    @Column()
-    waterImage: string;
+  @Column({ nullable: true, length: 1024 })
+  waterImage: string;
 
-    @Column()
-    lightPlan: boolean;
+  @Column()
+  lightPlan: boolean;
 
-    @Column()
-    lightImage: string;
+  @Column({ nullable: true, length: 1024 })
+  lightImage: string;
 
-    @Column()
-    projectPlan: boolean;
+  @Column()
+  projectPlan: boolean;
 
-    @Column()
-    projectImage: string;
+  @Column({ nullable: true, length: 1024 })
+  projectImage: string;
 
-    @Column()
-    finalPlan: boolean;
+  @Column()
+  finalPlan: boolean;
 
-    @Column()
-    finalImage: string;
+  @Column({ nullable: true, length: 1024 })
+  finalImage: string;
 
-    @Column()
-    planType: string;
+  @Column()
+  planType: string;
 
-    @Column()
-    planNumberUpdate: number;
+  @Column()
+  planNumberUpdate: number;
 
-    @Column()
-    yearUpdate: string;
+  @Column()
+  yearUpdate: number;
 
-    @Column()
-    stateImage: string;
+  @Column({ nullable: true, length: 1024 })
+  stateImage: string;
 
-    @Column()
-    imageVisado: string;
+  @Column({ nullable: true, length: 1024 })
+  imageVisado: string;
 
-    @Column()
-    formalities: string;
+  @Column()
+  formalities: string;
 
-    @Column()
-    documentation: string;
+  @Column()
+  documentation: string;
 
-    @Column()
-    contacts: string;
+  @Column()
+  contacts: string;
 
-    // Un plan puede tener muchas propiedades
-    @ManyToOne(() => Property, property => property.plans)
-    @JoinColumn({ name: 'propertyId' })
-    property: Property;
+  // Un plan puede tener muchas propiedades
+  @ManyToOne(() => Property, (property) => property.plans, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'propertyId' })
+  property: Property;
 }

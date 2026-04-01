@@ -1,6 +1,7 @@
-import { Entity, Column, OneToMany, PrimaryColumn } from 'typeorm';
+import { Entity, Column, OneToMany } from 'typeorm';
 import { BaseEntity } from 'src/shared/entities/base.entity';
 import { Property } from 'src/modules/property/entities/property.entity';
+import { Notification } from 'src/modules/notification/entities/notification.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -14,13 +15,13 @@ export class User extends BaseEntity {
   password: string;
 
   @Column()
-  role:number;
-  
+  role: number;
+
   // Un usuario puede tener muchas propiedades
-  @OneToMany(() => Property, property => property.user)
+  @OneToMany(() => Property, (property) => property.user)
   property: Property[];
 
   // Un usuario puede tener muchas notificaciones
-  @OneToMany(() => User, user => user.notifications)
+  @OneToMany(() => Notification, (notification) => notification.user)
   notifications: Notification[];
 }

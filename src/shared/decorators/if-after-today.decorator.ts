@@ -1,4 +1,8 @@
-import { registerDecorator, ValidationOptions, ValidationArguments } from 'class-validator';
+import {
+  registerDecorator,
+  ValidationOptions,
+  ValidationArguments,
+} from 'class-validator';
 
 export function IsAfterToday(validationOptions?: ValidationOptions) {
   return function (object: object, propertyName: string) {
@@ -9,7 +13,7 @@ export function IsAfterToday(validationOptions?: ValidationOptions) {
       options: validationOptions,
       validator: {
         validate(value: any) {
-            console.log('validating', value)
+          console.log('validating', value);
           // Get the current date in milliseconds
           const now = new Date().getTime();
 

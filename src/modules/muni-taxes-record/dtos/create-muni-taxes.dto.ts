@@ -1,3 +1,1 @@
-export class CreateMuniTaxesDto {
-    
-}
+export class CreateMuniTaxesDto {}

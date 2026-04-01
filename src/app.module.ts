@@ -19,30 +19,28 @@ import { RentedModule } from './modules/rented-record/rented.module';
 import { WritingModule } from './modules/writing-record/writing.module';
 
 @Module({
-    imports: [
-        // DevtoolsModule.register({
-        //     // http: process.env.NODE_ENV !== 'production',
-        //     http: true,
-        //   }),
-        NestConfig.forRoot({
-            envFilePath: '.env',
-            isGlobal: true,
-        }),
-        DatabaseModule,
-        NotificationModule,
-        UsersModule,
-        AuthModule,
-        PropertyModule,
-        InstallationModule,
-        ClassificationModule,
-        InsuranceModule,
-        PlanModule,
-        RentedModule,
-        WritingModule,
-    ],
-    controllers: [AppController],
-    providers: [
-        AppService,
-    ],
+  imports: [
+    // DevtoolsModule.register({
+    //     // http: process.env.NODE_ENV !== 'production',
+    //     http: true,
+    //   }),
+    NestConfig.forRoot({
+      envFilePath: '.env',
+      isGlobal: true,
+    }),
+    DatabaseModule,
+    NotificationModule,
+    UsersModule,
+    AuthModule,
+    PropertyModule,
+    InstallationModule,
+    ClassificationModule,
+    InsuranceModule,
+    PlanModule,
+    RentedModule,
+    WritingModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {}
