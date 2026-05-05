@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsNumber,
   IsString,
+  Matches,
 } from 'class-validator';
 import { IsRequired } from 'src/shared/decorators/is-required.decorator';
 
@@ -14,10 +15,11 @@ export class CreateInsuranceDto {
   @IsRequired()
   name: string;
 
-  @IsNumber()
+  @IsString()
+  @Matches(/^\d{10}$/) 
   @IsNotEmpty()
   @IsRequired()
-  phone: number;
+  phone: string;
 
   @IsString()
   @IsEmail()

@@ -6,7 +6,7 @@ export class ReadInsuranceDto {
   name: string;
 
   @Expose()
-  phone: number;
+  phone: string;
 
   @Expose()
   email: string;
