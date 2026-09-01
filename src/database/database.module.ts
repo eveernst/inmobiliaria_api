@@ -17,17 +17,19 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const isProduction = config.get('NODE_ENV') === 'production';
+        const dbHost = config.get<string>('DB_HOST');
+        const isRemote = !['localhost', '127.0.0.1'].includes(dbHost);
 
         return {
           type: 'postgres',
-          host: config.get('DB_HOST'),
+          host: dbHost,
           port: Number(config.get('DB_PORT')),
           username: config.get('DB_USER'),
           password: config.get('DB_PASSWORD'),
           database: config.get('DB_NAME'),
           autoLoadEntities: true,
           synchronize: !isProduction,
-          ssl: { rejectUnauthorized: false },
+          ssl: isRemote ? { rejectUnauthorized: false } : false,
         };
       },
     }),
