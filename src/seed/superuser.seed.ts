@@ -37,6 +37,9 @@ async function bootstrap() {
     console.log(
       `Superusuario creado: id ${superuser.id}, email ${superuser.email}.`,
     );
+  } catch (error) {
+    console.error('No se pudo crear el superusuario:', error.message);
+    process.exitCode = 1;
   } finally {
     await app.close();
   }
