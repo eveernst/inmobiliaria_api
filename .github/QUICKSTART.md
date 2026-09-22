@@ -95,8 +95,8 @@ además de `MEMBER`/`OWNER` en el chequeo de `/claim`):
 
 8. **Marca la PR como Ready for Review** (saca el draft).
 
-9. **@eveernst (PO actual) aprueba la PR** — recordá que `master` tiene branch protection:
-   hace falta 1 approval y el check `build-and-test` en verde para poder mergear.
+9. **El check `build-and-test` corre en la PR** — recordá que `master` tiene branch protection:
+   sin ese check en verde, nadie puede mergear (ni admins). No exige review de otra persona.
 
 10. **El bot** cambia la label de `status:claimed` a `status:done` y comenta en #12:
     *"✅ Issue cerrada vía PR #15. status:claimed → status:done (sello histórico, no se quita)."*
@@ -244,7 +244,7 @@ Esta sección te dice cómo responder las preguntas típicas de la defensa de la
 | 4 | ¿Quién trabajó más issues? | `gh issue list --state closed --json assignees --limit 200 \| jq '[.[] \| .assignees[0].login] \| group_by(.) \| map({user: .[0], count: length}) \| sort_by(.count) \| reverse'` | Tabla con count por dev |
 | 5 | ¿Qué PRs mergeadas cerraron issues? | `gh pr list --state merged --search "Closes" --json number,title,closingIssuesReferences` | Lista con issues cerradas |
 | 6 | ¿Hay issues sin asignar hace mucho? | `gh issue list --label status:needs-triage --json number,title,createdAt --limit 20` | Lista ordenada por fecha |
-| 7 | ¿El branch protection de `master` está activo? | `gh api repos/eveernst/inmobiliaria_api/branches/master/protection --jq '{checks: .required_status_checks.contexts, approvals: .required_pull_request_reviews.required_approving_review_count}'` | CI obligatorio + 1 approval |
+| 7 | ¿El branch protection de `master` está activo? | `gh api repos/eveernst/inmobiliaria_api/branches/master/protection --jq '{checks: .required_status_checks.contexts, admins_enforced: .enforce_admins.enabled}'` | CI obligatorio, aplica también a admins |
 
 ### Diagrama de actores + responsabilidad
 
@@ -290,8 +290,8 @@ flowchart TB
 4. **No uses el PO como excusa para no tomar issues.** El PO coordina y destraba, pero también
    puede `claim` y trabajar como cualquier dev.
 
-5. **No mergees sin que el check `build-and-test` esté verde y sin 1 approval.** `master` tiene
-   branch protection — no hay forma de saltearlo, ni para admins.
+5. **No mergees sin que el check `build-and-test` esté verde.** `master` tiene branch
+   protection — no hay forma de saltearlo, ni para admins.
 
 ---
 

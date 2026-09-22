@@ -120,8 +120,9 @@ mano vía PR a `.github/ROTA.yml`.
 9. Una PR mergeada que cierra una issue con `status:claimed` la pasa a
    `status:done` automáticamente. El label no se quita.
 10. `master` es la rama principal y tiene branch protection: **CI obligatorio
-    (`build-and-test`) + 1 approval + sin push directo (ni para admins)**. Todo
-    cambio pasa por PR.
+    (`build-and-test`) + sin push directo (ni para admins)**. Todo cambio pasa
+    por PR — GitHub no te deja aprobar tu propia PR, así que si sos el único
+    admin activo, el CI en verde es lo que habilita el merge.
 
 ---
 
