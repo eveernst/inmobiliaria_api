@@ -1,7 +1,8 @@
-import { IsString, IsNotEmpty, IsEmail, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsEmail, IsEnum } from 'class-validator';
 
 // decorator
 import { IsRequired } from '../../../shared/decorators/is-required.decorator';
+import { UserRole } from '../../../shared/enums/user-role.enum';
 
 export class CreateUserDto {
   @IsString()
@@ -18,8 +19,8 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsRequired()
   password: string;
-  @IsNumber()
+  @IsEnum(UserRole)
   @IsNotEmpty()
   @IsRequired()
-  role: number;
+  role: UserRole;
 }
