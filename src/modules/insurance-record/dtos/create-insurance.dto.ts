@@ -3,6 +3,7 @@ import {
   IsEmail,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   Matches,
 } from 'class-validator';
@@ -16,7 +17,7 @@ export class CreateInsuranceDto {
   name: string;
 
   @IsString()
-  @Matches(/^\d{10}$/) 
+  @Matches(/^\d{10}$/)
   @IsNotEmpty()
   @IsRequired()
   phone: string;
@@ -60,22 +61,28 @@ export class CreateInsuranceDto {
   values: boolean;
 
   // formulario del seguro
+  @IsOptional()
   @IsString()
   insuranceLink?: string;
 
+  @IsOptional()
   @IsString()
   insuranceImage?: string;
 
+  @IsOptional()
   @IsString()
   insuranceDate?: string;
 
   // formulario anual
+  @IsOptional()
   @IsString()
   AnualFormLink?: string;
 
+  @IsOptional()
   @IsString()
   AnualFormImage?: string;
 
+  @IsOptional()
   @IsString()
   AnualFormDate?: string;
 
