@@ -1,0 +1,9 @@
+# Product Owner activo del equipo.
+# Este archivo no rota automáticamente.
+# Editá `current_po` con un PR cuando el equipo decida cambiarlo.
+
+# PO activo
+current_po: "@eveernst"
+
+# Última actualización manual
+last_updated: "2026-09-22"
