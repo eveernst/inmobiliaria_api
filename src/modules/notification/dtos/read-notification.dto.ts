@@ -2,14 +2,14 @@ import { Expose } from 'class-transformer';
 
 export class ReadNotificationDto {
   @Expose()
-  userId: number;
+  id: number;
 
   @Expose()
   message: string;
 
   @Expose()
-  read: boolean;
+  type: string;
 
   @Expose()
-  record_id: number;
+  date: Date;
 }

@@ -12,6 +12,7 @@
 
 1. [El modelo en 1 pantalla](#1-el-modelo-en-1-pantalla)
 2. [Para devs: 3 escenarios paso-a-paso](#2-para-devs-3-escenarios-paso-a-paso)
+   - 2.0 [Setup inicial (una vez, al clonar)](#20-setup-inicial-una-vez-al-clonar)
    - 2.1 [Tomar y terminar una issue](#21-tomar-y-terminar-una-issue)
    - 2.2 [Una semana como PO](#22-una-semana-como-po)
    - 2.3 [Issue bloqueada](#23-issue-bloqueada)
@@ -65,6 +66,30 @@ además de `MEMBER`/`OWNER` en el chequeo de `/claim`):
 ---
 
 ## 2. Para devs: 3 escenarios paso-a-paso
+
+### 2.0 Setup inicial (una vez, al clonar)
+
+**En Windows**, desactivá `core.autocrlf` en este repo apenas lo clonás. El repo fuerza finales
+de línea LF con `.gitattributes` (`* text=auto eol=lf`), y el `core.autocrlf=true` que Git for
+Windows trae por defecto hace que `git status` muestre archivos modificados que en realidad no
+cambiaron. Además, si alguno queda en CRLF, `npm run lint:check` falla con errores `Delete ␍` y
+el CI queda en rojo.
+
+```bash
+git config core.autocrlf false
+```
+
+**Si ya tenías el repo clonado** y `git status` te muestra archivos modificados que no tocaste:
+
+```bash
+git config core.autocrlf false
+git diff --stat   # tiene que salir vacío: no hay cambios reales de contenido
+git add -u        # recalcula el estado del índice; no stagea cambios reales
+git status        # ya no debería listar archivos modificados
+```
+
+Hacelo solo con el árbol limpio (sin trabajo propio sin commitear), porque `git add -u` stagea
+cualquier cambio real que tengas.
 
 ### 2.1 Tomar y terminar una issue
 

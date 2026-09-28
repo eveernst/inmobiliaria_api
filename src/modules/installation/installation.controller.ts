@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { InstallationService } from './installation.service';
 import { Installation } from './entities/installation.entity';
@@ -13,8 +14,13 @@ import { CreateInstallationDto } from './dtos/create-installation.dto';
 import { ReadInstallationDto } from './dtos/read-installation.dto';
 import { GenericResponse } from 'src/shared/generic-response.dto';
 import { plainToClass } from 'class-transformer';
+import { Roles } from 'src/shared/decorators/roles.decorator';
+import { RolesGuard } from 'src/shared/guards/roles.guard';
+import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
+import { UserRole } from 'src/shared/enums/user-role.enum';
 
 @Controller('installation')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class InstallationController {
   constructor(private readonly installationService: InstallationService) {}
 
@@ -33,6 +39,7 @@ export class InstallationController {
   }
 
   @Post()
+  @Roles(UserRole.ADMIN)
   async create(
     @Body() installationData: CreateInstallationDto,
   ): Promise<GenericResponse<ReadInstallationDto>> {
@@ -43,6 +50,7 @@ export class InstallationController {
   }
 
   @Put(':id')
+  @Roles(UserRole.ADMIN)
   update(
     @Param('id') id: number,
     @Body() installationData: Partial<Installation>,
@@ -51,6 +59,7 @@ export class InstallationController {
   }
 
   @Delete(':id')
+  @Roles(UserRole.ADMIN)
   remove(@Param('id') id: number): Promise<void> {
     return this.installationService.remove(id);
   }
