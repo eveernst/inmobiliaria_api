@@ -21,12 +21,16 @@ Follow this layout for any new domain module rather than inventing a different o
 ## Auth and roles
 
 - Roles are defined in `src/shared/enums/user-role.enum.ts` (`UserRole`). Protect endpoints with
-  `@UseGuards(JwtAuthGuard, RolesGuard)` plus `@Roles(UserRole.ADMIN, UserRole.SUPERUSER)` (see
-  `property.controller.ts` for the reference implementation) — don't leave a controller
+  `@UseGuards(JwtAuthGuard, RolesGuard)` at class level plus `@Roles(...)` on write handlers
+  (see `property.controller.ts` for the reference implementation) — don't leave a controller
   unguarded because "it's simple."
+- Roles are by function, not hierarchical. Domain writes (properties, installations,
+  documentation records, classifications) use `@Roles(UserRole.ADMIN)` only — never add
+  `SUPERUSER` there. See CLAUDE.md § Security Rules for the use-case references.
 - `RolesGuard` compares `user.role` from the JWT (set in `auth/jwt.strategy.ts`) — don't
-  duplicate that logic elsewhere.
-- User management (create/update/delete users, assign roles) is superuser-only.
+  duplicate that logic elsewhere, and don't add role hierarchy to it.
+- User management (create/update/delete users, assign roles) is superuser-only:
+  `@Roles(UserRole.SUPERUSER)`.
 
 ## Validation
 

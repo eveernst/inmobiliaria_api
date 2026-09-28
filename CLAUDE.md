@@ -85,11 +85,19 @@ localhost/dev database. `synchronize` is enabled outside production only.
 These are enforced, not decorative — don't work around them, fix the DTO/controller instead.
 
 1. **Guards on every controller that writes data.** Use
-   `@UseGuards(JwtAuthGuard, RolesGuard)` at the controller level, plus `@Roles(UserRole.ADMIN)`
-   (or `SUPERUSER`) on `POST`/`PUT`/`DELETE` handlers. `GET` handlers behind the class-level
-   guard still require a valid JWT, just no specific role. See `users.controller.ts` and
-   `property.controller.ts` for the reference pattern. Don't leave a controller unguarded
-   because "it's simple."
+   `@UseGuards(JwtAuthGuard, RolesGuard)` at the controller level, plus `@Roles(...)` on
+   `POST`/`PUT`/`DELETE` handlers. `GET` handlers behind the class-level guard still require a
+   valid JWT, just no specific role. See `users.controller.ts` and `property.controller.ts` for
+   the reference pattern. Don't leave a controller unguarded because "it's simple."
+
+   **Roles are by function, not hierarchical; the superuser only manages users.** Domain writes
+   (properties, installations, documentation records, classifications) use
+   `@Roles(UserRole.ADMIN)` only — never add `SUPERUSER` there. User management uses
+   `@Roles(UserRole.SUPERUSER)` only. This follows the use-case specs: the superuser is an actor
+   only in CU 1.3.2 (delete user), 1.3.3 (update user) and 1.3.4 (view user); every property,
+   installation, documentation and classification use case lists "Administrador" or
+   "Administrador, usuario común". Don't add role hierarchy to `RolesGuard` — it was considered
+   and rejected.
 
 2. **Responses are always mapped through a `Read*Dto`.** Use `plainToInstance(ReadXDto, entity,
    { excludeExtraneousValues: true })` and `@Expose()` on every field the DTO actually returns.
