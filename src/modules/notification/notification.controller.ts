@@ -1,26 +1,23 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Delete,
-  Put,
-} from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { NotificationService } from './notification.service';
-import { Notification } from './entities/notification.entity';
-import { CreateNotificationDto } from './dtos/create-notification.dto';
 import { GenericResponse } from 'src/shared/generic-response.dto';
-import { plainToClass } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import { ReadNotificationDto } from './dtos/read-notification.dto';
+import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 
+// Notifications are system-generated (see issue #7), so there are no
+// create/update/delete endpoints here.
 @Controller('notification')
+@UseGuards(JwtAuthGuard)
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
   @Get()
-  findAll(): Promise<Notification[]> {
-    return this.notificationService.findAll();
+  async findAll(): Promise<ReadNotificationDto[]> {
+    const notifications = await this.notificationService.findAll();
+    return plainToInstance(ReadNotificationDto, notifications, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Get(':id')
@@ -28,30 +25,9 @@ export class NotificationController {
     @Param('id') id: number,
   ): Promise<GenericResponse<ReadNotificationDto>> {
     const notification = await this.notificationService.findOne(id);
-    const response = plainToClass(ReadNotificationDto, notification);
+    const response = plainToInstance(ReadNotificationDto, notification, {
+      excludeExtraneousValues: true,
+    });
     return new GenericResponse<ReadNotificationDto>(response);
-  }
-
-  @Post()
-  async create(
-    @Body() notificationData: CreateNotificationDto,
-  ): Promise<GenericResponse<ReadNotificationDto>> {
-    const notification =
-      await this.notificationService.create(notificationData);
-    const response = plainToClass(ReadNotificationDto, notification);
-    return new GenericResponse<ReadNotificationDto>(response);
-  }
-
-  @Put(':id')
-  update(
-    @Param('id') id: number,
-    @Body() notificationData: Partial<Notification>,
-  ): Promise<Notification> {
-    return this.notificationService.update(id, notificationData);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: number): Promise<void> {
-    return this.notificationService.remove(id);
   }
 }

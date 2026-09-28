@@ -23,16 +23,4 @@ export class NotificationService {
     const notification = this.notificationRepository.create(notificationData);
     return await this.notificationRepository.save(notification);
   }
-
-  async update(
-    id: number,
-    notificationData: Partial<Notification>,
-  ): Promise<Notification> {
-    await this.notificationRepository.update(id, notificationData);
-    return this.findOne(id);
-  }
-
-  async remove(id: number): Promise<void> {
-    await this.notificationRepository.delete(id);
-  }
 }
