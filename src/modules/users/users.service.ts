@@ -48,7 +48,7 @@ export class UsersService {
 
   private async assertNotLastSuperuser(id: number): Promise<void> {
     const current = await this.findOne(id);
-    if (current.role !== UserRole.SUPERUSER) {
+    if (!current || current.role !== UserRole.SUPERUSER) {
       return;
     }
 
@@ -57,12 +57,13 @@ export class UsersService {
     });
     if (superuserCount <= 1) {
       throw new ForbiddenException(
-        'No se puede quitar el rol de superusuario al único superusuario existente.',
+        'La operación dejaría al sistema sin ningún superusuario.',
       );
     }
   }
 
   async remove(id: number): Promise<void> {
+    await this.assertNotLastSuperuser(id);
     await this.usersRepository.delete(id);
   }
 }
