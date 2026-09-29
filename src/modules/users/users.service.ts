@@ -2,7 +2,6 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
-  OnApplicationBootstrap,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -12,30 +11,11 @@ import { UserRole } from 'src/shared/enums/user-role.enum';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
-export class UsersService implements OnApplicationBootstrap {
+export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
   ) {}
-
-  // Seeds the initial superuser from SUPERUSER_EMAIL / SUPERUSER_PASSWORD
-  // when the system has none, so a fresh database is manageable.
-  async onApplicationBootstrap(): Promise<void> {
-    const email = process.env.SUPERUSER_EMAIL;
-    const password = process.env.SUPERUSER_PASSWORD;
-    if (!email || !password) {
-      return;
-    }
-    if (await this.usersRepository.existsBy({ role: UserRole.SUPERUSER })) {
-      return;
-    }
-    await this.create({
-      name: 'Super Admin',
-      email,
-      password,
-      role: UserRole.SUPERUSER,
-    });
-  }
 
   findAll(): Promise<User[]> {
     return this.usersRepository.find();
