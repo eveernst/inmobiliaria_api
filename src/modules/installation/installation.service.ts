@@ -22,11 +22,16 @@ export class InstallationService {
   ) {}
 
   findAll(): Promise<ReadInstallationDto[]> {
-    return this.installationRepository.find({ relations: ['classification'] });
+    return this.installationRepository.find({
+      relations: ['classification', 'property'],
+    });
   }
 
   findOne(id: number): Promise<Installation> {
-    return this.installationRepository.findOne({ where: { id } });
+    return this.installationRepository.findOne({
+      where: { id },
+      relations: ['classification', 'property'],
+    });
   }
 
   async create(
