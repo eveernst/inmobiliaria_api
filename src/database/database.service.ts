@@ -18,7 +18,7 @@
 //                 entities: [
 //                     __dirname + '/../**/*.entity.{js,ts}'
 //                 ],
-//                 synchronize: true, // ⚠️ solo en desarrollo
+//                 synchronize: false,
 //                 logging: true,
 //             } as DataSourceOptions;
 //         },
@@ -43,7 +43,7 @@ export const databaseProviders = [
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
         entities: [__dirname + '/../**/*.entity.{js,ts}'],
-        synchronize: !isProduction,
+        synchronize: false,
         logging: !isProduction,
         ssl: isProduction ? { rejectUnauthorized: false } : false,
         extra: isProduction

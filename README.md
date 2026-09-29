@@ -65,6 +65,25 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Database migrations
+
+The API uses PostgreSQL and TypeORM migrations. Schema synchronization is disabled in every
+environment, so apply schema changes explicitly:
+
+```bash
+# Generate a migration after changing an entity
+npm run migration:generate -- src/database/migrations/describe-change
+
+# Apply pending migrations
+npm run migration:run
+
+# Revert the latest migration when needed
+npm run migration:revert
+```
+
+Run these commands with the database variables configured in `.env`. Do not enable
+`synchronize` as a substitute for migrations.
+
 ## Resources
 
 Check out a few resources that may come in handy when working with NestJS:

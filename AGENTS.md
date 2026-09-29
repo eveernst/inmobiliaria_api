@@ -42,8 +42,8 @@ Follow this layout for any new domain module rather than inventing a different o
 
 ## Database
 
-- TypeORM `synchronize` is enabled outside production — don't hand-write migrations for schema
-  changes in dev, but don't rely on `synchronize` being on in production either.
+- TypeORM `synchronize` is disabled in every environment. Schema changes must use the versioned
+  migrations under `src/database/migrations/`.
 - SSL is conditional on the DB host: `ssl: isRemote ? { rejectUnauthorized: false } : false`
   (`database.module.ts`) — never hardcode SSL on for a localhost/dev database.
 

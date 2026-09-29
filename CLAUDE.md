@@ -78,7 +78,8 @@ Shared code lives in `src/shared/`:
 
 `src/database/database.module.ts` wires TypeORM via `ConfigService`. SSL is conditional on the
 DB host: `ssl: isRemote ? { rejectUnauthorized: false } : false` — never hardcode SSL on for a
-localhost/dev database. `synchronize` is enabled outside production only.
+localhost/dev database. `synchronize` is disabled in every environment; schema changes use the
+versioned migrations under `src/database/migrations/`.
 
 ## Security Rules
 
@@ -139,10 +140,10 @@ These are enforced, not decorative — don't work around them, fix the DTO/contr
 
 ## Database
 
-- TypeORM `synchronize` is enabled outside production — don't hand-write migrations for schema
-  changes in dev, but don't rely on `synchronize` being on in production either.
-- Postgres runs on Supabase. SSL is conditional on host (see Architecture above) — never
-  hardcode it on for local/dev.
+- TypeORM `synchronize` is disabled in every environment. Schema changes must use the versioned
+  migrations under `src/database/migrations/`.
+- PostgreSQL runs on Supabase. SSL is conditional on the DB host; never hardcode it on for
+  localhost/dev.
 
 ## Hygiene
 
