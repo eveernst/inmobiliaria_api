@@ -5,6 +5,7 @@ import { Installation } from './entities/installation.entity';
 import { CreateInstallationDto } from './dtos/create-installation.dto';
 import { Classification } from '../classification/entities/classification.entity';
 import { ReadInstallationDto } from './dtos/read-installation.dto';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class InstallationService {
@@ -13,6 +14,7 @@ export class InstallationService {
     private readonly installationRepository: Repository<Installation>,
     @InjectRepository(Classification)
     private readonly classificationRepository: Repository<Classification>,
+    private readonly notificationService: NotificationService,
   ) {}
 
   findAll(): Promise<ReadInstallationDto[]> {
@@ -23,13 +25,26 @@ export class InstallationService {
     return this.installationRepository.findOne({ where: { id } });
   }
 
-  async create(installationData: CreateInstallationDto): Promise<Installation> {
+  async create(
+    installationData: CreateInstallationDto,
+    actorUserId: number,
+  ): Promise<Installation> {
     const classification = await this.classificationRepository.findOne({
       where: { id: installationData.classificationId },
     });
     const data = { ...installationData, classification };
     const installation = this.installationRepository.create(data);
-    return await this.installationRepository.save(installation);
+    const savedInstallation =
+      await this.installationRepository.save(installation);
+
+    await this.notificationService.createRegistrationNotification(
+      actorUserId,
+      'installation',
+      savedInstallation.id,
+      savedInstallation.property,
+    );
+
+    return savedInstallation;
   }
 
   async update(

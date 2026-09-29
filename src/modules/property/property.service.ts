@@ -14,6 +14,7 @@ import { Rented } from '../rented-record/entities/rented.entity';
 import { Writing } from '../writing-record/entities/writing.entity';
 import { Notification } from '../notification/entities/notification.entity';
 import { PropertyFiltersDto } from './dtos/property-filters.dto';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class PropertyService {
@@ -34,6 +35,7 @@ export class PropertyService {
     private readonly writingRepository: Repository<Writing>,
     @InjectRepository(Notification)
     private readonly notificationRepository: Repository<Notification>,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async findAll(filters: PropertyFiltersDto = {}): Promise<ReadPropertyDto[]> {
@@ -143,7 +145,10 @@ export class PropertyService {
     });
   }
 
-  async create(createPropertyDto: CreatePropertyDto): Promise<Property> {
+  async create(
+    createPropertyDto: CreatePropertyDto,
+    actorUserId: number,
+  ): Promise<Property> {
     const classification = await this.classificationRepository.findOne({
       where: { id: createPropertyDto.classification },
     });
@@ -172,6 +177,14 @@ export class PropertyService {
       );
       await this.installationRepository.save(installations);
     }
+
+    await this.notificationService.createRegistrationNotification(
+      actorUserId,
+      'property',
+      property.id,
+      property,
+    );
+
     return property;
   }
 

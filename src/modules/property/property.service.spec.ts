@@ -17,6 +17,7 @@ describe('PropertyService.findAll', () => {
     {} as never,
     {} as never,
     {} as never,
+    {} as never,
   );
 
   beforeEach(() => {

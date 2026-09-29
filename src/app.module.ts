@@ -17,6 +17,7 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { PlanModule } from './modules/plan-record/plan.module';
 import { RentedModule } from './modules/rented-record/rented.module';
 import { WritingModule } from './modules/writing-record/writing.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { WritingModule } from './modules/writing-record/writing.module';
       envFilePath: '.env',
       isGlobal: true,
     }),
+    ScheduleModule.forRoot(),
     DatabaseModule,
     NotificationModule,
     UsersModule,

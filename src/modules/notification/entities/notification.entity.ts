@@ -16,6 +16,15 @@ export class Notification extends BaseEntity {
   @Column()
   date: Date;
 
+  @Column({ length: 100, nullable: true })
+  sourceType?: string;
+
+  @Column({ nullable: true })
+  sourceId?: number;
+
+  @Column({ nullable: true })
+  dueDate?: Date;
+
   // Muchas notificaciones pueden pertenecer a una propiedad
   @ManyToOne(() => Property, (property) => property.notifications, {
     onDelete: 'CASCADE',
