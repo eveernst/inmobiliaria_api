@@ -16,6 +16,7 @@ import { CreateInstallationDto } from './dtos/create-installation.dto';
 import { ReadInstallationDto } from './dtos/read-installation.dto';
 import { GenericResponse } from 'src/shared/generic-response.dto';
 import { plainToClass } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
@@ -29,8 +30,11 @@ export class InstallationController {
   constructor(private readonly installationService: InstallationService) {}
 
   @Get()
-  findAll(): Promise<ReadInstallationDto[]> {
-    return this.installationService.findAll();
+  async findAll(): Promise<ReadInstallationDto[]> {
+    const installations = await this.installationService.findAll();
+    return plainToInstance(ReadInstallationDto, installations, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Get(':id')
@@ -38,7 +42,9 @@ export class InstallationController {
     @Param('id') id: number,
   ): Promise<GenericResponse<ReadInstallationDto>> {
     const installation = await this.installationService.findOne(id);
-    const response = plainToClass(ReadInstallationDto, installation);
+    const response = plainToInstance(ReadInstallationDto, installation, {
+      excludeExtraneousValues: true,
+    });
     return new GenericResponse<ReadInstallationDto>(response);
   }
 
