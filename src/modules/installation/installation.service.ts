@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Installation } from './entities/installation.entity';
@@ -11,6 +11,8 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class InstallationService {
+  private readonly logger = new Logger(InstallationService.name);
+
   constructor(
     @InjectRepository(Installation)
     private readonly installationRepository: Repository<Installation>,
@@ -58,12 +60,22 @@ export class InstallationService {
     const savedInstallation =
       await this.installationRepository.save(installation);
 
-    await this.notificationService.createRegistrationNotification(
-      actorUserId,
-      'installation',
-      savedInstallation.id,
-      property,
-    );
+    // The notification is a side effect: if it fails, the installation is
+    // already saved, so failing the request would only make the client retry
+    // and create a duplicate.
+    try {
+      await this.notificationService.createRegistrationNotification(
+        actorUserId,
+        'installation',
+        savedInstallation.id,
+        property,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Failed to create registration notification for installation ${savedInstallation.id}`,
+        error instanceof Error ? error.stack : String(error),
+      );
+    }
 
     return savedInstallation;
   }

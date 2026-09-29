@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Property } from './entities/property.entity';
@@ -18,6 +18,8 @@ import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class PropertyService {
+  private readonly logger = new Logger(PropertyService.name);
+
   constructor(
     @InjectRepository(Property)
     private readonly propertyRepository: Repository<Property>,
@@ -178,12 +180,22 @@ export class PropertyService {
       await this.installationRepository.save(installations);
     }
 
-    await this.notificationService.createRegistrationNotification(
-      actorUserId,
-      'property',
-      property.id,
-      property,
-    );
+    // The notification is a side effect: if it fails, the property is already
+    // saved, so failing the request would only make the client retry and
+    // create a duplicate.
+    try {
+      await this.notificationService.createRegistrationNotification(
+        actorUserId,
+        'property',
+        property.id,
+        property,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Failed to create registration notification for property ${property.id}`,
+        error instanceof Error ? error.stack : String(error),
+      );
+    }
 
     return property;
   }
