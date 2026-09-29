@@ -7,7 +7,9 @@ import {
   Delete,
   Put,
   UseGuards,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { InstallationService } from './installation.service';
 import { Installation } from './entities/installation.entity';
 import { CreateInstallationDto } from './dtos/create-installation.dto';
@@ -18,6 +20,8 @@ import { Roles } from 'src/shared/decorators/roles.decorator';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { UserRole } from 'src/shared/enums/user-role.enum';
+
+type AuthenticatedRequest = Request & { user: { id: number } };
 
 @Controller('installation')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -42,9 +46,12 @@ export class InstallationController {
   @Roles(UserRole.ADMIN)
   async create(
     @Body() installationData: CreateInstallationDto,
+    @Req() request: AuthenticatedRequest,
   ): Promise<GenericResponse<ReadInstallationDto>> {
-    const installation =
-      await this.installationService.create(installationData);
+    const installation = await this.installationService.create(
+      installationData,
+      request.user.id,
+    );
     const response = plainToClass(ReadInstallationDto, installation);
     return new GenericResponse<ReadInstallationDto>(response);
   }

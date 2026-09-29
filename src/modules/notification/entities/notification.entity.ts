@@ -1,11 +1,16 @@
 // crear demonio "cron" para enviar notificaciones a los usuarios
 
-import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { BaseEntity } from 'src/shared/entities/base.entity';
 import { Property } from 'src/modules/property/entities/property.entity';
 import { User } from 'src/modules/users/entities/user.entity';
 
 @Entity()
+@Index(
+  'UQ_notification_due_date_source_user',
+  ['sourceType', 'sourceId', 'dueDate', 'user'],
+  { unique: true },
+)
 export class Notification extends BaseEntity {
   @Column({ length: 100 })
   message: string;
@@ -15,6 +20,15 @@ export class Notification extends BaseEntity {
 
   @Column()
   date: Date;
+
+  @Column({ length: 100, nullable: true })
+  sourceType?: string;
+
+  @Column({ nullable: true })
+  sourceId?: number;
+
+  @Column({ nullable: true })
+  dueDate?: Date;
 
   // Muchas notificaciones pueden pertenecer a una propiedad
   @ManyToOne(() => Property, (property) => property.notifications, {

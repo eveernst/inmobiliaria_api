@@ -9,7 +9,9 @@ import {
   UseGuards,
   ParseIntPipe,
   Query,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { PropertyService } from './property.service';
 import { Property } from './entities/property.entity';
 import { CreatePropertyDto } from './dtos/create-property.dto';
@@ -22,6 +24,8 @@ import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { UserRole } from 'src/shared/enums/user-role.enum';
 import { PropertyFiltersDto } from './dtos/property-filters.dto';
+
+type AuthenticatedRequest = Request & { user: { id: number } };
 
 @Controller('property')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -44,8 +48,12 @@ export class PropertyController {
   @Roles(UserRole.ADMIN)
   async create(
     @Body() propertyData: CreatePropertyDto,
+    @Req() request: AuthenticatedRequest,
   ): Promise<GenericResponse<ReadPropertyDto>> {
-    const property = await this.propertyService.create(propertyData);
+    const property = await this.propertyService.create(
+      propertyData,
+      request.user.id,
+    );
     const response = plainToClass(ReadPropertyDto, property);
     return new GenericResponse<ReadPropertyDto>(response);
   }
