@@ -8,6 +8,7 @@ import {
   Put,
   UseGuards,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { PropertyService } from './property.service';
 import { Property } from './entities/property.entity';
@@ -20,6 +21,7 @@ import { Roles } from 'src/shared/decorators/roles.decorator';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { UserRole } from 'src/shared/enums/user-role.enum';
+import { PropertyFiltersDto } from './dtos/property-filters.dto';
 
 @Controller('property')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -27,8 +29,8 @@ export class PropertyController {
   constructor(private readonly propertyService: PropertyService) {}
 
   @Get()
-  findAll(): Promise<ReadPropertyDto[]> {
-    return this.propertyService.findAll();
+  findAll(@Query() filters: PropertyFiltersDto): Promise<ReadPropertyDto[]> {
+    return this.propertyService.findAll(filters);
   }
 
   @Get(':id')

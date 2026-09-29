@@ -13,6 +13,7 @@ import { Plan } from '../plan-record/entities/plan.entity';
 import { Rented } from '../rented-record/entities/rented.entity';
 import { Writing } from '../writing-record/entities/writing.entity';
 import { Notification } from '../notification/entities/notification.entity';
+import { PropertyFiltersDto } from './dtos/property-filters.dto';
 
 @Injectable()
 export class PropertyService {
@@ -35,22 +36,87 @@ export class PropertyService {
     private readonly notificationRepository: Repository<Notification>,
   ) {}
 
-  async findAll(): Promise<ReadPropertyDto[]> {
-    const properties = await this.propertyRepository.find({
-      relations: [
-        'classification',
-        'installations',
-        'installations.classification',
-        'writings',
-        'renteds',
-        'insurances',
-        'plans',
-      ], // Incluye la relación necesaria
-    });
+  async findAll(filters: PropertyFiltersDto = {}): Promise<ReadPropertyDto[]> {
+    const relations = [
+      'classification',
+      'installations',
+      'installations.classification',
+      'writings',
+      'renteds',
+      'insurances',
+      'plans',
+    ];
 
-    // Transforma las entidades en instancias de ReadPropertyDto
+    const hasFilters = Object.values(filters).some(
+      (value) => value !== undefined && value.trim() !== '',
+    );
+
+    let stateFilter: number | undefined;
+    if (filters.state?.trim()) {
+      const state = Number(filters.state.trim());
+
+      if (!Number.isInteger(state)) {
+        return [];
+      }
+
+      stateFilter = state;
+    }
+
+    let properties: Property[];
+
+    if (!hasFilters) {
+      properties = await this.propertyRepository.find({ relations });
+    } else {
+      const query = this.propertyRepository
+        .createQueryBuilder('property')
+        .leftJoinAndSelect('property.classification', 'classification')
+        .leftJoinAndSelect('property.installations', 'installations')
+        .leftJoinAndSelect(
+          'installations.classification',
+          'installationClassification',
+        )
+        .leftJoinAndSelect('property.writings', 'writings')
+        .leftJoinAndSelect('property.renteds', 'renteds')
+        .leftJoinAndSelect('property.insurances', 'insurances')
+        .leftJoinAndSelect('property.plans', 'plans');
+
+      if (filters.province?.trim()) {
+        query.andWhere('LOWER(property.province) LIKE LOWER(:province)', {
+          province: `%${filters.province.trim()}%`,
+        });
+      }
+
+      if (filters.address?.trim()) {
+        query.andWhere('LOWER(property.address) LIKE LOWER(:address)', {
+          address: `%${filters.address.trim()}%`,
+        });
+      }
+
+      if (filters.classification?.trim()) {
+        const classification = filters.classification.trim();
+        const classificationId = Number(classification);
+
+        if (Number.isInteger(classificationId)) {
+          query.andWhere('classification.id = :classificationId', {
+            classificationId,
+          });
+        } else {
+          query.andWhere(
+            'LOWER(classification.name) LIKE LOWER(:classification)',
+            { classification: `%${classification}%` },
+          );
+        }
+      }
+
+      if (stateFilter !== undefined) {
+        query.andWhere('property.state = :state', { state: stateFilter });
+      }
+
+      properties = await query.getMany();
+    }
+
     return plainToInstance(ReadPropertyDto, properties, {
-      excludeExtraneousValues: true, // Solo incluye campos marcados con @Expose
+      excludeExtraneousValues: true,
     });
   }
 
