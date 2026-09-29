@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  OnApplicationBootstrap,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -7,11 +12,30 @@ import { UserRole } from 'src/shared/enums/user-role.enum';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
-export class UsersService {
+export class UsersService implements OnApplicationBootstrap {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
   ) {}
+
+  // Seeds the initial superuser from SUPERUSER_EMAIL / SUPERUSER_PASSWORD
+  // when the system has none, so a fresh database is manageable.
+  async onApplicationBootstrap(): Promise<void> {
+    const email = process.env.SUPERUSER_EMAIL;
+    const password = process.env.SUPERUSER_PASSWORD;
+    if (!email || !password) {
+      return;
+    }
+    if (await this.usersRepository.existsBy({ role: UserRole.SUPERUSER })) {
+      return;
+    }
+    await this.create({
+      name: 'Super Admin',
+      email,
+      password,
+      role: UserRole.SUPERUSER,
+    });
+  }
 
   findAll(): Promise<User[]> {
     return this.usersRepository.find();
@@ -63,6 +87,15 @@ export class UsersService {
   }
 
   async remove(id: number): Promise<void> {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+      relations: ['property'],
+    });
+    if (user?.property?.length) {
+      throw new ConflictException(
+        `El usuario tiene ${user.property.length} propiedad(es) asignada(s). Reasignalas antes de eliminarlo.`,
+      );
+    }
     await this.assertNotLastSuperuser(id);
     await this.usersRepository.delete(id);
   }
