@@ -1,6 +1,10 @@
+import { Logger } from '@nestjs/common';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { PropertyService } from './property.service';
 import { Property } from './entities/property.entity';
+import { CreatePropertyDto } from './dtos/create-property.dto';
+import { Classification } from '../classification/entities/classification.entity';
+import { NotificationService } from '../notification/notification.service';
 
 describe('PropertyService.findAll', () => {
   const repository = {
@@ -85,5 +89,61 @@ describe('PropertyService.findAll', () => {
     await expect(service.findAll({ state: 'invalid' })).resolves.toEqual([]);
 
     expect(repository.createQueryBuilder).not.toHaveBeenCalled();
+  });
+});
+
+describe('PropertyService.create', () => {
+  const propertyRepository = {
+    create: jest.fn(),
+    save: jest.fn(),
+  } as unknown as jest.Mocked<Repository<Property>>;
+  const classificationRepository = {
+    findOne: jest.fn(),
+  } as unknown as jest.Mocked<Repository<Classification>>;
+  const notificationService = {
+    createRegistrationNotification: jest.fn(),
+  } as unknown as jest.Mocked<NotificationService>;
+
+  const service = new PropertyService(
+    propertyRepository,
+    classificationRepository,
+    {} as never,
+    {} as never,
+    {} as never,
+    {} as never,
+    {} as never,
+    {} as never,
+    notificationService,
+  );
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('returns the saved property when the registration notification fails', async () => {
+    const logError = jest
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation(() => undefined);
+    const classification = { id: 3 } as Classification;
+    const property = { id: 21 } as Property;
+
+    classificationRepository.findOne.mockResolvedValue(classification);
+    propertyRepository.create.mockReturnValue(property);
+    propertyRepository.save.mockResolvedValue(property);
+    notificationService.createRegistrationNotification.mockRejectedValue(
+      new Error('column "sourceType" does not exist'),
+    );
+
+    await expect(
+      service.create({ classification: 3 } as CreatePropertyDto, 7),
+    ).resolves.toBe(property);
+
+    expect(propertyRepository.save).toHaveBeenCalledTimes(1);
+    expect(logError).toHaveBeenCalledWith(
+      expect.stringContaining('property 21'),
+      expect.any(String),
+    );
+
+    logError.mockRestore();
   });
 });
