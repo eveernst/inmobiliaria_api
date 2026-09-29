@@ -6,6 +6,8 @@ import { CreateInstallationDto } from './dtos/create-installation.dto';
 import { Classification } from '../classification/entities/classification.entity';
 import { ReadInstallationDto } from './dtos/read-installation.dto';
 import { NotificationService } from '../notification/notification.service';
+import { Property } from '../property/entities/property.entity';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class InstallationService {
@@ -14,6 +16,8 @@ export class InstallationService {
     private readonly installationRepository: Repository<Installation>,
     @InjectRepository(Classification)
     private readonly classificationRepository: Repository<Classification>,
+    @InjectRepository(Property)
+    private readonly propertyRepository: Repository<Property>,
     private readonly notificationService: NotificationService,
   ) {}
 
@@ -29,10 +33,22 @@ export class InstallationService {
     installationData: CreateInstallationDto,
     actorUserId: number,
   ): Promise<Installation> {
+    if (!installationData.propertyId) {
+      throw new BadRequestException('propertyId is required');
+    }
+
     const classification = await this.classificationRepository.findOne({
       where: { id: installationData.classificationId },
     });
-    const data = { ...installationData, classification };
+    const property = await this.propertyRepository.findOne({
+      where: { id: installationData.propertyId },
+    });
+
+    if (!property) {
+      throw new NotFoundException('Property not found');
+    }
+
+    const data = { ...installationData, classification, property };
     const installation = this.installationRepository.create(data);
     const savedInstallation =
       await this.installationRepository.save(installation);
@@ -41,7 +57,7 @@ export class InstallationService {
       actorUserId,
       'installation',
       savedInstallation.id,
-      savedInstallation.property,
+      property,
     );
 
     return savedInstallation;

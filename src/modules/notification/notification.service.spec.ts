@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { NotificationService } from './notification.service';
 import { Notification } from './entities/notification.entity';
 import { User } from '../users/entities/user.entity';
@@ -62,5 +62,31 @@ describe('NotificationService', () => {
     ).resolves.toEqual([]);
 
     expect(notificationRepository.save).not.toHaveBeenCalled();
+  });
+
+  it('ignores a concurrent duplicate rejected by the unique index', async () => {
+    const property = { id: 11, user: { id: 7 } } as Property;
+    const dueDate = new Date('2026-10-01T00:00:00.000Z');
+    const duplicateError = new QueryFailedError(
+      'INSERT',
+      [],
+      new Error('duplicate'),
+    );
+    Object.defineProperty(duplicateError, 'driverError', {
+      value: { code: '23505' },
+    });
+    notificationRepository.findOne.mockResolvedValue(null);
+    notificationRepository.create.mockReturnValue({} as Notification);
+    notificationRepository.save.mockRejectedValue(duplicateError);
+
+    await expect(
+      service.createDueDateNotification({
+        sourceType: 'rented-contract',
+        sourceId: 22,
+        dueDate,
+        property,
+        message: 'Vence el contrato en 7 días',
+      }),
+    ).resolves.toEqual([]);
   });
 });

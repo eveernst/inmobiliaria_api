@@ -5,11 +5,12 @@ import { InstallationController } from './installation.controller';
 import { Installation } from './entities/installation.entity';
 import { Classification } from '../classification/entities/classification.entity';
 import { NotificationModule } from '../notification/notification.module';
+import { Property } from '../property/entities/property.entity';
 
 @Module({
   imports: [
     NotificationModule,
-    TypeOrmModule.forFeature([Installation, Classification]),
+    TypeOrmModule.forFeature([Installation, Classification, Property]),
   ],
   controllers: [InstallationController],
   providers: [InstallationService],

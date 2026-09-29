@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { Notification } from './entities/notification.entity';
 import { User } from '../users/entities/user.entity';
 import { Property } from '../property/entities/property.entity';
@@ -79,20 +79,29 @@ export class NotificationService {
         continue;
       }
 
-      notifications.push(
-        await this.notificationRepository.save(
-          this.notificationRepository.create({
-            message: data.message,
-            type: 'due-date',
-            date: new Date(),
-            sourceType: data.sourceType,
-            sourceId: data.sourceId,
-            dueDate: data.dueDate,
-            property: data.property,
-            user,
-          }),
-        ),
-      );
+      try {
+        notifications.push(
+          await this.notificationRepository.save(
+            this.notificationRepository.create({
+              message: data.message,
+              type: 'due-date',
+              date: new Date(),
+              sourceType: data.sourceType,
+              sourceId: data.sourceId,
+              dueDate: data.dueDate,
+              property: data.property,
+              user,
+            }),
+          ),
+        );
+      } catch (error) {
+        if (
+          !(error instanceof QueryFailedError) ||
+          error.driverError?.code !== '23505'
+        ) {
+          throw error;
+        }
+      }
     }
 
     return notifications;

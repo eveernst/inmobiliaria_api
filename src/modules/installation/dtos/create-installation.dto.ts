@@ -24,4 +24,9 @@ export class CreateInstallationDto {
   @IsNotEmpty()
   @IsRequired()
   classificationId: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  @IsRequired()
+  propertyId: number;
 }
