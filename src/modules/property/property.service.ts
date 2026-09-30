@@ -159,23 +159,26 @@ export class PropertyService {
       throw new Error('Classification not found');
     }
 
+    const { installations: installationsData, ...propertyData } =
+      createPropertyDto;
+
     const property = this.propertyRepository.create({
-      ...createPropertyDto,
+      ...propertyData,
       classification,
     });
     console.log(property);
     await this.propertyRepository.save(property);
 
     // Guardar las instalaciones de esta propiedad
-    if (createPropertyDto.installations) {
+    if (installationsData) {
       // Crear las instalaciones en la base de datos y asociarlas a la propiedad
-      const installations = createPropertyDto.installations.map(
-        (installation) => {
-          return this.installationRepository.create({
+      const installations = installationsData.map(
+        ({ classification: classificationId, ...installation }) =>
+          this.installationRepository.create({
             ...installation,
+            classification: { id: classificationId },
             property,
-          });
-        },
+          }),
       );
       await this.installationRepository.save(installations);
     }
