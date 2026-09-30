@@ -11,7 +11,7 @@ export class AddNotificationDueDateUniqueIndex1790647000000
       'public';
 
     await queryRunner.query(
-      `CREATE UNIQUE INDEX "UQ_notification_due_date_source_user" ON "${schema}"."notification" ("sourceType", "sourceId", "dueDate", "userId")`,
+      `CREATE UNIQUE INDEX IF NOT EXISTS "UQ_notification_due_date_source_user" ON "${schema}"."notification" ("sourceType", "sourceId", "dueDate", "userId")`,
     );
   }
 
