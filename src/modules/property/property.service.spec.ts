@@ -69,8 +69,8 @@ describe('PropertyService.findAll', () => {
     ).resolves.toEqual([]);
 
     expect(query.andWhere).toHaveBeenCalledWith(
-      'LOWER(property.province) LIKE LOWER(:province)',
-      { province: '%Córdoba%' },
+      'property.province = :province',
+      { province: 'Córdoba' },
     );
     expect(query.andWhere).toHaveBeenCalledWith(
       'LOWER(property.address) LIKE LOWER(:address)',

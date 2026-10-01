@@ -1,8 +1,9 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsIn, IsOptional, IsString } from 'class-validator';
+import { PROVINCES } from '../../../shared/constants/provinces';
 
 export class PropertyFiltersDto {
   @IsOptional()
-  @IsString()
+  @IsIn(PROVINCES)
   province?: string;
 
   @IsOptional()
