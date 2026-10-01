@@ -1,12 +1,14 @@
 import {
   IsArray,
   IsBoolean,
+  IsIn,
   IsNumber,
   IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { PROVINCES } from '../../../shared/constants/provinces';
 import { IsRequired } from '../../../shared/decorators/is-required.decorator';
 import { ToNumber } from '../../../shared/decorators/to-number.decorator';
 import { CreatePropertyInstallationDto } from './create-property-installation.dto';
@@ -25,7 +27,7 @@ export class CreatePropertyDto {
   // @IsRequired()
   // outerImage: string;
 
-  @IsString()
+  @IsIn(PROVINCES)
   @IsRequired()
   province: string;
 

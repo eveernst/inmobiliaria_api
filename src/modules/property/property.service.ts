@@ -84,9 +84,9 @@ export class PropertyService {
         .leftJoinAndSelect('property.insurances', 'insurances')
         .leftJoinAndSelect('property.plans', 'plans');
 
-      if (filters.province?.trim()) {
-        query.andWhere('LOWER(property.province) LIKE LOWER(:province)', {
-          province: `%${filters.province.trim()}%`,
+      if (filters.province) {
+        query.andWhere('property.province = :province', {
+          province: filters.province,
         });
       }
 
