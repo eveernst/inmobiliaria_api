@@ -1,4 +1,4 @@
-import { ForbiddenException } from '@nestjs/common';
+import { ConflictException, ForbiddenException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserRole } from 'src/shared/enums/user-role.enum';
 
@@ -71,6 +71,17 @@ describe('UsersService', () => {
 
       expect(repository.count).not.toHaveBeenCalled();
       expect(repository.delete).toHaveBeenCalledWith(2);
+    });
+
+    it('rejects deleting a user that still has assigned properties', async () => {
+      repository.findOne.mockResolvedValue({
+        id: 2,
+        role: UserRole.ADMIN,
+        property: [{ id: 10 }],
+      });
+
+      await expect(service.remove(2)).rejects.toBeInstanceOf(ConflictException);
+      expect(repository.delete).not.toHaveBeenCalled();
     });
 
     it('keeps deleting a missing user as a no-op instead of crashing', async () => {

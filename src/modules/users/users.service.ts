@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -63,6 +67,15 @@ export class UsersService {
   }
 
   async remove(id: number): Promise<void> {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+      relations: ['property'],
+    });
+    if (user?.property?.length) {
+      throw new ConflictException(
+        `El usuario tiene ${user.property.length} propiedad(es) asignada(s). Reasignalas antes de eliminarlo.`,
+      );
+    }
     await this.assertNotLastSuperuser(id);
     await this.usersRepository.delete(id);
   }
