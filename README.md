@@ -68,7 +68,9 @@ $ npm run test:cov
 ## Database migrations
 
 The API uses PostgreSQL and TypeORM migrations. Schema synchronization is disabled in every
-environment, so apply schema changes explicitly:
+environment. Pending migrations run automatically when the API starts (`migrationsRun: true`),
+so a normal deploy needs no extra step. The CLI commands are for creating migrations and for
+running or reverting them by hand:
 
 ```bash
 # Generate a migration after changing an entity
@@ -83,6 +85,20 @@ npm run migration:revert
 
 Run these commands with the database variables configured in `.env`. Do not enable
 `synchronize` as a substitute for migrations.
+
+**Catch-up vs. new migrations.** The first three migrations (`InitialSchema`,
+`AddNotificationDueDateTracking`, `AddNotificationDueDateUniqueIndex`) are *catch-up* migrations:
+the shared database was built by `synchronize` before migrations existed, so they are idempotent
+(`IF NOT EXISTS`, guarded `ADD CONSTRAINT`). `src/database/migrations.spec.ts` checks those three
+only.
+
+**New migrations work the other way around:** they run on a known schema, so write them as plain
+statements that fail loudly. A no-op `IF NOT EXISTS` still gets recorded as applied, so a schema
+that doesn't match what you expected goes unnoticed until something breaks at runtime. Don't add
+new migrations to `migrations.spec.ts`.
+
+Keep specs and any other non-migration files out of `src/database/migrations/`, because every file
+in that folder is loaded as a migration.
 
 ## Resources
 

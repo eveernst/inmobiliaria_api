@@ -25,12 +25,18 @@ export class NotificationService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  findAll(): Promise<Notification[]> {
-    return this.notificationRepository.find();
+  findAll(userId: number): Promise<Notification[]> {
+    return this.notificationRepository.find({
+      where: { user: { id: userId } },
+    });
   }
 
-  findOne(id: number): Promise<Notification> {
-    return this.notificationRepository.findOne({ where: { id } });
+  // Scoped to the owner: another user's notification is indistinguishable
+  // from a missing one, so ids don't leak across users.
+  findOne(id: number, userId: number): Promise<Notification | null> {
+    return this.notificationRepository.findOne({
+      where: { id, user: { id: userId } },
+    });
   }
 
   async createRegistrationNotification(

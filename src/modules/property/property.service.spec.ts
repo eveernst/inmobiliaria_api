@@ -4,6 +4,7 @@ import { PropertyService } from './property.service';
 import { Property } from './entities/property.entity';
 import { CreatePropertyDto } from './dtos/create-property.dto';
 import { Classification } from '../classification/entities/classification.entity';
+import { Installation } from '../installation/entities/installation.entity';
 import { NotificationService } from '../notification/notification.service';
 
 describe('PropertyService.findAll', () => {
@@ -100,6 +101,10 @@ describe('PropertyService.create', () => {
   const classificationRepository = {
     findOne: jest.fn(),
   } as unknown as jest.Mocked<Repository<Classification>>;
+  const installationRepository = {
+    create: jest.fn(),
+    save: jest.fn(),
+  } as unknown as jest.Mocked<Repository<Installation>>;
   const notificationService = {
     createRegistrationNotification: jest.fn(),
   } as unknown as jest.Mocked<NotificationService>;
@@ -107,7 +112,7 @@ describe('PropertyService.create', () => {
   const service = new PropertyService(
     propertyRepository,
     classificationRepository,
-    {} as never,
+    installationRepository,
     {} as never,
     {} as never,
     {} as never,
@@ -145,5 +150,46 @@ describe('PropertyService.create', () => {
     );
 
     logError.mockRestore();
+  });
+
+  it('saves nested installations linked to the property and their classification', async () => {
+    const classification = { id: 2 } as Classification;
+    const property = { id: 21 } as Property;
+    const dto = {
+      classification: 2,
+      address: 'Av. Siempre Viva 742',
+      installations: [
+        {
+          name: 'Gas',
+          classification: 1,
+          quantity: 2,
+          file: '',
+          details: 'Boiler',
+        },
+      ],
+    } as CreatePropertyDto;
+
+    classificationRepository.findOne.mockResolvedValue(classification);
+    propertyRepository.create.mockReturnValue(property);
+    propertyRepository.save.mockResolvedValue(property);
+    installationRepository.create.mockImplementation(
+      (data) => data as Installation,
+    );
+
+    await service.create(dto, 7);
+
+    expect(propertyRepository.create).toHaveBeenCalledWith({
+      classification,
+      address: 'Av. Siempre Viva 742',
+    });
+    expect(installationRepository.create).toHaveBeenCalledWith({
+      name: 'Gas',
+      quantity: 2,
+      file: '',
+      details: 'Boiler',
+      classification: { id: 1 },
+      property,
+    });
+    expect(installationRepository.save).toHaveBeenCalledTimes(1);
   });
 });
