@@ -1,13 +1,27 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Insurance } from '../insurance-record/entities/insurance.entity';
 import { Rented } from '../rented-record/entities/rented.entity';
+import { Property } from '../property/entities/property.entity';
 import { NotificationService } from './notification.service';
+
+const NOTICE_WINDOW_DAYS = 7;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+interface DueDate {
+  sourceType: string;
+  sourceId: number;
+  dueDate: Date | undefined;
+  property: Property;
+  subject: string;
+}
 
 @Injectable()
 export class NotificationScheduler {
+  private readonly logger = new Logger(NotificationScheduler.name);
+
   constructor(
     @InjectRepository(Insurance)
     private readonly insuranceRepository: Repository<Insurance>,
@@ -16,9 +30,13 @@ export class NotificationScheduler {
     private readonly notificationService: NotificationService,
   ) {}
 
+  // Notifies every due date from today up to NOTICE_WINDOW_DAYS ahead, not
+  // only the exact 7th day, so a run missed while the app was down is caught
+  // up the next day. Running daily over the same window is safe: the service
+  // skips due dates already notified, and the unique index backs it up.
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async createDueDateNotifications(): Promise<void> {
-    const targetDate = this.addDays(new Date(), 7);
+    const today = this.startOfUtcDay(new Date());
 
     const [insurances, renteds] = await Promise.all([
       this.insuranceRepository.find({
@@ -29,73 +47,83 @@ export class NotificationScheduler {
       }),
     ]);
 
-    for (const insurance of insurances) {
-      await this.notifyInsuranceDate(
-        insurance,
-        insurance.insuranceDate,
-        targetDate,
-        'Vence el seguro del inmueble en 7 días',
-        'insurance-date',
-      );
-      await this.notifyInsuranceDate(
-        insurance,
-        insurance.AnualFormDate,
-        targetDate,
-        'Vence el formulario anual del seguro en 7 días',
-        'insurance-annual-date',
-      );
-    }
+    const dueDates: DueDate[] = [
+      ...insurances.flatMap((insurance) => [
+        {
+          sourceType: 'insurance-date',
+          sourceId: insurance.id,
+          dueDate: insurance.insuranceDate,
+          property: insurance.property,
+          subject: 'el seguro del inmueble',
+        },
+        {
+          sourceType: 'insurance-annual-date',
+          sourceId: insurance.id,
+          dueDate: insurance.AnualFormDate,
+          property: insurance.property,
+          subject: 'el formulario anual del seguro',
+        },
+      ]),
+      ...renteds.map((rented) => ({
+        sourceType: 'rented-contract',
+        sourceId: rented.id,
+        dueDate: rented.contratEndDate,
+        property: rented.property,
+        subject: 'el contrato de alquiler',
+      })),
+    ];
 
-    for (const rented of renteds) {
-      if (this.isSameDay(rented.contratEndDate, targetDate)) {
-        await this.notificationService.createDueDateNotification({
-          sourceType: 'rented-contract',
-          sourceId: rented.id,
-          dueDate: rented.contratEndDate,
-          property: rented.property,
-          message: 'Vence el contrato de alquiler en 7 días',
-        });
+    for (const due of dueDates) {
+      // One bad record must not cancel the notices for the rest of the day.
+      try {
+        await this.notifyIfDueSoon(due, today);
+      } catch (error) {
+        this.logger.error(
+          `Failed to create due-date notification for ${due.sourceType} ${due.sourceId}`,
+          error instanceof Error ? error.stack : String(error),
+        );
       }
     }
   }
 
-  private async notifyInsuranceDate(
-    insurance: Insurance,
-    dueDate: Date | undefined,
-    targetDate: Date,
-    message: string,
-    sourceType: string,
-  ): Promise<void> {
-    if (!dueDate || !this.isSameDay(dueDate, targetDate)) {
+  private async notifyIfDueSoon(due: DueDate, today: Date): Promise<void> {
+    if (!due.dueDate) {
+      return;
+    }
+
+    const daysLeft = Math.round(
+      (this.startOfUtcDay(new Date(due.dueDate)).getTime() - today.getTime()) /
+        DAY_MS,
+    );
+
+    if (daysLeft < 0 || daysLeft > NOTICE_WINDOW_DAYS) {
       return;
     }
 
     await this.notificationService.createDueDateNotification({
-      sourceType,
-      sourceId: insurance.id,
-      dueDate,
-      property: insurance.property,
-      message,
+      sourceType: due.sourceType,
+      sourceId: due.sourceId,
+      dueDate: due.dueDate,
+      property: due.property,
+      message: `Vence ${due.subject} ${this.whenLabel(daysLeft)}`,
     });
   }
 
-  private addDays(date: Date, days: number): Date {
-    const result = new Date(date);
-    result.setUTCHours(0, 0, 0, 0);
-    result.setUTCDate(result.getUTCDate() + days);
-    return result;
+  // The message is stored once per due date (deduplication), so it states
+  // the days left when it was first created.
+  private whenLabel(daysLeft: number): string {
+    if (daysLeft === 0) {
+      return 'hoy';
+    }
+    if (daysLeft === 1) {
+      return 'mañana';
+    }
+    return `en ${daysLeft} días`;
   }
 
-  private isSameDay(firstDate: Date | undefined, secondDate: Date): boolean {
-    if (!firstDate) {
-      return false;
-    }
-
-    const date = new Date(firstDate);
-    return (
-      date.getUTCFullYear() === secondDate.getUTCFullYear() &&
-      date.getUTCMonth() === secondDate.getUTCMonth() &&
-      date.getUTCDate() === secondDate.getUTCDate()
-    );
+  private startOfUtcDay(date: Date): Date {
+    const result = new Date(date);
+    result.setUTCHours(0, 0, 0, 0);
+    return result;
   }
 }
