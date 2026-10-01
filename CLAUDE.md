@@ -62,9 +62,11 @@ Current modules (`src/modules/`):
 - **`rented-record/`** — rental contracts.
 - **`writing-record/`** — deed records ("escrituras"), JDAAC/JDUA board votes.
 - **`notification/`** — system-generated warnings. Created on successful property/installation
-  registration, and by a daily `@Cron` job that warns 7 days before a document/contract's end
-  date (deduplicated: it checks for an existing notification for the same entity + due date
-  before inserting).
+  registration, and by a daily `@Cron` job that warns about every document/contract end date
+  within the next 7 days, not only the exact 7th day, so a run missed while the app was down is
+  caught up the next day. It's deduplicated (it checks for an existing notification for the same
+  entity + due date + user before inserting, backed by a unique index), and each record is
+  processed in its own try/catch so one bad record doesn't stop the rest.
 
 Shared code lives in `src/shared/`:
 
