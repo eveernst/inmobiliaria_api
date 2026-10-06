@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { Notification } from 'src/modules/notification/entities/notification.entity';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UserRole } from 'src/shared/enums/user-role.enum';
 import * as bcrypt from 'bcrypt';
@@ -66,6 +67,9 @@ export class UsersService {
     }
   }
 
+  // Both FKs to user are ON DELETE NO ACTION. Per CU 1.3.2 a user with
+  // properties can't be deleted until they're reassigned; notifications are
+  // personal, so they're deleted along with the user.
   async remove(id: number): Promise<void> {
     const user = await this.usersRepository.findOne({
       where: { id },
@@ -77,6 +81,9 @@ export class UsersService {
       );
     }
     await this.assertNotLastSuperuser(id);
-    await this.usersRepository.delete(id);
+    await this.usersRepository.manager.transaction(async (manager) => {
+      await manager.delete(Notification, { user: { id } });
+      await manager.delete(User, id);
+    });
   }
 }
