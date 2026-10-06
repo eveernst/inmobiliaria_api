@@ -127,4 +127,13 @@ describe('CreatePropertyDto with the global ValidationPipe', () => {
       );
     },
   );
+
+  it('rejects a province outside the AAC list (requirement 14)', async () => {
+    const errors = await errorsFor({
+      ...formPayload,
+      province: 'Buenos Aires',
+    });
+
+    expect(errors).toEqual([expect.stringContaining('province')]);
+  });
 });
