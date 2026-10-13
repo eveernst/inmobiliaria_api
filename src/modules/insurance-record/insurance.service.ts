@@ -22,11 +22,15 @@ export class InsuranceService {
     return this.insuranceRepository.find({ relations: ['property'] });
   }
 
-  findOne(id: number): Promise<Insurance> {
-    return this.insuranceRepository.findOne({
+  async findOne(id: number): Promise<Insurance> {
+    const insurance = await this.insuranceRepository.findOne({
       where: { id },
       relations: ['property'],
     });
+    if (!insurance) {
+      throw new NotFoundException('Insurance not found');
+    }
+    return insurance;
   }
 
   async update(
@@ -38,7 +42,10 @@ export class InsuranceService {
   }
 
   async remove(id: number): Promise<void> {
-    await this.insuranceRepository.delete(id);
+    const { affected } = await this.insuranceRepository.delete(id);
+    if (!affected) {
+      throw new NotFoundException('Insurance not found');
+    }
   }
 
   async create(createInsuranceDto: CreateInsuranceDto): Promise<Insurance> {

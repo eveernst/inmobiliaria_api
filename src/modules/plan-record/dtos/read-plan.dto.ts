@@ -2,6 +2,9 @@ import { Expose } from 'class-transformer';
 
 export class ReadPlanDto {
   @Expose()
+  id: number;
+
+  @Expose()
   generalPlan: boolean;
 
   @Expose()

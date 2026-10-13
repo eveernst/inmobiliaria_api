@@ -22,11 +22,15 @@ export class PlanService {
     return this.planRepository.find({ relations: ['property'] });
   }
 
-  findOne(id: number): Promise<Plan> {
-    return this.planRepository.findOne({
+  async findOne(id: number): Promise<Plan> {
+    const plan = await this.planRepository.findOne({
       where: { id },
       relations: ['property'],
     });
+    if (!plan) {
+      throw new NotFoundException('Plan not found');
+    }
+    return plan;
   }
 
   async update(id: number, planData: Partial<Plan>): Promise<Plan> {
@@ -35,7 +39,10 @@ export class PlanService {
   }
 
   async remove(id: number): Promise<void> {
-    await this.planRepository.delete(id);
+    const { affected } = await this.planRepository.delete(id);
+    if (!affected) {
+      throw new NotFoundException('Plan not found');
+    }
   }
 
   async create(createPlanDto: CreatePlanDto): Promise<Plan> {

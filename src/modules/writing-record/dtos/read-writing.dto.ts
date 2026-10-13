@@ -2,6 +2,9 @@ import { Expose } from 'class-transformer';
 
 export class ReadWritingDto {
   @Expose()
+  id: number;
+
+  @Expose()
   writingNumber: number;
 
   @Expose()

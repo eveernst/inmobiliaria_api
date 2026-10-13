@@ -7,6 +7,7 @@ import {
   Delete,
   Put,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { InsuranceService } from './insurance.service';
 import { Insurance } from './entities/insurance.entity';
@@ -31,7 +32,7 @@ export class InsuranceController {
 
   @Get(':id')
   async findOne(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
   ): Promise<GenericResponse<ReadInsuranceDto>> {
     const insurance = await this.insuranceService.findOne(id);
     const response = plainToClass(ReadInsuranceDto, insurance);
@@ -47,7 +48,7 @@ export class InsuranceController {
   @Put(':id')
   @Roles(UserRole.ADMIN)
   update(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() insuranceData: Partial<Insurance>,
   ): Promise<Insurance> {
     return this.insuranceService.update(id, insuranceData);
@@ -55,7 +56,7 @@ export class InsuranceController {
 
   @Delete(':id')
   @Roles(UserRole.ADMIN)
-  remove(@Param('id') id: number): Promise<void> {
+  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.insuranceService.remove(id);
   }
 }

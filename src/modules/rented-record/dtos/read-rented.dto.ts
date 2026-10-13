@@ -1,6 +1,9 @@
 import { Expose } from 'class-transformer';
 
 export class ReadRentedDto {
+  @Expose()
+  id: number;
+
   // datos del propietario
   @Expose()
   ownerDetails: string;

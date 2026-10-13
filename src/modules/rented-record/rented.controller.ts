@@ -7,6 +7,7 @@ import {
   Delete,
   Put,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { RentedService } from './rented.service';
 import { CreateRentedDto } from './dtos/create-rented.dto';
@@ -31,7 +32,7 @@ export class RentedController {
 
   @Get(':id')
   async findOne(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
   ): Promise<GenericResponse<ReadRentedDto>> {
     const rented = await this.rentedService.findOne(id);
     const response = plainToClass(ReadRentedDto, rented);
@@ -47,7 +48,7 @@ export class RentedController {
   @Put(':id')
   @Roles(UserRole.ADMIN)
   update(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() rentedData: Partial<Rented>,
   ): Promise<Rented> {
     return this.rentedService.update(id, rentedData);
@@ -55,7 +56,7 @@ export class RentedController {
 
   @Delete(':id')
   @Roles(UserRole.ADMIN)
-  remove(@Param('id') id: number): Promise<void> {
+  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.rentedService.remove(id);
   }
 }
