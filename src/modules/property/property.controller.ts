@@ -13,8 +13,8 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { PropertyService } from './property.service';
-import { Property } from './entities/property.entity';
 import { CreatePropertyDto } from './dtos/create-property.dto';
+import { UpdatePropertyDto } from './dtos/update-property.dto';
 import { GenericResponse } from 'src/shared/generic-response.dto';
 import { plainToClass } from 'class-transformer';
 import { ReadPropertyDto } from './dtos/read-property.dto';
@@ -62,7 +62,7 @@ export class PropertyController {
   @Roles(UserRole.ADMIN)
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() propertyData: Partial<Property>,
+    @Body() propertyData: UpdatePropertyDto,
   ): Promise<ReadPropertyInstallationDto> {
     console.log('=== UPDATE PROPERTY ===');
     console.log('ID:', id);

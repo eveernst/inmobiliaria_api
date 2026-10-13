@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Property } from './entities/property.entity';
 import { CreatePropertyDto } from './dtos/create-property.dto';
+import { UpdatePropertyDto } from './dtos/update-property.dto';
 import { Classification } from '../classification/entities/classification.entity';
 import { Installation } from '../installation/entities/installation.entity';
 import { ReadPropertyDto } from './dtos/read-property.dto';
@@ -205,7 +206,7 @@ export class PropertyService {
 
   async update(
     id: number,
-    propertyData: Partial<Property>,
+    propertyData: UpdatePropertyDto,
   ): Promise<ReadPropertyInstallationDto> {
     // Buscar la propiedad con sus relaciones necesarias
     const property = await this.propertyRepository.findOne({
@@ -225,13 +226,10 @@ export class PropertyService {
     }
 
     // Verificar y asignar la nueva clasificación
-    const classificationId =
-      typeof propertyData.classification === 'object'
-        ? propertyData.classification?.id
-        : parseInt(propertyData.classification as any);
+    const classificationId = propertyData.classification;
 
     let classificationToSave = null;
-    if (classificationId && !isNaN(classificationId)) {
+    if (classificationId) {
       const classification = await this.classificationRepository.findOne({
         where: { id: classificationId },
       });
@@ -247,12 +245,6 @@ export class PropertyService {
     const { installations, ...propertyFields } = propertyData as any;
 
     delete propertyFields.classification;
-    delete propertyFields.user;
-    delete propertyFields.insurances;
-    delete propertyFields.plans;
-    delete propertyFields.renteds;
-    delete propertyFields.writings;
-    delete propertyFields.id;
 
     // Actualizar campos simples
     await this.propertyRepository.update(id, propertyFields);
