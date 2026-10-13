@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Insurance } from './entities/insurance.entity';
@@ -49,10 +45,6 @@ export class InsuranceService {
   }
 
   async create(createInsuranceDto: CreateInsuranceDto): Promise<Insurance> {
-    if (!createInsuranceDto.propertyId) {
-      throw new BadRequestException('propertyId is required');
-    }
-
     const property = await this.propertyRepository.findOne({
       where: { id: createInsuranceDto.propertyId },
     });

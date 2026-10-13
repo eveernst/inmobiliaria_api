@@ -1,10 +1,13 @@
 import {
   IsBoolean,
   IsDate,
+  IsInt,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { IsRequired } from 'src/shared/decorators/is-required.decorator';
 
 export class CreatePlanDto {
@@ -23,6 +26,7 @@ export class CreatePlanDto {
   @IsRequired()
   year: number;
 
+  @IsOptional()
   @IsString()
   planImage?: string;
 
@@ -31,6 +35,7 @@ export class CreatePlanDto {
   @IsNotEmpty()
   structurePlan: boolean;
 
+  @IsOptional()
   @IsString()
   structureImage?: string;
 
@@ -39,6 +44,7 @@ export class CreatePlanDto {
   @IsNotEmpty()
   gasPlan: boolean;
 
+  @IsOptional()
   @IsString()
   gasImage?: string;
 
@@ -47,6 +53,7 @@ export class CreatePlanDto {
   @IsNotEmpty()
   waterPlan: boolean;
 
+  @IsOptional()
   @IsString()
   waterImage?: string;
 
@@ -55,6 +62,7 @@ export class CreatePlanDto {
   @IsNotEmpty()
   lightPlan: boolean;
 
+  @IsOptional()
   @IsString()
   lightImage?: string;
 
@@ -63,6 +71,7 @@ export class CreatePlanDto {
   @IsNotEmpty()
   projectPlan: boolean;
 
+  @IsOptional()
   @IsString()
   projectImage?: string;
 
@@ -71,6 +80,7 @@ export class CreatePlanDto {
   @IsNotEmpty()
   finalPlan: boolean;
 
+  @IsOptional()
   @IsString()
   finalImage?: string;
 
@@ -90,6 +100,7 @@ export class CreatePlanDto {
   @IsRequired()
   yearUpdate: number;
 
+  @IsOptional()
   @IsString()
   stateImage?: string;
 
@@ -104,6 +115,7 @@ export class CreatePlanDto {
   professionalContact: string;
 
   // visado municipal
+  @Type(() => Date)
   @IsDate()
   @IsNotEmpty()
   @IsRequired()
@@ -114,6 +126,7 @@ export class CreatePlanDto {
   @IsRequired()
   numberVisado: number;
 
+  @IsOptional()
   @IsString()
   imageVisado?: string;
 
@@ -132,8 +145,7 @@ export class CreatePlanDto {
   @IsRequired()
   contacts: string;
 
-  @IsNumber()
-  @IsNotEmpty()
+  @IsInt()
   @IsRequired()
   propertyId: number;
 }

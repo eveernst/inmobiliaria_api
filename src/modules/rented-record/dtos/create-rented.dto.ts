@@ -1,11 +1,20 @@
-import { IsDate, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsDate,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 import { IsRequired } from 'src/shared/decorators/is-required.decorator';
 
 export class CreateRentedDto {
+  // Text fields the form treats as optional arrive as ''. The columns are
+  // NOT NULL, so '' is accepted and stored; omitting the field is rejected.
+
   // datos del propietario
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   ownerDetails: string;
 
   @IsString()
@@ -14,36 +23,28 @@ export class CreateRentedDto {
   affectation: string;
 
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   ownerContact: string;
 
   // datos del inquilino
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   renterDetails: string;
 
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   address: string;
 
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   renterContact: string;
 
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   locality: string;
 
+  @Type(() => Date)
   @IsDate()
   @IsNotEmpty()
   @IsRequired()
   contratStartDate: Date;
 
+  @Type(() => Date)
   @IsDate()
   @IsNotEmpty()
   @IsRequired()
@@ -60,15 +61,13 @@ export class CreateRentedDto {
   price: number;
 
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   adjustmentType: string;
 
+  @IsOptional()
   @IsString()
   contractImage?: string;
 
-  @IsNumber()
-  @IsNotEmpty()
+  @IsInt()
   @IsRequired()
   propertyId: number;
 }
