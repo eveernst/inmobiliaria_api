@@ -1,8 +1,8 @@
 import {
   IsBoolean,
   IsEmail,
+  IsInt,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
   Matches,
@@ -91,8 +91,7 @@ export class CreateInsuranceDto {
   @IsRequired()
   observations: string;
 
-  @IsNumber()
-  @IsNotEmpty()
+  @IsInt()
   @IsRequired()
   propertyId: number;
 }

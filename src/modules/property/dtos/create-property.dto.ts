@@ -39,6 +39,7 @@ export class CreatePropertyDto {
   @IsRequired()
   address: string;
 
+  @ToNumber()
   @IsNumber()
   @IsRequired()
   postalCode: number;
@@ -85,6 +86,7 @@ export class CreatePropertyDto {
   @IsString()
   file?: string;
 
+  @ToNumber()
   @IsNumber()
   @IsRequired()
   classification: number; // El ID de Classification
