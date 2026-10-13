@@ -22,11 +22,15 @@ export class RentedService {
     return this.rentedRepository.find({ relations: ['property'] });
   }
 
-  findOne(id: number): Promise<Rented> {
-    return this.rentedRepository.findOne({
+  async findOne(id: number): Promise<Rented> {
+    const rented = await this.rentedRepository.findOne({
       where: { id },
       relations: ['property'],
     });
+    if (!rented) {
+      throw new NotFoundException('Rented record not found');
+    }
+    return rented;
   }
 
   async update(id: number, rentedData: Partial<Rented>): Promise<Rented> {
@@ -35,7 +39,10 @@ export class RentedService {
   }
 
   async remove(id: number): Promise<void> {
-    await this.rentedRepository.delete(id);
+    const { affected } = await this.rentedRepository.delete(id);
+    if (!affected) {
+      throw new NotFoundException('Rented record not found');
+    }
   }
 
   async create(createRentedDto: CreateRentedDto): Promise<Rented> {

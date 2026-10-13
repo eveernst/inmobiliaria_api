@@ -3,6 +3,9 @@ import { Property } from 'src/modules/property/entities/property.entity';
 
 export class ReadInsuranceDto {
   @Expose()
+  id: number;
+
+  @Expose()
   name: string;
 
   @Expose()

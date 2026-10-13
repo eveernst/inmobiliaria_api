@@ -7,6 +7,7 @@ import {
   Delete,
   Put,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { WritingService } from './writing.service';
 import { Writing } from './entities/writing.entity';
@@ -31,7 +32,7 @@ export class WritingController {
 
   @Get(':id')
   async findOne(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
   ): Promise<GenericResponse<ReadWritingDto>> {
     const writing = await this.writingService.findOne(id);
     const response = plainToClass(ReadWritingDto, writing);
@@ -47,7 +48,7 @@ export class WritingController {
   @Put(':id')
   @Roles(UserRole.ADMIN)
   update(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() writingData: Partial<Writing>,
   ): Promise<Writing> {
     return this.writingService.update(id, writingData);
@@ -55,7 +56,7 @@ export class WritingController {
 
   @Delete(':id')
   @Roles(UserRole.ADMIN)
-  remove(@Param('id') id: number): Promise<void> {
+  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.writingService.remove(id);
   }
 }

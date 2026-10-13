@@ -22,11 +22,15 @@ export class WritingService {
     return this.writingRepository.find({ relations: ['property'] });
   }
 
-  findOne(id: number): Promise<Writing> {
-    return this.writingRepository.findOne({
+  async findOne(id: number): Promise<Writing> {
+    const writing = await this.writingRepository.findOne({
       where: { id },
       relations: ['property'],
     });
+    if (!writing) {
+      throw new NotFoundException('Writing not found');
+    }
+    return writing;
   }
 
   async update(id: number, writingData: Partial<Writing>): Promise<Writing> {
@@ -35,7 +39,10 @@ export class WritingService {
   }
 
   async remove(id: number): Promise<void> {
-    await this.writingRepository.delete(id);
+    const { affected } = await this.writingRepository.delete(id);
+    if (!affected) {
+      throw new NotFoundException('Writing not found');
+    }
   }
 
   async create(createWritingDto: CreateWritingDto): Promise<Writing> {
