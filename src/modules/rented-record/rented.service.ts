@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Rented } from './entities/rented.entity';
 import { CreateRentedDto } from './dtos/create-rented.dto';
+import { UpdateRentedDto } from './dtos/update-rented.dto';
 import { Property } from '../property/entities/property.entity';
 
 @Injectable()
@@ -29,8 +30,10 @@ export class RentedService {
     return rented;
   }
 
-  async update(id: number, rentedData: Partial<Rented>): Promise<Rented> {
-    await this.rentedRepository.update(id, rentedData);
+  async update(id: number, rentedData: UpdateRentedDto): Promise<Rented> {
+    if (Object.keys(rentedData).length > 0) {
+      await this.rentedRepository.update(id, rentedData);
+    }
     return this.findOne(id);
   }
 

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Plan } from './entities/plan.entity';
 import { CreatePlanDto } from './dtos/create-plan.dto';
+import { UpdatePlanDto } from './dtos/update-plan.dto';
 import { Property } from '../property/entities/property.entity';
 
 @Injectable()
@@ -29,8 +30,10 @@ export class PlanService {
     return plan;
   }
 
-  async update(id: number, planData: Partial<Plan>): Promise<Plan> {
-    await this.planRepository.update(id, planData);
+  async update(id: number, planData: UpdatePlanDto): Promise<Plan> {
+    if (Object.keys(planData).length > 0) {
+      await this.planRepository.update(id, planData);
+    }
     return this.findOne(id);
   }
 

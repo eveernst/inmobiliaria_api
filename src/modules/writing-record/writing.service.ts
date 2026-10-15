@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Writing } from './entities/writing.entity';
 import { CreateWritingDto } from './dtos/create-writing.dto';
+import { UpdateWritingDto } from './dtos/update-writing.dto';
 import { Property } from '../property/entities/property.entity';
 
 @Injectable()
@@ -29,8 +30,10 @@ export class WritingService {
     return writing;
   }
 
-  async update(id: number, writingData: Partial<Writing>): Promise<Writing> {
-    await this.writingRepository.update(id, writingData);
+  async update(id: number, writingData: UpdateWritingDto): Promise<Writing> {
+    if (Object.keys(writingData).length > 0) {
+      await this.writingRepository.update(id, writingData);
+    }
     return this.findOne(id);
   }
 

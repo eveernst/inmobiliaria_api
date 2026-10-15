@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { RentedService } from './rented.service';
 import { CreateRentedDto } from './dtos/create-rented.dto';
+import { UpdateRentedDto } from './dtos/update-rented.dto';
 import { ReadRentedDto } from './dtos/read-rented.dto';
 import { GenericResponse } from 'src/shared/generic-response.dto';
 import { plainToClass } from 'class-transformer';
@@ -49,7 +50,7 @@ export class RentedController {
   @Roles(UserRole.ADMIN)
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() rentedData: Partial<Rented>,
+    @Body() rentedData: UpdateRentedDto,
   ): Promise<Rented> {
     return this.rentedService.update(id, rentedData);
   }

@@ -12,6 +12,7 @@ import {
 import { PlanService } from './plan.service';
 import { Plan } from './entities/plan.entity';
 import { CreatePlanDto } from './dtos/create-plan.dto';
+import { UpdatePlanDto } from './dtos/update-plan.dto';
 import { ReadPlanDto } from './dtos/read-plan.dto';
 import { GenericResponse } from 'src/shared/generic-response.dto';
 import { plainToClass } from 'class-transformer';
@@ -49,7 +50,7 @@ export class PlanController {
   @Roles(UserRole.ADMIN)
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() planData: Partial<Plan>,
+    @Body() planData: UpdatePlanDto,
   ): Promise<Plan> {
     return this.planService.update(id, planData);
   }

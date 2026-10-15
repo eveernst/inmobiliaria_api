@@ -12,6 +12,7 @@ import {
 import { WritingService } from './writing.service';
 import { Writing } from './entities/writing.entity';
 import { CreateWritingDto } from './dtos/create-writing.dto';
+import { UpdateWritingDto } from './dtos/update-writing.dto';
 import { ReadWritingDto } from './dtos/read-writing.dto';
 import { GenericResponse } from 'src/shared/generic-response.dto';
 import { plainToClass } from 'class-transformer';
@@ -49,7 +50,7 @@ export class WritingController {
   @Roles(UserRole.ADMIN)
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() writingData: Partial<Writing>,
+    @Body() writingData: UpdateWritingDto,
   ): Promise<Writing> {
     return this.writingService.update(id, writingData);
   }
