@@ -108,7 +108,9 @@ const insurancePayload = {
   team: false,
   content: false,
   values: false,
-  observations: '',
+  insuranceDate: '2026-03-01',
+  AnualFormDate: '2026-12-01',
+  observations: 'None',
   propertyId: 2,
 };
 
@@ -143,10 +145,10 @@ describe('Document Create DTOs with the global ValidationPipe', () => {
   });
 
   describe('CreatePlanDto', () => {
-    it('accepts the form payload and converts dateVisado to a Date', async () => {
+    it('accepts the form payload and keeps dateVisado as a calendar date', async () => {
       const dto = await validate(CreatePlanDto, planPayload);
 
-      expect(dto.dateVisado).toEqual(new Date('2024-05-10'));
+      expect(dto.dateVisado).toBe('2024-05-10');
     });
 
     it('accepts images that are missing or removed', async () => {
@@ -167,17 +169,19 @@ describe('Document Create DTOs with the global ValidationPipe', () => {
           dateVisado,
         });
 
-        expect(errors).toContain('dateVisado must be a Date instance');
+        expect(errors).toContain(
+          'dateVisado must be a valid date in YYYY-MM-DD format',
+        );
       },
     );
   });
 
   describe('CreateRentedDto', () => {
-    it('accepts the form payload and converts both dates', async () => {
+    it('accepts the form payload and keeps both dates as calendar dates', async () => {
       const dto = await validate(CreateRentedDto, rentedPayload);
 
-      expect(dto.contratStartDate).toEqual(new Date('2026-01-01'));
-      expect(dto.contratEndDate).toEqual(new Date('2027-01-01'));
+      expect(dto.contratStartDate).toBe('2026-01-01');
+      expect(dto.contratEndDate).toBe('2027-01-01');
     });
 
     it('accepts a contract image when one was uploaded', async () => {
@@ -209,7 +213,9 @@ describe('Document Create DTOs with the global ValidationPipe', () => {
           [field]: '',
         });
 
-        expect(errors).toContain(`${field} must be a Date instance`);
+        expect(errors).toContain(
+          `${field} must be a valid date in YYYY-MM-DD format`,
+        );
       },
     );
 
@@ -224,11 +230,11 @@ describe('Document Create DTOs with the global ValidationPipe', () => {
   });
 
   describe('CreateWritingDto', () => {
-    it('accepts the form payload and converts both vote dates', async () => {
+    it('accepts the form payload and keeps both vote dates as calendar dates', async () => {
       const dto = await validate(CreateWritingDto, writingPayload);
 
-      expect(dto.voteDateJDAAC).toEqual(new Date('2023-03-01'));
-      expect(dto.voteDateJDUA).toEqual(new Date('2023-04-01'));
+      expect(dto.voteDateJDAAC).toBe('2023-03-01');
+      expect(dto.voteDateJDUA).toBe('2023-04-01');
     });
 
     it('accepts images that are missing or removed', async () => {
@@ -249,7 +255,9 @@ describe('Document Create DTOs with the global ValidationPipe', () => {
           [field]: '',
         });
 
-        expect(errors).toContain(`${field} must be a Date instance`);
+        expect(errors).toContain(
+          `${field} must be a valid date in YYYY-MM-DD format`,
+        );
       },
     );
 
@@ -268,6 +276,112 @@ describe('Document Create DTOs with the global ValidationPipe', () => {
       });
 
       expect(errors).toContain(`ERR_${field.toUpperCase()}_IS_REQUIRED`);
+    });
+  });
+
+  // Required: the due-date scheduler warns on both dates (issue #46).
+  describe('CreateInsuranceDto', () => {
+    it('accepts the form payload and keeps both dates as calendar dates', async () => {
+      const dto = await validate(CreateInsuranceDto, insurancePayload);
+
+      expect(dto.insuranceDate).toBe('2026-03-01');
+      expect(dto.AnualFormDate).toBe('2026-12-01');
+    });
+
+    // The form omits an empty date instead of sending ''.
+    it.each(['insuranceDate', 'AnualFormDate'])(
+      'rejects a missing %s',
+      async (field) => {
+        const errors = await errorsFor(CreateInsuranceDto, {
+          ...insurancePayload,
+          [field]: undefined,
+        });
+
+        expect(errors).toContain(`ERR_${field.toUpperCase()}_IS_REQUIRED`);
+      },
+    );
+
+    it('accepts empty observations', async () => {
+      await expect(
+        errorsFor(CreateInsuranceDto, {
+          ...insurancePayload,
+          observations: '',
+        }),
+      ).resolves.toEqual([]);
+    });
+
+    it('still requires observations to be sent, even empty', async () => {
+      const withoutObservations: object = {
+        ...insurancePayload,
+        observations: undefined,
+      };
+
+      const errors = await errorsFor(CreateInsuranceDto, withoutObservations);
+
+      expect(errors).toContain('observations must be a string');
+    });
+
+    it.each(['insuranceDate', 'AnualFormDate'])(
+      'rejects an invalid %s',
+      async (field) => {
+        const errors = await errorsFor(CreateInsuranceDto, {
+          ...insurancePayload,
+          [field]: 'not-a-date',
+        });
+
+        expect(errors).toContain(
+          `${field} must be a valid date in YYYY-MM-DD format`,
+        );
+      },
+    );
+  });
+
+  describe('date fields', () => {
+    const dateFields = [
+      ['CreatePlanDto', CreatePlanDto, planPayload, 'dateVisado'],
+      ['CreateRentedDto', CreateRentedDto, rentedPayload, 'contratStartDate'],
+      ['CreateRentedDto', CreateRentedDto, rentedPayload, 'contratEndDate'],
+      ['CreateWritingDto', CreateWritingDto, writingPayload, 'voteDateJDAAC'],
+      ['CreateWritingDto', CreateWritingDto, writingPayload, 'voteDateJDUA'],
+      [
+        'CreateInsuranceDto',
+        CreateInsuranceDto,
+        insurancePayload,
+        'insuranceDate',
+      ],
+      [
+        'CreateInsuranceDto',
+        CreateInsuranceDto,
+        insurancePayload,
+        'AnualFormDate',
+      ],
+    ] as const;
+
+    // A Date would mean UTC midnight, stored a day earlier west of UTC.
+    it.each(dateFields)(
+      '%s keeps %s as the string the form sent',
+      async (_, dto, payload, field) => {
+        const result = await validate<object>(dto, {
+          ...payload,
+          [field]: '2026-03-01',
+        });
+
+        expect(result[field]).toBe('2026-03-01');
+      },
+    );
+
+    it.each(
+      dateFields.flatMap((entry) =>
+        ['01/03/2026', '2026-3-1', '2026-02-30', '2026-03-01T00:00:00Z'].map(
+          (value) => [...entry, value] as const,
+        ),
+      ),
+    )('%s rejects %s = %p', async (_, dto, payload, field, value) => {
+      const errors = await errorsFor(dto, { ...payload, [field]: value });
+
+      expect(errors).toContain(
+        `${field} must be a valid date in YYYY-MM-DD format`,
+      );
     });
   });
 

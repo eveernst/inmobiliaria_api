@@ -1,14 +1,13 @@
 import {
   IsBoolean,
-  IsDate,
   IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 import { IsRequired } from 'src/shared/decorators/is-required.decorator';
+import { IsCalendarDate } from 'src/shared/decorators/is-calendar-date.decorator';
 
 export class CreatePlanDto {
   // plano general
@@ -115,11 +114,9 @@ export class CreatePlanDto {
   professionalContact: string;
 
   // visado municipal
-  @Type(() => Date)
-  @IsDate()
-  @IsNotEmpty()
+  @IsCalendarDate()
   @IsRequired()
-  dateVisado: Date;
+  dateVisado: string;
 
   @IsNumber()
   @IsNotEmpty()

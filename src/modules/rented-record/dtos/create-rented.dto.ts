@@ -1,13 +1,12 @@
 import {
-  IsDate,
   IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 import { IsRequired } from 'src/shared/decorators/is-required.decorator';
+import { IsCalendarDate } from 'src/shared/decorators/is-calendar-date.decorator';
 
 export class CreateRentedDto {
   // Text fields the form treats as optional arrive as ''. The columns are
@@ -38,17 +37,13 @@ export class CreateRentedDto {
   @IsString()
   locality: string;
 
-  @Type(() => Date)
-  @IsDate()
-  @IsNotEmpty()
+  @IsCalendarDate()
   @IsRequired()
-  contratStartDate: Date;
+  contratStartDate: string;
 
-  @Type(() => Date)
-  @IsDate()
-  @IsNotEmpty()
+  @IsCalendarDate()
   @IsRequired()
-  contratEndDate: Date;
+  contratEndDate: string;
 
   @IsString()
   @IsNotEmpty()

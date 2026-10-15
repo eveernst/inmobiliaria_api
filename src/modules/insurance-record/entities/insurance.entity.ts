@@ -41,7 +41,7 @@ export class Insurance extends BaseEntity {
   insuranceImage?: string;
 
   @Column()
-  insuranceDate?: Date;
+  insuranceDate: Date;
 
   // formulario anual
   @Column({ length: 1024, nullable: true })
@@ -51,7 +51,7 @@ export class Insurance extends BaseEntity {
   AnualFormImage?: string;
 
   @Column()
-  AnualFormDate?: Date;
+  AnualFormDate: Date;
 
   @Column()
   observations: string;
