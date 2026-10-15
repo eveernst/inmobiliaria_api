@@ -1,13 +1,12 @@
 import {
-  IsDate,
   IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 import { IsRequired } from '../../../shared/decorators/is-required.decorator';
+import { IsCalendarDate } from '../../../shared/decorators/is-calendar-date.decorator';
 
 export class CreateWritingDto {
   // Text fields the form treats as optional arrive as ''. The columns are
@@ -23,11 +22,9 @@ export class CreateWritingDto {
   @IsRequired()
   voteNumberJDAAC: number;
 
-  @Type(() => Date)
-  @IsDate()
-  @IsNotEmpty()
+  @IsCalendarDate()
   @IsRequired()
-  voteDateJDAAC: Date;
+  voteDateJDAAC: string;
 
   @IsOptional()
   @IsString()
@@ -38,11 +35,9 @@ export class CreateWritingDto {
   @IsRequired()
   voteNumberJDUA: number;
 
-  @Type(() => Date)
-  @IsDate()
-  @IsNotEmpty()
+  @IsCalendarDate()
   @IsRequired()
-  voteDateJDUA: Date;
+  voteDateJDUA: string;
 
   @IsOptional()
   @IsString()

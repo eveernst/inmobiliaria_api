@@ -8,6 +8,7 @@ import {
   Matches,
 } from 'class-validator';
 import { IsRequired } from 'src/shared/decorators/is-required.decorator';
+import { IsCalendarDate } from 'src/shared/decorators/is-calendar-date.decorator';
 
 export class CreateInsuranceDto {
   // responsable del seguro ARM
@@ -69,9 +70,9 @@ export class CreateInsuranceDto {
   @IsString()
   insuranceImage?: string;
 
-  @IsOptional()
-  @IsString()
-  insuranceDate?: string;
+  @IsCalendarDate()
+  @IsRequired()
+  insuranceDate: string;
 
   // formulario anual
   @IsOptional()
@@ -82,13 +83,13 @@ export class CreateInsuranceDto {
   @IsString()
   AnualFormImage?: string;
 
-  @IsOptional()
-  @IsString()
-  AnualFormDate?: string;
-
-  @IsString()
-  @IsNotEmpty()
+  @IsCalendarDate()
   @IsRequired()
+  AnualFormDate: string;
+
+  // Text fields the form treats as optional arrive as ''. The columns are
+  // NOT NULL, so '' is accepted and stored; omitting the field is rejected.
+  @IsString()
   observations: string;
 
   @IsInt()
