@@ -1,4 +1,5 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
+import { ReadPropertySummaryDto } from 'src/modules/property/dtos/read-property-summary.dto';
 
 export class ReadWritingDto {
   @Expose()
@@ -81,4 +82,8 @@ export class ReadWritingDto {
 
   @Expose()
   detailSpaces: string;
+
+  @Expose()
+  @Type(() => ReadPropertySummaryDto)
+  property: ReadPropertySummaryDto;
 }
