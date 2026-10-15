@@ -12,6 +12,7 @@ import {
 import { InsuranceService } from './insurance.service';
 import { Insurance } from './entities/insurance.entity';
 import { CreateInsuranceDto } from './dtos/create-insurance.dto';
+import { UpdateInsuranceDto } from './dtos/update-insurance.dto';
 import { ReadInsuranceDto } from './dtos/read-insurance.dto';
 import { GenericResponse } from 'src/shared/generic-response.dto';
 import { plainToClass } from 'class-transformer';
@@ -49,7 +50,7 @@ export class InsuranceController {
   @Roles(UserRole.ADMIN)
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() insuranceData: Partial<Insurance>,
+    @Body() insuranceData: UpdateInsuranceDto,
   ): Promise<Insurance> {
     return this.insuranceService.update(id, insuranceData);
   }
