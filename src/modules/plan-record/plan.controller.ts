@@ -10,12 +10,11 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { PlanService } from './plan.service';
-import { Plan } from './entities/plan.entity';
 import { CreatePlanDto } from './dtos/create-plan.dto';
 import { UpdatePlanDto } from './dtos/update-plan.dto';
 import { ReadPlanDto } from './dtos/read-plan.dto';
 import { GenericResponse } from 'src/shared/generic-response.dto';
-import { plainToClass } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
@@ -27,8 +26,11 @@ export class PlanController {
   constructor(private readonly planService: PlanService) {}
 
   @Get()
-  findAll(): Promise<Plan[]> {
-    return this.planService.findAll();
+  async findAll(): Promise<ReadPlanDto[]> {
+    const items = await this.planService.findAll();
+    return plainToInstance(ReadPlanDto, items, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Get(':id')
@@ -36,23 +38,31 @@ export class PlanController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<GenericResponse<ReadPlanDto>> {
     const plan = await this.planService.findOne(id);
-    const response = plainToClass(ReadPlanDto, plan);
+    const response = plainToInstance(ReadPlanDto, plan, {
+      excludeExtraneousValues: true,
+    });
     return new GenericResponse<ReadPlanDto>(response);
   }
 
   @Post()
   @Roles(UserRole.ADMIN)
-  create(@Body() planData: CreatePlanDto): Promise<Plan> {
-    return this.planService.create(planData);
+  async create(@Body() planData: CreatePlanDto): Promise<ReadPlanDto> {
+    const created = await this.planService.create(planData);
+    return plainToInstance(ReadPlanDto, created, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Put(':id')
   @Roles(UserRole.ADMIN)
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() planData: UpdatePlanDto,
-  ): Promise<Plan> {
-    return this.planService.update(id, planData);
+  ): Promise<ReadPlanDto> {
+    const updated = await this.planService.update(id, planData);
+    return plainToInstance(ReadPlanDto, updated, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Delete(':id')

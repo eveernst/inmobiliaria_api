@@ -204,10 +204,7 @@ export class PropertyService {
     return property;
   }
 
-  async update(
-    id: number,
-    propertyData: UpdatePropertyDto,
-  ): Promise<ReadPropertyInstallationDto> {
+  async update(id: number, propertyData: UpdatePropertyDto): Promise<Property> {
     // Buscar la propiedad con sus relaciones necesarias
     const property = await this.propertyRepository.findOne({
       where: { id },

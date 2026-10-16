@@ -16,7 +16,7 @@ import { PropertyService } from './property.service';
 import { CreatePropertyDto } from './dtos/create-property.dto';
 import { UpdatePropertyDto } from './dtos/update-property.dto';
 import { GenericResponse } from 'src/shared/generic-response.dto';
-import { plainToClass } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import { ReadPropertyDto } from './dtos/read-property.dto';
 import { ReadPropertyInstallationDto } from './dtos/read-property-installation.dto';
 import { Roles } from 'src/shared/decorators/roles.decorator';
@@ -54,20 +54,25 @@ export class PropertyController {
       propertyData,
       request.user.id,
     );
-    const response = plainToClass(ReadPropertyDto, property);
+    const response = plainToInstance(ReadPropertyDto, property, {
+      excludeExtraneousValues: true,
+    });
     return new GenericResponse<ReadPropertyDto>(response);
   }
 
   @Put(':id')
   @Roles(UserRole.ADMIN)
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() propertyData: UpdatePropertyDto,
   ): Promise<ReadPropertyInstallationDto> {
     console.log('=== UPDATE PROPERTY ===');
     console.log('ID:', id);
     console.log('Data received:', JSON.stringify(propertyData, null, 2));
-    return this.propertyService.update(id, propertyData);
+    const property = await this.propertyService.update(id, propertyData);
+    return plainToInstance(ReadPropertyInstallationDto, property, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Delete(':id')

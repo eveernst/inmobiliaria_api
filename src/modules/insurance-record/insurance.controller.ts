@@ -10,12 +10,11 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { InsuranceService } from './insurance.service';
-import { Insurance } from './entities/insurance.entity';
 import { CreateInsuranceDto } from './dtos/create-insurance.dto';
 import { UpdateInsuranceDto } from './dtos/update-insurance.dto';
 import { ReadInsuranceDto } from './dtos/read-insurance.dto';
 import { GenericResponse } from 'src/shared/generic-response.dto';
-import { plainToClass } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
@@ -27,8 +26,11 @@ export class InsuranceController {
   constructor(private readonly insuranceService: InsuranceService) {}
 
   @Get()
-  findAll(): Promise<Insurance[]> {
-    return this.insuranceService.findAll();
+  async findAll(): Promise<ReadInsuranceDto[]> {
+    const items = await this.insuranceService.findAll();
+    return plainToInstance(ReadInsuranceDto, items, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Get(':id')
@@ -36,23 +38,33 @@ export class InsuranceController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<GenericResponse<ReadInsuranceDto>> {
     const insurance = await this.insuranceService.findOne(id);
-    const response = plainToClass(ReadInsuranceDto, insurance);
+    const response = plainToInstance(ReadInsuranceDto, insurance, {
+      excludeExtraneousValues: true,
+    });
     return new GenericResponse<ReadInsuranceDto>(response);
   }
 
   @Post()
   @Roles(UserRole.ADMIN)
-  create(@Body() insuranceData: CreateInsuranceDto): Promise<Insurance> {
-    return this.insuranceService.create(insuranceData);
+  async create(
+    @Body() insuranceData: CreateInsuranceDto,
+  ): Promise<ReadInsuranceDto> {
+    const created = await this.insuranceService.create(insuranceData);
+    return plainToInstance(ReadInsuranceDto, created, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Put(':id')
   @Roles(UserRole.ADMIN)
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() insuranceData: UpdateInsuranceDto,
-  ): Promise<Insurance> {
-    return this.insuranceService.update(id, insuranceData);
+  ): Promise<ReadInsuranceDto> {
+    const updated = await this.insuranceService.update(id, insuranceData);
+    return plainToInstance(ReadInsuranceDto, updated, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Delete(':id')
