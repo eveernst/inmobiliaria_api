@@ -65,7 +65,9 @@ const rentedPayload = {
   renterContact: '',
   locality: '',
   contratStartDate: '2026-01-01',
-  province: 'Cordoba',
+  // The rented form used to send 'Cordoba' (no accent); since #49 only the
+  // shared AAC province list is accepted, so the front must send 'Córdoba'.
+  province: 'Córdoba',
   contratEndDate: '2027-01-01',
   price: 150000,
   adjustmentType: '',

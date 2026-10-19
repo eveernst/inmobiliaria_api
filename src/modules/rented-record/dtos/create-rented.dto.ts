@@ -1,10 +1,12 @@
 import {
+  IsIn,
   IsInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
+import { PROVINCES } from 'src/shared/constants/provinces';
 import { IsRequired } from 'src/shared/decorators/is-required.decorator';
 import { IsCalendarDate } from 'src/shared/decorators/is-calendar-date.decorator';
 
@@ -45,8 +47,8 @@ export class CreateRentedDto {
   @IsRequired()
   contratEndDate: string;
 
-  @IsString()
-  @IsNotEmpty()
+  // Same list as properties (requirement 14, issues #24 and #49).
+  @IsIn(PROVINCES)
   @IsRequired()
   province: string;
 
