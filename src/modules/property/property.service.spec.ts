@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { PropertyService } from './property.service';
 import { Property } from './entities/property.entity';
@@ -38,7 +38,6 @@ describe('PropertyService.findAll', () => {
       relations: [
         'classification',
         'installations',
-        'installations.classification',
         'writings',
         'renteds',
         'insurances',
@@ -152,7 +151,7 @@ describe('PropertyService.create', () => {
     logError.mockRestore();
   });
 
-  it('saves nested installations linked to the property and their classification', async () => {
+  it('saves nested installations linked to the property', async () => {
     const classification = { id: 2 } as Classification;
     const property = { id: 21 } as Property;
     const dto = {
@@ -161,7 +160,6 @@ describe('PropertyService.create', () => {
       installations: [
         {
           name: 'Gas',
-          classification: 1,
           quantity: 2,
           file: '',
           details: 'Boiler',
@@ -187,9 +185,140 @@ describe('PropertyService.create', () => {
       quantity: 2,
       file: '',
       details: 'Boiler',
-      classification: { id: 1 },
       property,
     });
     expect(installationRepository.save).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('PropertyService.update installations (#47)', () => {
+  const manager = {
+    create: jest.fn(),
+    save: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  };
+  const propertyRepository = {
+    findOne: jest.fn(),
+    update: jest.fn(),
+    manager: {
+      transaction: jest.fn((work: (m: typeof manager) => Promise<void>) =>
+        work(manager),
+      ),
+    },
+  } as unknown as jest.Mocked<Repository<Property>>;
+
+  const service = new PropertyService(
+    propertyRepository,
+    {} as never,
+    {} as never,
+    {} as never,
+    {} as never,
+    {} as never,
+    {} as never,
+    {} as never,
+    {} as never,
+  );
+
+  const property = { id: 5, installations: [{ id: 1 }, { id: 2 }] };
+  const item = { name: 'Gas', quantity: 1, details: 'Boiler' };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    propertyRepository.findOne.mockResolvedValue(property as Property);
+    manager.create.mockImplementation((_entity, data) => data);
+  });
+
+  it('leaves installations untouched when they are not sent', async () => {
+    await service.update(5, { description: 'x' });
+
+    expect(manager.delete).not.toHaveBeenCalled();
+    expect(manager.save).not.toHaveBeenCalled();
+    expect(manager.update).not.toHaveBeenCalledWith(
+      Installation,
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it('saves the property fields inside the same transaction as the installations', async () => {
+    await service.update(5, {
+      description: 'x',
+      installations: [{ id: 1, ...item }],
+    });
+
+    expect(propertyRepository.manager.transaction).toHaveBeenCalledTimes(1);
+    expect(manager.update).toHaveBeenCalledWith(Property, 5, {
+      description: 'x',
+    });
+    expect(propertyRepository.update).not.toHaveBeenCalled();
+  });
+
+  it('does not send an empty property update when only installations change', async () => {
+    await service.update(5, { installations: [{ id: 1, ...item }] });
+
+    expect(manager.update).not.toHaveBeenCalledWith(
+      Property,
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it('fails the whole update when the installation sync fails', async () => {
+    manager.delete.mockRejectedValueOnce(new Error('FK violation'));
+
+    await expect(
+      service.update(5, { description: 'x', installations: [] }),
+    ).rejects.toThrow('FK violation');
+
+    // Nothing was written outside the transaction, so the rollback covers it.
+    expect(propertyRepository.update).not.toHaveBeenCalled();
+  });
+
+  it('updates an installation in place keeping its id', async () => {
+    await service.update(5, {
+      installations: [
+        { id: 1, ...item },
+        { id: 2, ...item },
+      ],
+    });
+
+    expect(manager.update).toHaveBeenCalledWith(Installation, 1, item);
+    expect(manager.update).toHaveBeenCalledWith(Installation, 2, item);
+    expect(manager.save).not.toHaveBeenCalled();
+    expect(manager.delete).not.toHaveBeenCalled();
+  });
+
+  it('creates installations without id linked to the property', async () => {
+    await service.update(5, {
+      installations: [{ id: 1, ...item }, { id: 2, ...item }, item],
+    });
+
+    expect(manager.create).toHaveBeenCalledWith(Installation, {
+      ...item,
+      property: { id: 5 },
+    });
+    expect(manager.save).toHaveBeenCalledTimes(1);
+  });
+
+  it('deletes the installations missing from the payload', async () => {
+    await service.update(5, { installations: [{ id: 1, ...item }] });
+
+    expect(manager.delete).toHaveBeenCalledWith(Installation, [2]);
+  });
+
+  it('deletes all installations when an empty array is sent', async () => {
+    await service.update(5, { installations: [] });
+
+    expect(manager.delete).toHaveBeenCalledWith(Installation, [1, 2]);
+  });
+
+  it('rejects an id that belongs to another property and writes nothing', async () => {
+    await expect(
+      service.update(5, { installations: [{ id: 99, ...item }] }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+
+    expect(propertyRepository.update).not.toHaveBeenCalled();
+    expect(propertyRepository.manager.transaction).not.toHaveBeenCalled();
   });
 });

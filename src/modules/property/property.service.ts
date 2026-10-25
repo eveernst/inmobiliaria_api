@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Property } from './entities/property.entity';
@@ -45,7 +45,6 @@ export class PropertyService {
     const relations = [
       'classification',
       'installations',
-      'installations.classification',
       'writings',
       'renteds',
       'insurances',
@@ -76,10 +75,6 @@ export class PropertyService {
         .createQueryBuilder('property')
         .leftJoinAndSelect('property.classification', 'classification')
         .leftJoinAndSelect('property.installations', 'installations')
-        .leftJoinAndSelect(
-          'installations.classification',
-          'installationClassification',
-        )
         .leftJoinAndSelect('property.writings', 'writings')
         .leftJoinAndSelect('property.renteds', 'renteds')
         .leftJoinAndSelect('property.insurances', 'insurances')
@@ -131,7 +126,6 @@ export class PropertyService {
       relations: [
         'classification',
         'installations',
-        // 'installations.classification',
         'writings',
         'renteds',
         'insurances',
@@ -173,13 +167,8 @@ export class PropertyService {
     // Guardar las instalaciones de esta propiedad
     if (installationsData) {
       // Crear las instalaciones en la base de datos y asociarlas a la propiedad
-      const installations = installationsData.map(
-        ({ classification: classificationId, ...installation }) =>
-          this.installationRepository.create({
-            ...installation,
-            classification: { id: classificationId },
-            property,
-          }),
+      const installations = installationsData.map((installation) =>
+        this.installationRepository.create({ ...installation, property }),
       );
       await this.installationRepository.save(installations);
     }
@@ -222,52 +211,72 @@ export class PropertyService {
       throw new Error('Property not found');
     }
 
-    // Verificar y asignar la nueva clasificación
-    const classificationId = propertyData.classification;
+    const {
+      installations,
+      classification: classificationId,
+      ...propertyFields
+    } = propertyData;
 
-    let classificationToSave = null;
+    // Un id de instalacion ajeno a esta propiedad nunca se pisa ni se mueve.
+    const ownedIds = property.installations.map((i) => i.id);
+    if (
+      installations?.some((i) => i.id !== undefined && !ownedIds.includes(i.id))
+    ) {
+      throw new BadRequestException(
+        'Installation does not belong to this property',
+      );
+    }
+
+    // Verificar la nueva clasificación
+    let classificationToSave: Classification | null = null;
     if (classificationId) {
-      const classification = await this.classificationRepository.findOne({
+      classificationToSave = await this.classificationRepository.findOne({
         where: { id: classificationId },
       });
 
-      if (!classification) {
+      if (!classificationToSave) {
         throw new Error('Classification not found');
       }
-
-      classificationToSave = classification;
     }
 
-    // Actualizar los campos de la propiedad (sin relaciones)
-    const { installations, ...propertyFields } = propertyData as any;
+    const fieldsToUpdate: Partial<Property> = {
+      ...(propertyFields as Partial<Property>),
+      ...(classificationToSave ? { classification: classificationToSave } : {}),
+    };
 
-    delete propertyFields.classification;
+    // Todo en una sola transaccion: si falla la sincronizacion de las
+    // instalaciones, tampoco quedan guardados los campos de la propiedad.
+    await this.propertyRepository.manager.transaction(async (manager) => {
+      // TypeORM rechaza un update sin valores, por eso solo se envia si hay campos.
+      if (Object.keys(fieldsToUpdate).length > 0) {
+        await manager.update(Property, id, fieldsToUpdate);
+      }
 
-    // Actualizar campos simples
-    await this.propertyRepository.update(id, propertyFields);
+      // Instalaciones: con id se actualizan, sin id se crean y las que no
+      // vienen en el payload se eliminan. Si no vienen, no se tocan.
+      if (!installations) {
+        return;
+      }
 
-    // Actualizar clasificación si existe
-    if (classificationToSave) {
-      await this.propertyRepository.update(id, {
-        classification: classificationToSave,
-      });
-    }
-
-    // Actualizar las instalaciones
-    if (installations && installations.length > 0) {
-      // Eliminar instalaciones existentes
-      await this.installationRepository.delete({ property: { id } });
-
-      // Crear nuevas instalaciones asociadas a la propiedad
-      const newInstallations = installations.map((installation) =>
-        this.installationRepository.create({
-          ...installation,
-          property: { id }, // Asociar solo el ID de la propiedad
-        }),
+      const sentIds = new Set(
+        installations.filter((i) => i.id !== undefined).map((i) => i.id),
       );
+      const removedIds = ownedIds.filter((existing) => !sentIds.has(existing));
 
-      await this.installationRepository.save(newInstallations);
-    }
+      if (removedIds.length > 0) {
+        await manager.delete(Installation, removedIds);
+      }
+
+      for (const { id: installationId, ...fields } of installations) {
+        if (installationId !== undefined) {
+          await manager.update(Installation, installationId, fields);
+        } else {
+          await manager.save(
+            manager.create(Installation, { ...fields, property: { id } }),
+          );
+        }
+      }
+    });
 
     // Retornar la propiedad actualizada con relaciones
     const updatedProperty = await this.propertyRepository.findOne({

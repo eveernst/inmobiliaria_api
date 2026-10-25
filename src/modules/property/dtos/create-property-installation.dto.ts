@@ -3,8 +3,7 @@ import { IsRequired } from 'src/shared/decorators/is-required.decorator';
 
 // An installation created together with its property (POST /property).
 // Unlike CreateInstallationDto it has no propertyId (the property doesn't
-// exist yet), and the classification comes as a plain id under
-// `classification`, which TypeORM maps straight to the classificationId FK.
+// exist yet). Installations have no classification (#47).
 export class CreatePropertyInstallationDto {
   @IsString()
   @IsNotEmpty()
@@ -24,9 +23,4 @@ export class CreatePropertyInstallationDto {
   @IsNotEmpty()
   @IsRequired()
   details: string;
-
-  @IsNumber()
-  @IsNotEmpty()
-  @IsRequired()
-  classification: number;
 }

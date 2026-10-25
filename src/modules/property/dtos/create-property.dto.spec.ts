@@ -25,8 +25,8 @@ const errorsFor = async (body: object): Promise<string[]> => {
 };
 
 // Real payload captured from the property form (issue #33): <select> values
-// arrive as strings, empty inputs as '', nested installations use
-// `classification` as a plain id and carry no propertyId.
+// arrive as strings, empty inputs as '', nested installations carry no
+// propertyId and no classification (#47).
 const formPayload = {
   goodUseCode: '1234567',
   destiny: '5',
@@ -47,7 +47,6 @@ const formPayload = {
   installations: [
     {
       name: 'Gas',
-      classification: 1,
       quantity: 2,
       file: '',
       details: 'Boiler',
@@ -68,7 +67,7 @@ describe('CreatePropertyDto with the global ValidationPipe', () => {
     const dto = await validate(formPayload);
 
     expect(dto.installations).toEqual([
-      expect.objectContaining({ name: 'Gas', classification: 1, quantity: 2 }),
+      expect.objectContaining({ name: 'Gas', quantity: 2 }),
     ]);
   });
 
@@ -103,6 +102,17 @@ describe('CreatePropertyDto with the global ValidationPipe', () => {
 
     expect(errors).toContain(
       'installations.0.property propertyId should not exist',
+    );
+  });
+
+  it('rejects a classification inside a nested installation (#47)', async () => {
+    const errors = await errorsFor({
+      ...formPayload,
+      installations: [{ ...formPayload.installations[0], classification: 1 }],
+    });
+
+    expect(errors).toContain(
+      'installations.0.property classification should not exist',
     );
   });
 

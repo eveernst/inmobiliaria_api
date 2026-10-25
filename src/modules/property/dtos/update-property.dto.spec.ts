@@ -24,8 +24,8 @@ const errorsFor = async (body: object): Promise<string[]> => {
 };
 
 // The edit payload the property form sends since front #29: only the 17
-// editable fields. Existing installations carry their id; their classification
-// may be missing because GET /property/:id doesn't load it yet (#47).
+// editable fields. Existing installations carry their id; none has a
+// classification (#47).
 const editPayload = {
   goodUseCode: '1234567',
   destiny: '5',
@@ -45,7 +45,7 @@ const editPayload = {
   classification: 2,
   installations: [
     { id: 7, name: 'Gas', quantity: 2, file: '', details: 'Boiler' },
-    { name: 'Agua', quantity: 1, details: 'Tank', classification: 3 },
+    { name: 'Agua', quantity: 1, details: 'Tank' },
   ],
 };
 
@@ -110,22 +110,16 @@ describe('UpdatePropertyDto with the global ValidationPipe', () => {
       expect(errors).toContain('installations.0.id must be an integer number');
     });
 
-    it.each([undefined, null])(
-      'accepts a missing classification (%p)',
+    it.each([3, 'x'])(
+      'rejects a classification inside an installation (%p) (#47)',
       async (classification) => {
-        await expect(
-          errorsFor(withInstallation({ classification })),
-        ).resolves.toEqual([]);
+        const errors = await errorsFor(withInstallation({ classification }));
+
+        expect(errors).toContain(
+          'installations.0.property classification should not exist',
+        );
       },
     );
-
-    it('rejects a non-numeric classification', async () => {
-      const errors = await errorsFor(withInstallation({ classification: 'x' }));
-
-      expect(errors).toContain(
-        'installations.0.classification must be a number conforming to the specified constraints',
-      );
-    });
 
     it('still requires the installation fields', async () => {
       const errors = await errorsFor(withInstallation({ name: '  ' }));
