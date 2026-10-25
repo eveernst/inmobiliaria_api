@@ -3,10 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Installation } from './entities/installation.entity';
 import { CreateInstallationDto } from './dtos/create-installation.dto';
+import { UpdateInstallationDto } from './dtos/update-installation.dto';
 import { ReadInstallationDto } from './dtos/read-installation.dto';
 import { NotificationService } from '../notification/notification.service';
 import { Property } from '../property/entities/property.entity';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class InstallationService {
@@ -37,10 +38,6 @@ export class InstallationService {
     installationData: CreateInstallationDto,
     actorUserId: number,
   ): Promise<Installation> {
-    if (!installationData.propertyId) {
-      throw new BadRequestException('propertyId is required');
-    }
-
     const property = await this.propertyRepository.findOne({
       where: { id: installationData.propertyId },
     });
@@ -76,7 +73,7 @@ export class InstallationService {
 
   async update(
     id: number,
-    installationData: Partial<Installation>,
+    installationData: UpdateInstallationDto,
   ): Promise<Installation> {
     await this.installationRepository.update(id, installationData);
     return this.findOne(id);
