@@ -2,7 +2,6 @@ import { Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InstallationService } from './installation.service';
 import { Installation } from './entities/installation.entity';
-import { Classification } from '../classification/entities/classification.entity';
 import { Property } from '../property/entities/property.entity';
 import { NotificationService } from '../notification/notification.service';
 
@@ -11,9 +10,6 @@ describe('InstallationService.create', () => {
     create: jest.fn(),
     save: jest.fn(),
   } as unknown as jest.Mocked<Repository<Installation>>;
-  const classificationRepository = {
-    findOne: jest.fn(),
-  } as unknown as jest.Mocked<Repository<Classification>>;
   const propertyRepository = {
     findOne: jest.fn(),
   } as unknown as jest.Mocked<Repository<Property>>;
@@ -22,7 +18,6 @@ describe('InstallationService.create', () => {
   } as unknown as jest.Mocked<NotificationService>;
   const service = new InstallationService(
     installationRepository,
-    classificationRepository,
     propertyRepository,
     notificationService,
   );
@@ -32,18 +27,15 @@ describe('InstallationService.create', () => {
   });
 
   it('associates the installation and notification with its property', async () => {
-    const classification = { id: 4 } as Classification;
     const property = { id: 9 } as Property;
     const installation = { id: 12, property } as Installation;
     const data = {
       name: 'Gas',
       quantity: 1,
       details: 'Boiler',
-      classificationId: 4,
       propertyId: 9,
     };
 
-    classificationRepository.findOne.mockResolvedValue(classification);
     propertyRepository.findOne.mockResolvedValue(property);
     installationRepository.create.mockReturnValue(installation);
     installationRepository.save.mockResolvedValue(installation);
@@ -52,7 +44,6 @@ describe('InstallationService.create', () => {
 
     expect(installationRepository.create).toHaveBeenCalledWith({
       ...data,
-      classification,
       property,
     });
     expect(
@@ -67,9 +58,6 @@ describe('InstallationService.create', () => {
     const property = { id: 9 } as Property;
     const installation = { id: 12, property } as Installation;
 
-    classificationRepository.findOne.mockResolvedValue({
-      id: 4,
-    } as Classification);
     propertyRepository.findOne.mockResolvedValue(property);
     installationRepository.create.mockReturnValue(installation);
     installationRepository.save.mockResolvedValue(installation);
@@ -83,7 +71,6 @@ describe('InstallationService.create', () => {
           name: 'Gas',
           quantity: 1,
           details: 'Boiler',
-          classificationId: 4,
           propertyId: 9,
         },
         7,

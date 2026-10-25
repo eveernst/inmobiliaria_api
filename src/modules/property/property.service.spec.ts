@@ -38,7 +38,6 @@ describe('PropertyService.findAll', () => {
       relations: [
         'classification',
         'installations',
-        'installations.classification',
         'writings',
         'renteds',
         'insurances',
@@ -152,7 +151,7 @@ describe('PropertyService.create', () => {
     logError.mockRestore();
   });
 
-  it('saves nested installations linked to the property and their classification', async () => {
+  it('saves nested installations linked to the property', async () => {
     const classification = { id: 2 } as Classification;
     const property = { id: 21 } as Property;
     const dto = {
@@ -161,7 +160,6 @@ describe('PropertyService.create', () => {
       installations: [
         {
           name: 'Gas',
-          classification: 1,
           quantity: 2,
           file: '',
           details: 'Boiler',
@@ -187,7 +185,6 @@ describe('PropertyService.create', () => {
       quantity: 2,
       file: '',
       details: 'Boiler',
-      classification: { id: 1 },
       property,
     });
     expect(installationRepository.save).toHaveBeenCalledTimes(1);

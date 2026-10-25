@@ -45,7 +45,6 @@ export class PropertyService {
     const relations = [
       'classification',
       'installations',
-      'installations.classification',
       'writings',
       'renteds',
       'insurances',
@@ -76,10 +75,6 @@ export class PropertyService {
         .createQueryBuilder('property')
         .leftJoinAndSelect('property.classification', 'classification')
         .leftJoinAndSelect('property.installations', 'installations')
-        .leftJoinAndSelect(
-          'installations.classification',
-          'installationClassification',
-        )
         .leftJoinAndSelect('property.writings', 'writings')
         .leftJoinAndSelect('property.renteds', 'renteds')
         .leftJoinAndSelect('property.insurances', 'insurances')
@@ -131,7 +126,6 @@ export class PropertyService {
       relations: [
         'classification',
         'installations',
-        // 'installations.classification',
         'writings',
         'renteds',
         'insurances',
@@ -173,13 +167,8 @@ export class PropertyService {
     // Guardar las instalaciones de esta propiedad
     if (installationsData) {
       // Crear las instalaciones en la base de datos y asociarlas a la propiedad
-      const installations = installationsData.map(
-        ({ classification: classificationId, ...installation }) =>
-          this.installationRepository.create({
-            ...installation,
-            classification: { id: classificationId },
-            property,
-          }),
+      const installations = installationsData.map((installation) =>
+        this.installationRepository.create({ ...installation, property }),
       );
       await this.installationRepository.save(installations);
     }
