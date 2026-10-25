@@ -211,80 +211,72 @@ export class PropertyService {
       throw new Error('Property not found');
     }
 
+    const {
+      installations,
+      classification: classificationId,
+      ...propertyFields
+    } = propertyData;
+
     // Un id de instalacion ajeno a esta propiedad nunca se pisa ni se mueve.
     const ownedIds = property.installations.map((i) => i.id);
-    const installationsData: UpdatePropertyDto['installations'] =
-      propertyData.installations;
     if (
-      installationsData?.some(
-        (i) => i.id !== undefined && !ownedIds.includes(i.id),
-      )
+      installations?.some((i) => i.id !== undefined && !ownedIds.includes(i.id))
     ) {
       throw new BadRequestException(
         'Installation does not belong to this property',
       );
     }
 
-    // Verificar y asignar la nueva clasificación
-    const classificationId = propertyData.classification;
-
-    let classificationToSave = null;
+    // Verificar la nueva clasificación
+    let classificationToSave: Classification | null = null;
     if (classificationId) {
-      const classification = await this.classificationRepository.findOne({
+      classificationToSave = await this.classificationRepository.findOne({
         where: { id: classificationId },
       });
 
-      if (!classification) {
+      if (!classificationToSave) {
         throw new Error('Classification not found');
       }
-
-      classificationToSave = classification;
     }
 
-    // Actualizar los campos de la propiedad (sin relaciones)
-    const { installations, ...propertyFields } = propertyData as any as {
-      installations?: UpdatePropertyDto['installations'];
-      [key: string]: unknown;
+    const fieldsToUpdate: Partial<Property> = {
+      ...(propertyFields as Partial<Property>),
+      ...(classificationToSave ? { classification: classificationToSave } : {}),
     };
 
-    delete propertyFields.classification;
+    // Todo en una sola transaccion: si falla la sincronizacion de las
+    // instalaciones, tampoco quedan guardados los campos de la propiedad.
+    await this.propertyRepository.manager.transaction(async (manager) => {
+      // TypeORM rechaza un update sin valores, por eso solo se envia si hay campos.
+      if (Object.keys(fieldsToUpdate).length > 0) {
+        await manager.update(Property, id, fieldsToUpdate);
+      }
 
-    // Actualizar campos simples
-    await this.propertyRepository.update(id, propertyFields);
+      // Instalaciones: con id se actualizan, sin id se crean y las que no
+      // vienen en el payload se eliminan. Si no vienen, no se tocan.
+      if (!installations) {
+        return;
+      }
 
-    // Actualizar clasificación si existe
-    if (classificationToSave) {
-      await this.propertyRepository.update(id, {
-        classification: classificationToSave,
-      });
-    }
+      const sentIds = new Set(
+        installations.filter((i) => i.id !== undefined).map((i) => i.id),
+      );
+      const removedIds = ownedIds.filter((existing) => !sentIds.has(existing));
 
-    // Sincronizar las instalaciones en una transaccion: con id se actualizan,
-    // sin id se crean y las que no vienen en el payload se eliminan.
-    if (installations) {
-      await this.propertyRepository.manager.transaction(async (manager) => {
-        const sentIds = new Set(
-          installations.filter((i) => i.id !== undefined).map((i) => i.id),
-        );
-        const removedIds = ownedIds.filter(
-          (existing) => !sentIds.has(existing),
-        );
+      if (removedIds.length > 0) {
+        await manager.delete(Installation, removedIds);
+      }
 
-        if (removedIds.length > 0) {
-          await manager.delete(Installation, removedIds);
+      for (const { id: installationId, ...fields } of installations) {
+        if (installationId !== undefined) {
+          await manager.update(Installation, installationId, fields);
+        } else {
+          await manager.save(
+            manager.create(Installation, { ...fields, property: { id } }),
+          );
         }
-
-        for (const { id: installationId, ...fields } of installations) {
-          if (installationId !== undefined) {
-            await manager.update(Installation, installationId, fields);
-          } else {
-            await manager.save(
-              manager.create(Installation, { ...fields, property: { id } }),
-            );
-          }
-        }
-      });
-    }
+      }
+    });
 
     // Retornar la propiedad actualizada con relaciones
     const updatedProperty = await this.propertyRepository.findOne({

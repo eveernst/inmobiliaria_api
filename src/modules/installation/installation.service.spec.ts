@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InstallationService } from './installation.service';
 import { Installation } from './entities/installation.entity';
@@ -84,5 +84,37 @@ describe('InstallationService.create', () => {
     );
 
     logError.mockRestore();
+  });
+});
+
+describe('InstallationService.update', () => {
+  const installationRepository = {
+    update: jest.fn(),
+    findOne: jest.fn(),
+  } as unknown as jest.Mocked<Repository<Installation>>;
+  const service = new InstallationService(
+    installationRepository,
+    {} as never,
+    {} as never,
+  );
+
+  beforeEach(() => jest.clearAllMocks());
+
+  it('rejects an empty body with 400 instead of an empty database update', async () => {
+    await expect(service.update(3, {})).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
+
+    expect(installationRepository.update).not.toHaveBeenCalled();
+  });
+
+  it('updates the given fields', async () => {
+    installationRepository.findOne.mockResolvedValue({ id: 3 } as never);
+
+    await service.update(3, { name: 'Gas' });
+
+    expect(installationRepository.update).toHaveBeenCalledWith(3, {
+      name: 'Gas',
+    });
   });
 });

@@ -232,8 +232,47 @@ describe('PropertyService.update installations (#47)', () => {
   it('leaves installations untouched when they are not sent', async () => {
     await service.update(5, { description: 'x' });
 
-    expect(propertyRepository.manager.transaction).not.toHaveBeenCalled();
     expect(manager.delete).not.toHaveBeenCalled();
+    expect(manager.save).not.toHaveBeenCalled();
+    expect(manager.update).not.toHaveBeenCalledWith(
+      Installation,
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it('saves the property fields inside the same transaction as the installations', async () => {
+    await service.update(5, {
+      description: 'x',
+      installations: [{ id: 1, ...item }],
+    });
+
+    expect(propertyRepository.manager.transaction).toHaveBeenCalledTimes(1);
+    expect(manager.update).toHaveBeenCalledWith(Property, 5, {
+      description: 'x',
+    });
+    expect(propertyRepository.update).not.toHaveBeenCalled();
+  });
+
+  it('does not send an empty property update when only installations change', async () => {
+    await service.update(5, { installations: [{ id: 1, ...item }] });
+
+    expect(manager.update).not.toHaveBeenCalledWith(
+      Property,
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it('fails the whole update when the installation sync fails', async () => {
+    manager.delete.mockRejectedValueOnce(new Error('FK violation'));
+
+    await expect(
+      service.update(5, { description: 'x', installations: [] }),
+    ).rejects.toThrow('FK violation');
+
+    // Nothing was written outside the transaction, so the rollback covers it.
+    expect(propertyRepository.update).not.toHaveBeenCalled();
   });
 
   it('updates an installation in place keeping its id', async () => {

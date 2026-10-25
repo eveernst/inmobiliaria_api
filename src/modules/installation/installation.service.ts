@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Installation } from './entities/installation.entity';
@@ -75,6 +75,11 @@ export class InstallationService {
     id: number,
     installationData: UpdateInstallationDto,
   ): Promise<Installation> {
+    // Every field is optional, so an empty body passes the DTO; TypeORM would
+    // then throw on an update with no values (500).
+    if (Object.keys(installationData).length === 0) {
+      throw new BadRequestException('Nothing to update');
+    }
     await this.installationRepository.update(id, installationData);
     return this.findOne(id);
   }
