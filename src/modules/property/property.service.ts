@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Property } from './entities/property.entity';
@@ -211,6 +211,20 @@ export class PropertyService {
       throw new Error('Property not found');
     }
 
+    // Un id de instalacion ajeno a esta propiedad nunca se pisa ni se mueve.
+    const ownedIds = property.installations.map((i) => i.id);
+    const installationsData: UpdatePropertyDto['installations'] =
+      propertyData.installations;
+    if (
+      installationsData?.some(
+        (i) => i.id !== undefined && !ownedIds.includes(i.id),
+      )
+    ) {
+      throw new BadRequestException(
+        'Installation does not belong to this property',
+      );
+    }
+
     // Verificar y asignar la nueva clasificación
     const classificationId = propertyData.classification;
 
@@ -228,7 +242,10 @@ export class PropertyService {
     }
 
     // Actualizar los campos de la propiedad (sin relaciones)
-    const { installations, ...propertyFields } = propertyData as any;
+    const { installations, ...propertyFields } = propertyData as any as {
+      installations?: UpdatePropertyDto['installations'];
+      [key: string]: unknown;
+    };
 
     delete propertyFields.classification;
 
@@ -242,20 +259,31 @@ export class PropertyService {
       });
     }
 
-    // Actualizar las instalaciones
-    if (installations && installations.length > 0) {
-      // Eliminar instalaciones existentes
-      await this.installationRepository.delete({ property: { id } });
+    // Sincronizar las instalaciones en una transaccion: con id se actualizan,
+    // sin id se crean y las que no vienen en el payload se eliminan.
+    if (installations) {
+      await this.propertyRepository.manager.transaction(async (manager) => {
+        const sentIds = new Set(
+          installations.filter((i) => i.id !== undefined).map((i) => i.id),
+        );
+        const removedIds = ownedIds.filter(
+          (existing) => !sentIds.has(existing),
+        );
 
-      // Crear nuevas instalaciones asociadas a la propiedad
-      const newInstallations = installations.map((installation) =>
-        this.installationRepository.create({
-          ...installation,
-          property: { id }, // Asociar solo el ID de la propiedad
-        }),
-      );
+        if (removedIds.length > 0) {
+          await manager.delete(Installation, removedIds);
+        }
 
-      await this.installationRepository.save(newInstallations);
+        for (const { id: installationId, ...fields } of installations) {
+          if (installationId !== undefined) {
+            await manager.update(Installation, installationId, fields);
+          } else {
+            await manager.save(
+              manager.create(Installation, { ...fields, property: { id } }),
+            );
+          }
+        }
+      });
     }
 
     // Retornar la propiedad actualizada con relaciones
