@@ -1,4 +1,5 @@
-import { IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsInt, IsOptional, IsString } from 'class-validator';
 
 export class PropertyFiltersDto {
   @IsOptional()
@@ -6,12 +7,14 @@ export class PropertyFiltersDto {
   province?: string;
 
   @IsOptional()
-  @IsString()
-  classification?: string;
+  @Type(() => Number)
+  @IsInt()
+  classification?: number;
 
   @IsOptional()
-  @IsString()
-  state?: string;
+  @Type(() => Number)
+  @IsInt()
+  state?: number;
 
   @IsOptional()
   @IsString()
