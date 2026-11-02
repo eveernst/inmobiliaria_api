@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Property } from './entities/property.entity';
@@ -113,7 +119,7 @@ export class PropertyService {
     });
 
     if (!property) {
-      throw new Error('Property not found');
+      throw new NotFoundException('Property not found');
     }
 
     return plainToInstance(ReadPropertyInstallationDto, property, {
@@ -130,7 +136,7 @@ export class PropertyService {
     });
 
     if (!classification) {
-      throw new Error('Classification not found');
+      throw new NotFoundException('Classification not found');
     }
 
     const { installations: installationsData, ...propertyData } =
@@ -140,7 +146,6 @@ export class PropertyService {
       ...propertyData,
       classification,
     });
-    console.log(property);
     await this.propertyRepository.save(property);
 
     // Guardar las instalaciones de esta propiedad
@@ -187,7 +192,7 @@ export class PropertyService {
     });
 
     if (!property) {
-      throw new Error('Property not found');
+      throw new NotFoundException('Property not found');
     }
 
     const {
@@ -214,7 +219,7 @@ export class PropertyService {
       });
 
       if (!classificationToSave) {
-        throw new Error('Classification not found');
+        throw new NotFoundException('Classification not found');
       }
     }
 
@@ -271,7 +276,9 @@ export class PropertyService {
     });
 
     if (!updatedProperty) {
-      throw new Error('Error retrieving updated property');
+      throw new InternalServerErrorException(
+        'Error retrieving updated property',
+      );
     }
 
     return updatedProperty;
@@ -280,7 +287,7 @@ export class PropertyService {
   async remove(id: number): Promise<void> {
     const property = await this.propertyRepository.findOne({ where: { id } });
     if (!property) {
-      throw new Error('Property not found');
+      throw new NotFoundException('Property not found');
     }
 
     await this.notificationRepository.delete({ property: { id } });

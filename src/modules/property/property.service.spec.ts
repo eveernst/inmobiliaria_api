@@ -1,4 +1,4 @@
-import { BadRequestException, Logger } from '@nestjs/common';
+import { BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { PropertyService } from './property.service';
 import { Property } from './entities/property.entity';
@@ -10,6 +10,7 @@ import { NotificationService } from '../notification/notification.service';
 describe('PropertyService.findAll', () => {
   const repository = {
     find: jest.fn(),
+    findOne: jest.fn(),
     createQueryBuilder: jest.fn(),
   } as unknown as jest.Mocked<Repository<Property>>;
 
@@ -101,6 +102,14 @@ describe('PropertyService.findAll', () => {
     expect(query.andWhere).toHaveBeenCalledWith(
       'classification.id = :classificationId',
       { classificationId: 2 },
+    );
+  });
+
+  it('throws NotFoundException when the property does not exist', async () => {
+    repository.findOne.mockResolvedValue(null);
+
+    await expect(service.findOne(999)).rejects.toBeInstanceOf(
+      NotFoundException,
     );
   });
 });
