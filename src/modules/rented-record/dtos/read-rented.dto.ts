@@ -1,6 +1,10 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
+import { ReadPropertySummaryDto } from 'src/modules/property/dtos/read-property-summary.dto';
 
 export class ReadRentedDto {
+  @Expose()
+  id: number;
+
   // datos del propietario
   @Expose()
   ownerDetails: string;
@@ -41,4 +45,8 @@ export class ReadRentedDto {
 
   @Expose()
   contractImage: string;
+
+  @Expose()
+  @Type(() => ReadPropertySummaryDto)
+  property: ReadPropertySummaryDto;
 }

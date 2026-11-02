@@ -1,8 +1,20 @@
-import { IsNumber, IsString, IsBoolean } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsIn,
+  IsNumber,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { PROVINCES } from '../../../shared/constants/provinces';
 import { IsRequired } from '../../../shared/decorators/is-required.decorator';
-import { ReadInstallationDto } from 'src/modules/installation/dtos/read-installation.dto';
+import { ToNumber } from '../../../shared/decorators/to-number.decorator';
+import { CreatePropertyInstallationDto } from './create-property-installation.dto';
 
 export class CreatePropertyDto {
+  @ToNumber()
   @IsNumber()
   @IsRequired()
   goodUseCode: number;
@@ -15,7 +27,7 @@ export class CreatePropertyDto {
   // @IsRequired()
   // outerImage: string;
 
-  @IsString()
+  @IsIn(PROVINCES)
   @IsRequired()
   province: string;
 
@@ -27,6 +39,7 @@ export class CreatePropertyDto {
   @IsRequired()
   address: string;
 
+  @ToNumber()
   @IsNumber()
   @IsRequired()
   postalCode: number;
@@ -43,10 +56,12 @@ export class CreatePropertyDto {
   @IsRequired()
   district: string;
 
+  @ToNumber()
   @IsNumber()
   @IsRequired()
   destiny: number;
 
+  @ToNumber()
   @IsNumber()
   @IsRequired()
   state: number;
@@ -67,12 +82,18 @@ export class CreatePropertyDto {
   @IsRequired()
   description: string;
 
+  @IsOptional()
   @IsString()
   file?: string;
 
+  @ToNumber()
   @IsNumber()
   @IsRequired()
   classification: number; // El ID de Classification
 
-  installations?: ReadInstallationDto[];
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreatePropertyInstallationDto)
+  installations?: CreatePropertyInstallationDto[];
 }

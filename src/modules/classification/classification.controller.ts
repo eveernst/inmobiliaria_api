@@ -8,10 +8,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ClassificationService } from './classification.service';
-import { Classification } from './entities/classification.entity';
+import { UpdateClassificationDto } from './dtos/update-classification.dto';
 import { ReadClassificationDto } from './dtos/read-classification.dto';
 import { GenericResponse } from 'src/shared/generic-response.dto';
-import { plainToClass } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
@@ -23,8 +23,11 @@ export class ClassificationController {
   constructor(private readonly classificationService: ClassificationService) {}
 
   @Get()
-  findAll(): Promise<Classification[]> {
-    return this.classificationService.findAll();
+  async findAll(): Promise<ReadClassificationDto[]> {
+    const classifications = await this.classificationService.findAll();
+    return plainToInstance(ReadClassificationDto, classifications, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Get(':id')
@@ -32,17 +35,25 @@ export class ClassificationController {
     @Param('id') id: number,
   ): Promise<GenericResponse<ReadClassificationDto>> {
     const classification = await this.classificationService.findOne(id);
-    const response = plainToClass(ReadClassificationDto, classification);
+    const response = plainToInstance(ReadClassificationDto, classification, {
+      excludeExtraneousValues: true,
+    });
     return new GenericResponse<ReadClassificationDto>(response);
   }
 
   @Put(':id')
   @Roles(UserRole.ADMIN)
-  update(
+  async update(
     @Param('id') id: number,
-    @Body() classificationData: Partial<Classification>,
-  ): Promise<Classification> {
-    return this.classificationService.update(id, classificationData);
+    @Body() classificationData: UpdateClassificationDto,
+  ): Promise<ReadClassificationDto> {
+    const classification = await this.classificationService.update(
+      id,
+      classificationData,
+    );
+    return plainToInstance(ReadClassificationDto, classification, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Delete(':id')

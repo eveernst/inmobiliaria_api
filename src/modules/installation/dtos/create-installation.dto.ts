@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { IsRequired } from 'src/shared/decorators/is-required.decorator';
 
 export class CreateInstallationDto {
@@ -12,6 +12,7 @@ export class CreateInstallationDto {
   @IsRequired()
   quantity: number;
 
+  @IsOptional()
   @IsString()
   file?: string;
 
@@ -19,11 +20,6 @@ export class CreateInstallationDto {
   @IsNotEmpty()
   @IsRequired()
   details: string;
-
-  @IsNumber()
-  @IsNotEmpty()
-  @IsRequired()
-  classificationId: number;
 
   @IsNumber()
   @IsNotEmpty()

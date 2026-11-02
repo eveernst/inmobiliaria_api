@@ -1,48 +1,57 @@
 import 'reflect-metadata';
-import { plainToInstance } from 'class-transformer';
-import { validate } from 'class-validator';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { PropertyFiltersDto } from './property-filters.dto';
 
-describe('PropertyFiltersDto', () => {
-  it('transforms numeric query parameters into numbers', () => {
-    const filters = plainToInstance(PropertyFiltersDto, {
-      state: '1',
-      classification: '2',
-    });
+const pipe = new ValidationPipe({
+  whitelist: true,
+  forbidNonWhitelisted: true,
+  transform: true,
+});
 
-    expect(filters.state).toBe(1);
-    expect(filters.classification).toBe(2);
+const validate = (query: object): Promise<PropertyFiltersDto> =>
+  pipe.transform(query, { type: 'query', metatype: PropertyFiltersDto });
+
+describe('PropertyFiltersDto with the global ValidationPipe', () => {
+  it.each(['Córdoba', 'Santa Fe', 'Entre Ríos'])(
+    'accepts the AAC province %s',
+    async (province) => {
+      await expect(validate({ province })).resolves.toEqual(
+        expect.objectContaining({ province }),
+      );
+    },
+  );
+
+  it('accepts a query without province', async () => {
+    await expect(validate({})).resolves.toBeDefined();
+  });
+
+  it('rejects a province outside the AAC list', async () => {
+    await expect(validate({ province: 'Buenos Aires' })).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
+  });
+
+  it('rejects a partial province name now that the filter is exact', async () => {
+    await expect(validate({ province: 'Córd' })).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
+  });
+
+  it('transforms numeric query parameters into numbers', async () => {
+    await expect(
+      validate({ state: '1', classification: '2' }),
+    ).resolves.toEqual(expect.objectContaining({ state: 1, classification: 2 }));
   });
 
   it('rejects a non-integer state filter', async () => {
-    const filters = plainToInstance(PropertyFiltersDto, { state: 'abc' });
-
-    const errors = await validate(filters);
-
-    expect(errors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          property: 'state',
-          constraints: expect.objectContaining({ isInt: expect.any(String) }),
-        }),
-      ]),
+    await expect(validate({ state: 'abc' })).rejects.toBeInstanceOf(
+      BadRequestException,
     );
   });
 
   it('rejects classification names because classification means an id', async () => {
-    const filters = plainToInstance(PropertyFiltersDto, {
-      classification: 'Residential',
-    });
-
-    const errors = await validate(filters);
-
-    expect(errors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          property: 'classification',
-          constraints: expect.objectContaining({ isInt: expect.any(String) }),
-        }),
-      ]),
-    );
+    await expect(
+      validate({ classification: 'Residential' }),
+    ).rejects.toBeInstanceOf(BadRequestException);
   });
 });

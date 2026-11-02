@@ -1,7 +1,6 @@
 import { Entity, Column, OneToMany } from 'typeorm';
 import { BaseEntity } from 'src/shared/entities/base.entity';
 import { Property } from 'src/modules/property/entities/property.entity';
-import { Installation } from 'src/modules/installation/entities/installation.entity';
 
 @Entity()
 export class Classification extends BaseEntity {
@@ -10,8 +9,4 @@ export class Classification extends BaseEntity {
 
   @OneToMany(() => Property, (property) => property.classification)
   properties: Property[];
-
-  // Una clasificacion puede tener muchas instalaciones
-  @OneToMany(() => Installation, (installation) => installation.classification)
-  installations: Installation[];
 }

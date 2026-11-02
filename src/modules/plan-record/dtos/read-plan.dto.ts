@@ -1,6 +1,10 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
+import { ReadPropertySummaryDto } from 'src/modules/property/dtos/read-property-summary.dto';
 
 export class ReadPlanDto {
+  @Expose()
+  id: number;
+
   @Expose()
   generalPlan: boolean;
 
@@ -84,4 +88,8 @@ export class ReadPlanDto {
 
   @Expose()
   contacts: string;
+
+  @Expose()
+  @Type(() => ReadPropertySummaryDto)
+  property: ReadPropertySummaryDto;
 }

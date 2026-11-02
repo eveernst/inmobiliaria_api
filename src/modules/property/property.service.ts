@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Property } from './entities/property.entity';
 import { CreatePropertyDto } from './dtos/create-property.dto';
+import { UpdatePropertyDto } from './dtos/update-property.dto';
 import { Classification } from '../classification/entities/classification.entity';
 import { Installation } from '../installation/entities/installation.entity';
 import { ReadPropertyDto } from './dtos/read-property.dto';
@@ -18,6 +19,8 @@ import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class PropertyService {
+  private readonly logger = new Logger(PropertyService.name);
+
   constructor(
     @InjectRepository(Property)
     private readonly propertyRepository: Repository<Property>,
@@ -42,7 +45,6 @@ export class PropertyService {
     const relations = [
       'classification',
       'installations',
-      'installations.classification',
       'writings',
       'renteds',
       'insurances',
@@ -62,18 +64,14 @@ export class PropertyService {
         .createQueryBuilder('property')
         .leftJoinAndSelect('property.classification', 'classification')
         .leftJoinAndSelect('property.installations', 'installations')
-        .leftJoinAndSelect(
-          'installations.classification',
-          'installationClassification',
-        )
         .leftJoinAndSelect('property.writings', 'writings')
         .leftJoinAndSelect('property.renteds', 'renteds')
         .leftJoinAndSelect('property.insurances', 'insurances')
         .leftJoinAndSelect('property.plans', 'plans');
 
-      if (filters.province?.trim()) {
-        query.andWhere('LOWER(property.province) LIKE LOWER(:province)', {
-          province: `%${filters.province.trim()}%`,
+      if (filters.province) {
+        query.andWhere('property.province = :province', {
+          province: filters.province,
         });
       }
 
@@ -107,7 +105,6 @@ export class PropertyService {
       relations: [
         'classification',
         'installations',
-        // 'installations.classification',
         'writings',
         'renteds',
         'insurances',
@@ -136,41 +133,46 @@ export class PropertyService {
       throw new Error('Classification not found');
     }
 
+    const { installations: installationsData, ...propertyData } =
+      createPropertyDto;
+
     const property = this.propertyRepository.create({
-      ...createPropertyDto,
+      ...propertyData,
       classification,
     });
     console.log(property);
     await this.propertyRepository.save(property);
 
     // Guardar las instalaciones de esta propiedad
-    if (createPropertyDto.installations) {
+    if (installationsData) {
       // Crear las instalaciones en la base de datos y asociarlas a la propiedad
-      const installations = createPropertyDto.installations.map(
-        (installation) => {
-          return this.installationRepository.create({
-            ...installation,
-            property,
-          });
-        },
+      const installations = installationsData.map((installation) =>
+        this.installationRepository.create({ ...installation, property }),
       );
       await this.installationRepository.save(installations);
     }
 
-    await this.notificationService.createRegistrationNotification(
-      actorUserId,
-      'property',
-      property.id,
-      property,
-    );
+    // The notification is a side effect: if it fails, the property is already
+    // saved, so failing the request would only make the client retry and
+    // create a duplicate.
+    try {
+      await this.notificationService.createRegistrationNotification(
+        actorUserId,
+        'property',
+        property.id,
+        property,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Failed to create registration notification for property ${property.id}`,
+        error instanceof Error ? error.stack : String(error),
+      );
+    }
 
     return property;
   }
 
-  async update(
-    id: number,
-    propertyData: Partial<Property>,
-  ): Promise<ReadPropertyInstallationDto> {
+  async update(id: number, propertyData: UpdatePropertyDto): Promise<Property> {
     // Buscar la propiedad con sus relaciones necesarias
     const property = await this.propertyRepository.findOne({
       where: { id },
@@ -188,61 +190,72 @@ export class PropertyService {
       throw new Error('Property not found');
     }
 
-    // Verificar y asignar la nueva clasificación
-    const classificationId =
-      typeof propertyData.classification === 'object'
-        ? propertyData.classification?.id
-        : parseInt(propertyData.classification as any);
+    const {
+      installations,
+      classification: classificationId,
+      ...propertyFields
+    } = propertyData;
 
-    let classificationToSave = null;
-    if (classificationId && !isNaN(classificationId)) {
-      const classification = await this.classificationRepository.findOne({
+    // Un id de instalacion ajeno a esta propiedad nunca se pisa ni se mueve.
+    const ownedIds = property.installations.map((i) => i.id);
+    if (
+      installations?.some((i) => i.id !== undefined && !ownedIds.includes(i.id))
+    ) {
+      throw new BadRequestException(
+        'Installation does not belong to this property',
+      );
+    }
+
+    // Verificar la nueva clasificación
+    let classificationToSave: Classification | null = null;
+    if (classificationId) {
+      classificationToSave = await this.classificationRepository.findOne({
         where: { id: classificationId },
       });
 
-      if (!classification) {
+      if (!classificationToSave) {
         throw new Error('Classification not found');
       }
-
-      classificationToSave = classification;
     }
 
-    // Actualizar los campos de la propiedad (sin relaciones)
-    const { installations, ...propertyFields } = propertyData as any;
+    const fieldsToUpdate: Partial<Property> = {
+      ...(propertyFields as Partial<Property>),
+      ...(classificationToSave ? { classification: classificationToSave } : {}),
+    };
 
-    delete propertyFields.classification;
-    delete propertyFields.user;
-    delete propertyFields.insurances;
-    delete propertyFields.plans;
-    delete propertyFields.renteds;
-    delete propertyFields.writings;
-    delete propertyFields.id;
+    // Todo en una sola transaccion: si falla la sincronizacion de las
+    // instalaciones, tampoco quedan guardados los campos de la propiedad.
+    await this.propertyRepository.manager.transaction(async (manager) => {
+      // TypeORM rechaza un update sin valores, por eso solo se envia si hay campos.
+      if (Object.keys(fieldsToUpdate).length > 0) {
+        await manager.update(Property, id, fieldsToUpdate);
+      }
 
-    // Actualizar campos simples
-    await this.propertyRepository.update(id, propertyFields);
+      // Instalaciones: con id se actualizan, sin id se crean y las que no
+      // vienen en el payload se eliminan. Si no vienen, no se tocan.
+      if (!installations) {
+        return;
+      }
 
-    // Actualizar clasificación si existe
-    if (classificationToSave) {
-      await this.propertyRepository.update(id, {
-        classification: classificationToSave,
-      });
-    }
-
-    // Actualizar las instalaciones
-    if (installations && installations.length > 0) {
-      // Eliminar instalaciones existentes
-      await this.installationRepository.delete({ property: { id } });
-
-      // Crear nuevas instalaciones asociadas a la propiedad
-      const newInstallations = installations.map((installation) =>
-        this.installationRepository.create({
-          ...installation,
-          property: { id }, // Asociar solo el ID de la propiedad
-        }),
+      const sentIds = new Set(
+        installations.filter((i) => i.id !== undefined).map((i) => i.id),
       );
+      const removedIds = ownedIds.filter((existing) => !sentIds.has(existing));
 
-      await this.installationRepository.save(newInstallations);
-    }
+      if (removedIds.length > 0) {
+        await manager.delete(Installation, removedIds);
+      }
+
+      for (const { id: installationId, ...fields } of installations) {
+        if (installationId !== undefined) {
+          await manager.update(Installation, installationId, fields);
+        } else {
+          await manager.save(
+            manager.create(Installation, { ...fields, property: { id } }),
+          );
+        }
+      }
+    });
 
     // Retornar la propiedad actualizada con relaciones
     const updatedProperty = await this.propertyRepository.findOne({

@@ -1,12 +1,9 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Plan } from './entities/plan.entity';
 import { CreatePlanDto } from './dtos/create-plan.dto';
+import { UpdatePlanDto } from './dtos/update-plan.dto';
 import { Property } from '../property/entities/property.entity';
 
 @Injectable()
@@ -22,27 +19,32 @@ export class PlanService {
     return this.planRepository.find({ relations: ['property'] });
   }
 
-  findOne(id: number): Promise<Plan> {
-    return this.planRepository.findOne({
+  async findOne(id: number): Promise<Plan> {
+    const plan = await this.planRepository.findOne({
       where: { id },
       relations: ['property'],
     });
+    if (!plan) {
+      throw new NotFoundException('Plan not found');
+    }
+    return plan;
   }
 
-  async update(id: number, planData: Partial<Plan>): Promise<Plan> {
-    await this.planRepository.update(id, planData);
+  async update(id: number, planData: UpdatePlanDto): Promise<Plan> {
+    if (Object.keys(planData).length > 0) {
+      await this.planRepository.update(id, planData);
+    }
     return this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {
-    await this.planRepository.delete(id);
+    const { affected } = await this.planRepository.delete(id);
+    if (!affected) {
+      throw new NotFoundException('Plan not found');
+    }
   }
 
   async create(createPlanDto: CreatePlanDto): Promise<Plan> {
-    if (!createPlanDto.propertyId) {
-      throw new BadRequestException('propertyId is required');
-    }
-
     const property = await this.propertyRepository.findOne({
       where: { id: createPlanDto.propertyId },
     });

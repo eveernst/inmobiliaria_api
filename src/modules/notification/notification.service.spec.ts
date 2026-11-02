@@ -9,6 +9,7 @@ describe('NotificationService', () => {
     create: jest.fn(),
     save: jest.fn(),
     findOne: jest.fn(),
+    find: jest.fn(),
   } as unknown as jest.Mocked<Repository<Notification>>;
   const userRepository = {
     findOne: jest.fn(),
@@ -21,6 +22,32 @@ describe('NotificationService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe('scoping reads to the owner', () => {
+    it('findAll returns only the given user notifications', async () => {
+      notificationRepository.find.mockResolvedValue([]);
+
+      await service.findAll(1);
+      await service.findAll(2);
+
+      expect(notificationRepository.find).toHaveBeenNthCalledWith(1, {
+        where: { user: { id: 1 } },
+      });
+      expect(notificationRepository.find).toHaveBeenNthCalledWith(2, {
+        where: { user: { id: 2 } },
+      });
+    });
+
+    it('findOne filters by id and owner', async () => {
+      notificationRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.findOne(7, 2)).resolves.toBeNull();
+
+      expect(notificationRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 7, user: { id: 2 } },
+      });
+    });
   });
 
   it('creates a registration notification for the acting user', async () => {

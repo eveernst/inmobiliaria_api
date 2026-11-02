@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Classification } from './entities/classification.entity';
+import { UpdateClassificationDto } from './dtos/update-classification.dto';
 
 @Injectable()
 export class ClassificationService {
@@ -20,7 +21,7 @@ export class ClassificationService {
 
   async update(
     id: number,
-    classificationData: Partial<Classification>,
+    classificationData: UpdateClassificationDto,
   ): Promise<Classification> {
     await this.classificationRepository.update(id, classificationData);
     return this.findOne(id);

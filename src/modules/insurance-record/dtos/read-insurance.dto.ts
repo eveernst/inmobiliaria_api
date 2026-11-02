@@ -1,7 +1,10 @@
-import { Expose } from 'class-transformer';
-import { Property } from 'src/modules/property/entities/property.entity';
+import { Expose, Type } from 'class-transformer';
+import { ReadPropertySummaryDto } from 'src/modules/property/dtos/read-property-summary.dto';
 
 export class ReadInsuranceDto {
+  @Expose()
+  id: number;
+
   @Expose()
   name: string;
 
@@ -55,5 +58,6 @@ export class ReadInsuranceDto {
   observations: string;
 
   @Expose()
-  property: Property;
+  @Type(() => ReadPropertySummaryDto)
+  property: ReadPropertySummaryDto;
 }

@@ -1,11 +1,21 @@
-import { IsDate, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsIn,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { PROVINCES } from 'src/shared/constants/provinces';
 import { IsRequired } from 'src/shared/decorators/is-required.decorator';
+import { IsCalendarDate } from 'src/shared/decorators/is-calendar-date.decorator';
 
 export class CreateRentedDto {
+  // Text fields the form treats as optional arrive as ''. The columns are
+  // NOT NULL, so '' is accepted and stored; omitting the field is rejected.
+
   // datos del propietario
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   ownerDetails: string;
 
   @IsString()
@@ -14,43 +24,31 @@ export class CreateRentedDto {
   affectation: string;
 
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   ownerContact: string;
 
   // datos del inquilino
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   renterDetails: string;
 
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   address: string;
 
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   renterContact: string;
 
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   locality: string;
 
-  @IsDate()
-  @IsNotEmpty()
+  @IsCalendarDate()
   @IsRequired()
-  contratStartDate: Date;
+  contratStartDate: string;
 
-  @IsDate()
-  @IsNotEmpty()
+  @IsCalendarDate()
   @IsRequired()
-  contratEndDate: Date;
+  contratEndDate: string;
 
-  @IsString()
-  @IsNotEmpty()
+  // Same list as properties (requirement 14, issues #24 and #49).
+  @IsIn(PROVINCES)
   @IsRequired()
   province: string;
 
@@ -60,15 +58,13 @@ export class CreateRentedDto {
   price: number;
 
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   adjustmentType: string;
 
+  @IsOptional()
   @IsString()
   contractImage?: string;
 
-  @IsNumber()
-  @IsNotEmpty()
+  @IsInt()
   @IsRequired()
   propertyId: number;
 }

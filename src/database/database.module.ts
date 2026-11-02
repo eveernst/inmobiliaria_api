@@ -26,6 +26,10 @@ export function createDatabaseOptions(
     database: config.get('DB_NAME'),
     autoLoadEntities: true,
     migrations: [__dirname + '/migrations/*{.js,.ts}'],
+    // synchronize is off, so pending migrations must run on every startup.
+    // Only pending ones run; the catch-up migrations that meet the existing
+    // database are idempotent (see src/database/migrations.spec.ts).
+    migrationsRun: true,
     synchronize: false,
     ssl: isRemote ? { rejectUnauthorized: false } : false,
   };

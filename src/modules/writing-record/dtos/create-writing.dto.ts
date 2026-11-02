@@ -1,7 +1,17 @@
-import { IsDate, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { IsRequired } from '../../../shared/decorators/is-required.decorator';
+import { IsCalendarDate } from '../../../shared/decorators/is-calendar-date.decorator';
 
 export class CreateWritingDto {
+  // Text fields the form treats as optional arrive as ''. The columns are
+  // NOT NULL, so '' is accepted and stored; omitting the field is rejected.
+
   @IsNumber()
   @IsNotEmpty()
   @IsRequired()
@@ -12,11 +22,11 @@ export class CreateWritingDto {
   @IsRequired()
   voteNumberJDAAC: number;
 
-  @IsDate()
-  @IsNotEmpty()
+  @IsCalendarDate()
   @IsRequired()
-  voteDateJDAAC: Date;
+  voteDateJDAAC: string;
 
+  @IsOptional()
   @IsString()
   imageJDAAC?: string;
 
@@ -25,27 +35,21 @@ export class CreateWritingDto {
   @IsRequired()
   voteNumberJDUA: number;
 
-  @IsDate()
-  @IsNotEmpty()
+  @IsCalendarDate()
   @IsRequired()
-  voteDateJDUA: Date;
+  voteDateJDUA: string;
 
+  @IsOptional()
   @IsString()
   imageJDUA?: string;
 
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   domain: string;
 
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   folio: string;
 
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   tomo: string;
 
   @IsNumber()
@@ -54,8 +58,6 @@ export class CreateWritingDto {
   year: number;
 
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   department: string;
 
   @IsNumber()
@@ -79,23 +81,17 @@ export class CreateWritingDto {
   improvementValue: number;
 
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   cadastralNomenclature: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
-  ubicationMap: string;
+  ubicationMap?: string;
+
+  @IsOptional()
+  @IsString()
+  cadastralInform?: string;
 
   @IsString()
-  @IsNotEmpty()
-  @IsRequired()
-  cadastralInform: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @IsRequired()
   actingNotary: string;
 
   @IsNumber()
@@ -103,9 +99,11 @@ export class CreateWritingDto {
   @IsRequired()
   notaryContact: number;
 
+  @IsOptional()
   @IsString()
   interiorImage?: string;
 
+  @IsOptional()
   @IsString()
   exteriorImage?: string;
 
@@ -118,8 +116,7 @@ export class CreateWritingDto {
   @IsString()
   detailSpaces: string;
 
-  @IsNumber()
-  @IsNotEmpty()
+  @IsInt()
   @IsRequired()
   propertyId: number;
 }

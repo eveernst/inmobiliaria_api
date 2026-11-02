@@ -1,12 +1,9 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Insurance } from './entities/insurance.entity';
 import { CreateInsuranceDto } from './dtos/create-insurance.dto';
+import { UpdateInsuranceDto } from './dtos/update-insurance.dto';
 import { Property } from '../property/entities/property.entity';
 
 @Injectable()
@@ -22,30 +19,35 @@ export class InsuranceService {
     return this.insuranceRepository.find({ relations: ['property'] });
   }
 
-  findOne(id: number): Promise<Insurance> {
-    return this.insuranceRepository.findOne({
+  async findOne(id: number): Promise<Insurance> {
+    const insurance = await this.insuranceRepository.findOne({
       where: { id },
       relations: ['property'],
     });
+    if (!insurance) {
+      throw new NotFoundException('Insurance not found');
+    }
+    return insurance;
   }
 
   async update(
     id: number,
-    insuranceData: Partial<Insurance>,
+    insuranceData: UpdateInsuranceDto,
   ): Promise<Insurance> {
-    await this.insuranceRepository.update(id, insuranceData);
+    if (Object.keys(insuranceData).length > 0) {
+      await this.insuranceRepository.update(id, insuranceData);
+    }
     return this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {
-    await this.insuranceRepository.delete(id);
+    const { affected } = await this.insuranceRepository.delete(id);
+    if (!affected) {
+      throw new NotFoundException('Insurance not found');
+    }
   }
 
   async create(createInsuranceDto: CreateInsuranceDto): Promise<Insurance> {
-    if (!createInsuranceDto.propertyId) {
-      throw new BadRequestException('propertyId is required');
-    }
-
     const property = await this.propertyRepository.findOne({
       where: { id: createInsuranceDto.propertyId },
     });

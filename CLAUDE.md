@@ -62,9 +62,11 @@ Current modules (`src/modules/`):
 - **`rented-record/`** — rental contracts.
 - **`writing-record/`** — deed records ("escrituras"), JDAAC/JDUA board votes.
 - **`notification/`** — system-generated warnings. Created on successful property/installation
-  registration, and by a daily `@Cron` job that warns 7 days before a document/contract's end
-  date (deduplicated: it checks for an existing notification for the same entity + due date
-  before inserting).
+  registration, and by a daily `@Cron` job that warns about every document/contract end date
+  within the next 7 days, not only the exact 7th day, so a run missed while the app was down is
+  caught up the next day. It's deduplicated (it checks for an existing notification for the same
+  entity + due date + user before inserting, backed by a unique index), and each record is
+  processed in its own try/catch so one bad record doesn't stop the rest.
 
 Shared code lives in `src/shared/`:
 
@@ -141,7 +143,16 @@ These are enforced, not decorative — don't work around them, fix the DTO/contr
 ## Database
 
 - TypeORM `synchronize` is disabled in every environment. Schema changes must use the versioned
-  migrations under `src/database/migrations/`.
+  migrations under `src/database/migrations/`, which run automatically on startup
+  (`migrationsRun: true`).
+- Only the three catch-up migrations (`InitialSchema`, `AddNotificationDueDateTracking`,
+  `AddNotificationDueDateUniqueIndex`) are idempotent (`IF NOT EXISTS`, guarded `ADD CONSTRAINT`),
+  because the shared DB predates them. `src/database/migrations.spec.ts` checks those three only.
+- **New migrations are plain and fail loudly**: they run on a known schema, and a no-op
+  `IF NOT EXISTS` still gets recorded as applied, which hides a schema mismatch. Don't make new
+  migrations idempotent and don't add them to `migrations.spec.ts`.
+- Never put non-migration files (specs included) in `src/database/migrations/`; the migration
+  globs load everything there.
 - PostgreSQL runs on Supabase. SSL is conditional on the DB host; never hardcode it on for
   localhost/dev.
 

@@ -11,13 +11,13 @@ export class AddNotificationDueDateTracking1790646760921
       'public';
 
     await queryRunner.query(
-      `ALTER TABLE "${schema}"."notification" ADD "sourceType" character varying(100)`,
+      `ALTER TABLE "${schema}"."notification" ADD COLUMN IF NOT EXISTS "sourceType" character varying(100)`,
     );
     await queryRunner.query(
-      `ALTER TABLE "${schema}"."notification" ADD "sourceId" integer`,
+      `ALTER TABLE "${schema}"."notification" ADD COLUMN IF NOT EXISTS "sourceId" integer`,
     );
     await queryRunner.query(
-      `ALTER TABLE "${schema}"."notification" ADD "dueDate" TIMESTAMP`,
+      `ALTER TABLE "${schema}"."notification" ADD COLUMN IF NOT EXISTS "dueDate" TIMESTAMP`,
     );
   }
 

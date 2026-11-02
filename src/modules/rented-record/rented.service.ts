@@ -1,12 +1,9 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Rented } from './entities/rented.entity';
 import { CreateRentedDto } from './dtos/create-rented.dto';
+import { UpdateRentedDto } from './dtos/update-rented.dto';
 import { Property } from '../property/entities/property.entity';
 
 @Injectable()
@@ -22,27 +19,32 @@ export class RentedService {
     return this.rentedRepository.find({ relations: ['property'] });
   }
 
-  findOne(id: number): Promise<Rented> {
-    return this.rentedRepository.findOne({
+  async findOne(id: number): Promise<Rented> {
+    const rented = await this.rentedRepository.findOne({
       where: { id },
       relations: ['property'],
     });
+    if (!rented) {
+      throw new NotFoundException('Rented record not found');
+    }
+    return rented;
   }
 
-  async update(id: number, rentedData: Partial<Rented>): Promise<Rented> {
-    await this.rentedRepository.update(id, rentedData);
+  async update(id: number, rentedData: UpdateRentedDto): Promise<Rented> {
+    if (Object.keys(rentedData).length > 0) {
+      await this.rentedRepository.update(id, rentedData);
+    }
     return this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {
-    await this.rentedRepository.delete(id);
+    const { affected } = await this.rentedRepository.delete(id);
+    if (!affected) {
+      throw new NotFoundException('Rented record not found');
+    }
   }
 
   async create(createRentedDto: CreateRentedDto): Promise<Rented> {
-    if (!createRentedDto.propertyId) {
-      throw new BadRequestException('propertyId is required');
-    }
-
     const property = await this.propertyRepository.findOne({
       where: { id: createRentedDto.propertyId },
     });

@@ -11,11 +11,10 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { InstallationService } from './installation.service';
-import { Installation } from './entities/installation.entity';
+import { UpdateInstallationDto } from './dtos/update-installation.dto';
 import { CreateInstallationDto } from './dtos/create-installation.dto';
 import { ReadInstallationDto } from './dtos/read-installation.dto';
 import { GenericResponse } from 'src/shared/generic-response.dto';
-import { plainToClass } from 'class-transformer';
 import { plainToInstance } from 'class-transformer';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
@@ -58,17 +57,25 @@ export class InstallationController {
       installationData,
       request.user.id,
     );
-    const response = plainToClass(ReadInstallationDto, installation);
+    const response = plainToInstance(ReadInstallationDto, installation, {
+      excludeExtraneousValues: true,
+    });
     return new GenericResponse<ReadInstallationDto>(response);
   }
 
   @Put(':id')
   @Roles(UserRole.ADMIN)
-  update(
+  async update(
     @Param('id') id: number,
-    @Body() installationData: Partial<Installation>,
-  ): Promise<Installation> {
-    return this.installationService.update(id, installationData);
+    @Body() installationData: UpdateInstallationDto,
+  ): Promise<ReadInstallationDto> {
+    const installation = await this.installationService.update(
+      id,
+      installationData,
+    );
+    return plainToInstance(ReadInstallationDto, installation, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Delete(':id')

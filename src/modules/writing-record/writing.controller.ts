@@ -7,13 +7,14 @@ import {
   Delete,
   Put,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { WritingService } from './writing.service';
-import { Writing } from './entities/writing.entity';
 import { CreateWritingDto } from './dtos/create-writing.dto';
+import { UpdateWritingDto } from './dtos/update-writing.dto';
 import { ReadWritingDto } from './dtos/read-writing.dto';
 import { GenericResponse } from 'src/shared/generic-response.dto';
-import { plainToClass } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import { Roles } from 'src/shared/decorators/roles.decorator';
 import { RolesGuard } from 'src/shared/guards/roles.guard';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
@@ -25,37 +26,48 @@ export class WritingController {
   constructor(private readonly writingService: WritingService) {}
 
   @Get()
-  findAll(): Promise<Writing[]> {
-    return this.writingService.findAll();
+  async findAll(): Promise<ReadWritingDto[]> {
+    const items = await this.writingService.findAll();
+    return plainToInstance(ReadWritingDto, items, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Get(':id')
   async findOne(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
   ): Promise<GenericResponse<ReadWritingDto>> {
     const writing = await this.writingService.findOne(id);
-    const response = plainToClass(ReadWritingDto, writing);
+    const response = plainToInstance(ReadWritingDto, writing, {
+      excludeExtraneousValues: true,
+    });
     return new GenericResponse<ReadWritingDto>(response);
   }
 
   @Post()
   @Roles(UserRole.ADMIN)
-  create(@Body() writingData: CreateWritingDto): Promise<Writing> {
-    return this.writingService.create(writingData);
+  async create(@Body() writingData: CreateWritingDto): Promise<ReadWritingDto> {
+    const created = await this.writingService.create(writingData);
+    return plainToInstance(ReadWritingDto, created, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Put(':id')
   @Roles(UserRole.ADMIN)
-  update(
-    @Param('id') id: number,
-    @Body() writingData: Partial<Writing>,
-  ): Promise<Writing> {
-    return this.writingService.update(id, writingData);
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() writingData: UpdateWritingDto,
+  ): Promise<ReadWritingDto> {
+    const updated = await this.writingService.update(id, writingData);
+    return plainToInstance(ReadWritingDto, updated, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Delete(':id')
   @Roles(UserRole.ADMIN)
-  remove(@Param('id') id: number): Promise<void> {
+  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.writingService.remove(id);
   }
 }

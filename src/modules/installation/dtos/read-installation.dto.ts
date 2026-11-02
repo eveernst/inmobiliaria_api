@@ -1,5 +1,4 @@
 import { Expose, Type } from 'class-transformer';
-import { ReadClassificationDto } from 'src/modules/classification/dtos/read-classification.dto';
 import { ReadPropertySummaryDto } from 'src/modules/property/dtos/read-property-summary.dto';
 
 export class ReadInstallationDto {
@@ -17,10 +16,6 @@ export class ReadInstallationDto {
 
   @Expose()
   details: string;
-
-  @Expose()
-  @Type(() => ReadClassificationDto)
-  classification: ReadClassificationDto;
 
   @Expose()
   @Type(() => ReadPropertySummaryDto)
