@@ -1,7 +1,7 @@
+import 'reflect-metadata';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { PropertyFiltersDto } from './property-filters.dto';
 
-// Same options as the global pipe in main.ts.
 const pipe = new ValidationPipe({
   whitelist: true,
   forbidNonWhitelisted: true,
@@ -25,7 +25,7 @@ describe('PropertyFiltersDto with the global ValidationPipe', () => {
     await expect(validate({})).resolves.toBeDefined();
   });
 
-  it('rejects a province outside the AAC list (requirement 14)', async () => {
+  it('rejects a province outside the AAC list', async () => {
     await expect(validate({ province: 'Buenos Aires' })).rejects.toBeInstanceOf(
       BadRequestException,
     );
@@ -35,5 +35,25 @@ describe('PropertyFiltersDto with the global ValidationPipe', () => {
     await expect(validate({ province: 'Córd' })).rejects.toBeInstanceOf(
       BadRequestException,
     );
+  });
+
+  it('transforms numeric query parameters into numbers', async () => {
+    await expect(
+      validate({ state: '1', classification: '2' }),
+    ).resolves.toEqual(
+      expect.objectContaining({ state: 1, classification: 2 }),
+    );
+  });
+
+  it('rejects a non-integer state filter', async () => {
+    await expect(validate({ state: 'abc' })).rejects.toBeInstanceOf(
+      BadRequestException,
+    );
+  });
+
+  it('rejects classification names because classification means an id', async () => {
+    await expect(
+      validate({ classification: 'Residential' }),
+    ).rejects.toBeInstanceOf(BadRequestException);
   });
 });

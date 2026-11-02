@@ -51,20 +51,9 @@ export class PropertyService {
       'plans',
     ];
 
-    const hasFilters = Object.values(filters).some(
-      (value) => value !== undefined && value.trim() !== '',
+    const hasFilters = Object.values(filters).some((value) =>
+      typeof value === 'string' ? value.trim() !== '' : value !== undefined,
     );
-
-    let stateFilter: number | undefined;
-    if (filters.state?.trim()) {
-      const state = Number(filters.state.trim());
-
-      if (!Number.isInteger(state)) {
-        return [];
-      }
-
-      stateFilter = state;
-    }
 
     let properties: Property[];
 
@@ -92,24 +81,14 @@ export class PropertyService {
         });
       }
 
-      if (filters.classification?.trim()) {
-        const classification = filters.classification.trim();
-        const classificationId = Number(classification);
-
-        if (Number.isInteger(classificationId)) {
-          query.andWhere('classification.id = :classificationId', {
-            classificationId,
-          });
-        } else {
-          query.andWhere(
-            'LOWER(classification.name) LIKE LOWER(:classification)',
-            { classification: `%${classification}%` },
-          );
-        }
+      if (filters.classification !== undefined) {
+        query.andWhere('classification.id = :classificationId', {
+          classificationId: filters.classification,
+        });
       }
 
-      if (stateFilter !== undefined) {
-        query.andWhere('property.state = :state', { state: stateFilter });
+      if (filters.state !== undefined) {
+        query.andWhere('property.state = :state', { state: filters.state });
       }
 
       properties = await query.getMany();

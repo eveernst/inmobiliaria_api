@@ -61,8 +61,8 @@ describe('PropertyService.findAll', () => {
     await expect(
       service.findAll({
         province: 'Córdoba',
-        classification: '3',
-        state: '1',
+        classification: 3,
+        state: 1,
         address: 'Centro',
       }),
     ).resolves.toEqual([]);
@@ -85,10 +85,23 @@ describe('PropertyService.findAll', () => {
     expect(query.getMany).toHaveBeenCalledTimes(1);
   });
 
-  it('returns an empty array for an invalid state filter', async () => {
-    await expect(service.findAll({ state: 'invalid' })).resolves.toEqual([]);
+  it('filters classification only by its numeric id', async () => {
+    const query = {
+      leftJoinAndSelect: jest.fn(),
+      andWhere: jest.fn(),
+      getMany: jest.fn().mockResolvedValue([]),
+    } as unknown as jest.Mocked<SelectQueryBuilder<Property>>;
 
-    expect(repository.createQueryBuilder).not.toHaveBeenCalled();
+    query.leftJoinAndSelect.mockReturnValue(query);
+    query.andWhere.mockReturnValue(query);
+    repository.createQueryBuilder.mockReturnValue(query);
+
+    await expect(service.findAll({ classification: 2 })).resolves.toEqual([]);
+
+    expect(query.andWhere).toHaveBeenCalledWith(
+      'classification.id = :classificationId',
+      { classificationId: 2 },
+    );
   });
 });
 
