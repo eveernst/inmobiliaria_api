@@ -40,7 +40,9 @@ describe('PropertyFiltersDto with the global ValidationPipe', () => {
   it('transforms numeric query parameters into numbers', async () => {
     await expect(
       validate({ state: '1', classification: '2' }),
-    ).resolves.toEqual(expect.objectContaining({ state: 1, classification: 2 }));
+    ).resolves.toEqual(
+      expect.objectContaining({ state: 1, classification: 2 }),
+    );
   });
 
   it('rejects a non-integer state filter', async () => {
