@@ -66,9 +66,6 @@ export class PropertyController {
     @Param('id', ParseIntPipe) id: number,
     @Body() propertyData: UpdatePropertyDto,
   ): Promise<ReadPropertyInstallationDto> {
-    console.log('=== UPDATE PROPERTY ===');
-    console.log('ID:', id);
-    console.log('Data received:', JSON.stringify(propertyData, null, 2));
     const property = await this.propertyService.update(id, propertyData);
     return plainToInstance(ReadPropertyInstallationDto, property, {
       excludeExtraneousValues: true,
