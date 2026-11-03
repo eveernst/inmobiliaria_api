@@ -8,6 +8,7 @@ import {
   Matches,
 } from 'class-validator';
 import { IsRequired } from 'src/shared/decorators/is-required.decorator';
+import { NumberToText } from 'src/shared/decorators/to-text.decorator';
 import { IsCalendarDate } from 'src/shared/decorators/is-calendar-date.decorator';
 
 export class CreateInsuranceDto {
@@ -17,6 +18,7 @@ export class CreateInsuranceDto {
   @IsRequired()
   name: string;
 
+  @NumberToText()
   @IsString()
   @Matches(/^\d{10}$/)
   @IsNotEmpty()

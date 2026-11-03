@@ -6,6 +6,7 @@ import {
   IsString,
 } from 'class-validator';
 import { IsRequired } from '../../../shared/decorators/is-required.decorator';
+import { NumberToText } from '../../../shared/decorators/to-text.decorator';
 import { IsCalendarDate } from '../../../shared/decorators/is-calendar-date.decorator';
 
 export class CreateWritingDto {
@@ -94,10 +95,11 @@ export class CreateWritingDto {
   @IsString()
   actingNotary: string;
 
-  @IsNumber()
+  @NumberToText()
+  @IsString()
   @IsNotEmpty()
   @IsRequired()
-  notaryContact: number;
+  notaryContact: string;
 
   @IsOptional()
   @IsString()

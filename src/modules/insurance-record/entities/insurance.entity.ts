@@ -7,10 +7,10 @@ export class Insurance extends BaseEntity {
   @Column({ length: 100 })
   name: string;
 
-  @Column({ type: 'bigint', unique: true })
+  @Column()
   phone: string;
 
-  @Column({ unique: true })
+  @Column()
   email: string;
 
   @Column()

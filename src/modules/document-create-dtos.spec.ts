@@ -263,6 +263,38 @@ describe('Document Create DTOs with the global ValidationPipe', () => {
       },
     );
 
+    // notaryContact is text (#54). The current front still sends a number,
+    // the updated one a string: both are accepted and stored as a string.
+    it('accepts a notaryContact string', async () => {
+      const dto = await validate(CreateWritingDto, {
+        ...writingPayload,
+        notaryContact: '3510000045',
+      });
+
+      expect(dto.notaryContact).toBe('3510000045');
+    });
+
+    it('converts a numeric notaryContact to a string', async () => {
+      const dto = await validate(CreateWritingDto, {
+        ...writingPayload,
+        notaryContact: 3510000045,
+      });
+
+      expect(dto.notaryContact).toBe('3510000045');
+    });
+
+    it.each([true, {}, ['3510000045']])(
+      'rejects a notaryContact that is neither text nor a number (%p)',
+      async (notaryContact) => {
+        const errors = await errorsFor(CreateWritingDto, {
+          ...writingPayload,
+          notaryContact,
+        });
+
+        expect(errors).toContain('notaryContact must be a string');
+      },
+    );
+
     // NOT NULL columns: the form must ask for them (front change).
     it.each([
       'year',
@@ -288,6 +320,37 @@ describe('Document Create DTOs with the global ValidationPipe', () => {
 
       expect(dto.insuranceDate).toBe('2026-03-01');
       expect(dto.AnualFormDate).toBe('2026-12-01');
+    });
+
+    // phone is text (#54); email and phone are no longer unique, so the same
+    // contact can be used by several insurances.
+    it('accepts the same phone and email on two insurances', async () => {
+      await expect(
+        errorsFor(CreateInsuranceDto, insurancePayload),
+      ).resolves.toEqual([]);
+      await expect(
+        errorsFor(CreateInsuranceDto, { ...insurancePayload, propertyId: 3 }),
+      ).resolves.toEqual([]);
+    });
+
+    it('converts a numeric phone to a string', async () => {
+      const dto = await validate(CreateInsuranceDto, {
+        ...insurancePayload,
+        phone: 3511234567,
+      });
+
+      expect(dto.phone).toBe('3511234567');
+    });
+
+    it('still rejects a phone that is not 10 digits', async () => {
+      const errors = await errorsFor(CreateInsuranceDto, {
+        ...insurancePayload,
+        phone: 351123,
+      });
+
+      expect(errors).toContain(
+        'phone must match /^\\d{10}$/ regular expression',
+      );
     });
 
     // The form omits an empty date instead of sending ''.
