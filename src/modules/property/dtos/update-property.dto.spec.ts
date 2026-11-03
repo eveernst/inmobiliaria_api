@@ -86,6 +86,33 @@ describe('UpdatePropertyDto with the global ValidationPipe', () => {
     expect(errors).toContain('file must be a string');
   });
 
+  describe.each(['user', 'classification'])(
+    'the %s id when present (#65)',
+    (field) => {
+      it('accepts a positive integer, also as a <select> string', async () => {
+        const dto = await validate({ [field]: '7' });
+
+        expect(dto[field]).toBe(7);
+        await expect(errorsFor({ [field]: 7 })).resolves.toEqual([]);
+      });
+
+      it('is optional: omitting it passes', async () => {
+        await expect(errorsFor({ description: 'x' })).resolves.toEqual([]);
+      });
+
+      // @IsOptional() treats null as absent, so null used to reach the service.
+      it.each([null, 0, -1, 1.5, 'abc', '', true])(
+        'rejects %p',
+        async (value) => {
+          const errors = await errorsFor({ [field]: value });
+
+          expect(errors.length).toBeGreaterThan(0);
+          expect(errors.every((e) => e.includes(field))).toBe(true);
+        },
+      );
+    },
+  );
+
   it('rejects a province outside the AAC list', async () => {
     const errors = await errorsFor({ ...editPayload, province: 'Salta' });
 
