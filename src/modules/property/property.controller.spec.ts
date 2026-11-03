@@ -29,7 +29,7 @@ describe('PropertyController', () => {
   const entity = Object.assign(new Property(), {
     ...fields,
     ...timestamps,
-    user: { id: 1, password: 'hashed-secret' },
+    user: { id: 1, name: 'Responsible User', password: 'hashed-secret' },
     classification,
     installations: [
       {
@@ -65,6 +65,7 @@ describe('PropertyController', () => {
     expect({ ...response.data }).toEqual({
       ...fields,
       classification: { id: 3, name: 'Residential' },
+      user: { id: 1, name: 'Responsible User' },
     });
   });
 
@@ -76,6 +77,7 @@ describe('PropertyController', () => {
     expect({ ...response }).toEqual({
       ...fields,
       classification: { id: 3, name: 'Residential' },
+      user: { id: 1, name: 'Responsible User' },
       installations: [
         {
           id: 9,

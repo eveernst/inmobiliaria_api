@@ -91,6 +91,11 @@ export class CreatePropertyDto {
   @IsRequired()
   classification: number; // El ID de Classification
 
+  @ToNumber()
+  @IsNumber()
+  @IsRequired()
+  user: number; // El ID del usuario responsable
+
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })

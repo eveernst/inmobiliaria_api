@@ -6,6 +6,7 @@ import { CreatePropertyDto } from './dtos/create-property.dto';
 import { Classification } from '../classification/entities/classification.entity';
 import { Installation } from '../installation/entities/installation.entity';
 import { NotificationService } from '../notification/notification.service';
+import { User } from '../users/entities/user.entity';
 
 describe('PropertyService.findAll', () => {
   const repository = {
@@ -16,6 +17,7 @@ describe('PropertyService.findAll', () => {
 
   const service = new PropertyService(
     repository,
+    {} as never,
     {} as never,
     {} as never,
     {} as never,
@@ -38,6 +40,7 @@ describe('PropertyService.findAll', () => {
     expect(repository.find).toHaveBeenCalledWith({
       relations: [
         'classification',
+        'user',
         'installations',
         'writings',
         'renteds',
@@ -122,6 +125,9 @@ describe('PropertyService.create', () => {
   const classificationRepository = {
     findOne: jest.fn(),
   } as unknown as jest.Mocked<Repository<Classification>>;
+  const userRepository = {
+    findOne: jest.fn(),
+  } as unknown as jest.Mocked<Repository<User>>;
   const installationRepository = {
     create: jest.fn(),
     save: jest.fn(),
@@ -133,6 +139,7 @@ describe('PropertyService.create', () => {
   const service = new PropertyService(
     propertyRepository,
     classificationRepository,
+    userRepository,
     installationRepository,
     {} as never,
     {} as never,
@@ -151,9 +158,11 @@ describe('PropertyService.create', () => {
       .spyOn(Logger.prototype, 'error')
       .mockImplementation(() => undefined);
     const classification = { id: 3 } as Classification;
+    const user = { id: 7, name: 'Responsible User' } as User;
     const property = { id: 21 } as Property;
 
     classificationRepository.findOne.mockResolvedValue(classification);
+    userRepository.findOne.mockResolvedValue(user);
     propertyRepository.create.mockReturnValue(property);
     propertyRepository.save.mockResolvedValue(property);
     notificationService.createRegistrationNotification.mockRejectedValue(
@@ -161,7 +170,7 @@ describe('PropertyService.create', () => {
     );
 
     await expect(
-      service.create({ classification: 3 } as CreatePropertyDto, 7),
+      service.create({ classification: 3, user: 7 } as CreatePropertyDto, 7),
     ).resolves.toBe(property);
 
     expect(propertyRepository.save).toHaveBeenCalledTimes(1);
@@ -175,9 +184,11 @@ describe('PropertyService.create', () => {
 
   it('saves nested installations linked to the property', async () => {
     const classification = { id: 2 } as Classification;
+    const user = { id: 7, name: 'Responsible User' } as User;
     const property = { id: 21 } as Property;
     const dto = {
       classification: 2,
+      user: 7,
       address: 'Av. Siempre Viva 742',
       installations: [
         {
@@ -190,6 +201,7 @@ describe('PropertyService.create', () => {
     } as CreatePropertyDto;
 
     classificationRepository.findOne.mockResolvedValue(classification);
+    userRepository.findOne.mockResolvedValue(user);
     propertyRepository.create.mockReturnValue(property);
     propertyRepository.save.mockResolvedValue(property);
     installationRepository.create.mockImplementation(
@@ -200,6 +212,7 @@ describe('PropertyService.create', () => {
 
     expect(propertyRepository.create).toHaveBeenCalledWith({
       classification,
+      user,
       address: 'Av. Siempre Viva 742',
     });
     expect(installationRepository.create).toHaveBeenCalledWith({
@@ -210,6 +223,20 @@ describe('PropertyService.create', () => {
       property,
     });
     expect(installationRepository.save).toHaveBeenCalledTimes(1);
+  });
+
+  it('rejects an unknown responsible user before saving the property', async () => {
+    classificationRepository.findOne.mockResolvedValue({
+      id: 2,
+    } as Classification);
+    userRepository.findOne.mockResolvedValue(null);
+
+    await expect(
+      service.create({ classification: 2, user: 999 } as CreatePropertyDto, 7),
+    ).rejects.toBeInstanceOf(NotFoundException);
+
+    expect(propertyRepository.create).not.toHaveBeenCalled();
+    expect(propertyRepository.save).not.toHaveBeenCalled();
   });
 });
 
@@ -229,10 +256,14 @@ describe('PropertyService.update installations (#47)', () => {
       ),
     },
   } as unknown as jest.Mocked<Repository<Property>>;
+  const userRepository = {
+    findOne: jest.fn(),
+  } as unknown as jest.Mocked<Repository<User>>;
 
   const service = new PropertyService(
     propertyRepository,
     {} as never,
+    userRepository,
     {} as never,
     {} as never,
     {} as never,
@@ -261,6 +292,15 @@ describe('PropertyService.update installations (#47)', () => {
       expect.anything(),
       expect.anything(),
     );
+  });
+
+  it('updates the responsible user', async () => {
+    const user = { id: 8, name: 'New Responsible User' } as User;
+    userRepository.findOne.mockResolvedValue(user);
+
+    await service.update(5, { user: 8 });
+
+    expect(manager.update).toHaveBeenCalledWith(Property, 5, { user });
   });
 
   it('saves the property fields inside the same transaction as the installations', async () => {

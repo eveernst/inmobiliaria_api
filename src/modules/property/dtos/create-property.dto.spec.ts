@@ -44,6 +44,7 @@ const formPayload = {
   description: 'Test property',
   file: '',
   classification: 2,
+  user: '7',
   installations: [
     {
       name: 'Gas',
@@ -61,6 +62,7 @@ describe('CreatePropertyDto with the global ValidationPipe', () => {
     expect(dto.goodUseCode).toBe(1234567);
     expect(dto.destiny).toBe(5);
     expect(dto.state).toBe(0);
+    expect(dto.user).toBe(7);
   });
 
   it('accepts nested installations in the shape the form sends', async () => {
@@ -116,7 +118,7 @@ describe('CreatePropertyDto with the global ValidationPipe', () => {
     );
   });
 
-  it.each(['goodUseCode', 'destiny', 'state'])(
+  it.each(['goodUseCode', 'destiny', 'state', 'user'])(
     'rejects a non-numeric %s',
     async (field) => {
       const errors = await errorsFor({ ...formPayload, [field]: 'abc' });
@@ -127,7 +129,7 @@ describe('CreatePropertyDto with the global ValidationPipe', () => {
     },
   );
 
-  it.each(['goodUseCode', 'destiny', 'state'])(
+  it.each(['goodUseCode', 'destiny', 'state', 'user'])(
     'rejects an empty %s instead of turning it into 0',
     async (field) => {
       const errors = await errorsFor({ ...formPayload, [field]: '' });
