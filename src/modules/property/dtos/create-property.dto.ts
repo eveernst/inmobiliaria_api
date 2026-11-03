@@ -2,9 +2,11 @@ import {
   IsArray,
   IsBoolean,
   IsIn,
+  IsInt,
   IsNumber,
   IsOptional,
   IsString,
+  Min,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -88,11 +90,15 @@ export class CreatePropertyDto {
 
   @ToNumber()
   @IsNumber()
+  @IsInt()
+  @Min(1)
   @IsRequired()
   classification: number; // El ID de Classification
 
   @ToNumber()
   @IsNumber()
+  @IsInt()
+  @Min(1)
   @IsRequired()
   user: number; // El ID del usuario responsable
 

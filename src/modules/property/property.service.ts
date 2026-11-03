@@ -137,6 +137,15 @@ export class PropertyService {
     createPropertyDto: CreatePropertyDto,
     actorUserId: number,
   ): Promise<Property> {
+    // TypeORM 0.3 drops null/undefined `where` conditions and would match the
+    // first row, so never look an id up before checking it is there (#65).
+    if (createPropertyDto.classification == null) {
+      throw new BadRequestException('Classification is required');
+    }
+    if (createPropertyDto.user == null) {
+      throw new BadRequestException('Responsible user is required');
+    }
+
     const classification = await this.classificationRepository.findOne({
       where: { id: createPropertyDto.classification },
     });
@@ -229,8 +238,16 @@ export class PropertyService {
     }
 
     // Verificar la nueva clasificación
+    // An omitted id (undefined) means "keep"; null is a client error (#65).
+    if (classificationId === null) {
+      throw new BadRequestException('Classification cannot be null');
+    }
+    if (userId === null) {
+      throw new BadRequestException('Responsible user cannot be null');
+    }
+
     let classificationToSave: Classification | null = null;
-    if (classificationId) {
+    if (classificationId !== undefined) {
       classificationToSave = await this.classificationRepository.findOne({
         where: { id: classificationId },
       });
