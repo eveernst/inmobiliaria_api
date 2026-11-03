@@ -25,7 +25,12 @@ export class NotificationService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  findAll(userId: number): Promise<Notification[]> {
+  // TypeORM 0.3 drops null/undefined `where` conditions, so a missing user id
+  // would match every user's rows (#65). These guards fail closed.
+  async findAll(userId: number): Promise<Notification[]> {
+    if (userId == null) {
+      return [];
+    }
     return this.notificationRepository.find({
       where: { user: { id: userId } },
     });
@@ -33,7 +38,10 @@ export class NotificationService {
 
   // Scoped to the owner: another user's notification is indistinguishable
   // from a missing one, so ids don't leak across users.
-  findOne(id: number, userId: number): Promise<Notification | null> {
+  async findOne(id: number, userId: number): Promise<Notification | null> {
+    if (userId == null) {
+      return null;
+    }
     return this.notificationRepository.findOne({
       where: { id, user: { id: userId } },
     });
@@ -45,7 +53,10 @@ export class NotificationService {
     resourceId: number,
     property?: Property,
   ): Promise<Notification> {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const user =
+      userId == null
+        ? null
+        : await this.userRepository.findOne({ where: { id: userId } });
 
     if (!user) {
       throw new Error(`User ${userId} not found for notification`);

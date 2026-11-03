@@ -50,6 +50,36 @@ describe('NotificationService', () => {
     });
   });
 
+  // TypeORM 0.3 drops null/undefined `where` conditions (#65): without these
+  // guards a missing user id would list or load every user's notifications.
+  describe('missing user id', () => {
+    it.each([undefined, null])('findAll(%p) returns nothing', async (id) => {
+      await expect(service.findAll(id as number)).resolves.toEqual([]);
+
+      expect(notificationRepository.find).not.toHaveBeenCalled();
+    });
+
+    it.each([undefined, null])('findOne(7, %p) returns null', async (id) => {
+      await expect(service.findOne(7, id as number)).resolves.toBeNull();
+
+      expect(notificationRepository.findOne).not.toHaveBeenCalled();
+    });
+
+    it.each([undefined, null])(
+      'createRegistrationNotification(%p) does not pick the first user',
+      async (id) => {
+        userRepository.findOne.mockResolvedValue({ id: 1 } as User);
+
+        await expect(
+          service.createRegistrationNotification(id as number, 'property', 11),
+        ).rejects.toThrow('not found');
+
+        expect(userRepository.findOne).not.toHaveBeenCalled();
+        expect(notificationRepository.save).not.toHaveBeenCalled();
+      },
+    );
+  });
+
   it('creates a registration notification for the acting user', async () => {
     const user = { id: 7 } as User;
     const property = { id: 11 } as Property;

@@ -140,6 +140,20 @@ describe('CreatePropertyDto with the global ValidationPipe', () => {
     },
   );
 
+  // The ids end up in a TypeORM `where`: null/undefined would match the first
+  // row, and 0/negative/decimal ids are never valid (#65).
+  it.each(['user', 'classification'])(
+    'rejects null, 0, negative and decimal %s ids',
+    async (field) => {
+      for (const value of [null, 0, -1, 1.5]) {
+        const errors = await errorsFor({ ...formPayload, [field]: value });
+
+        expect(errors.length).toBeGreaterThan(0);
+        expect(errors.every((e) => e.toLowerCase().includes(field))).toBe(true);
+      }
+    },
+  );
+
   it('rejects a province outside the AAC list (requirement 14)', async () => {
     const errors = await errorsFor({
       ...formPayload,

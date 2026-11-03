@@ -3,6 +3,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { PropertyService } from './property.service';
 import { Property } from './entities/property.entity';
 import { CreatePropertyDto } from './dtos/create-property.dto';
+import { UpdatePropertyDto } from './dtos/update-property.dto';
 import { Classification } from '../classification/entities/classification.entity';
 import { Installation } from '../installation/entities/installation.entity';
 import { NotificationService } from '../notification/notification.service';
@@ -238,6 +239,30 @@ describe('PropertyService.create', () => {
     expect(propertyRepository.create).not.toHaveBeenCalled();
     expect(propertyRepository.save).not.toHaveBeenCalled();
   });
+
+  // TypeORM 0.3 drops null/undefined `where` conditions, so findOne would
+  // match the first row of the table (#65).
+  it.each([
+    ['user', { classification: 2, user: null }],
+    ['user', { classification: 2 }],
+    ['classification', { classification: null, user: 7 }],
+    ['classification', { user: 7 }],
+  ])(
+    'rejects a missing %s id without querying or saving',
+    async (_field, dto) => {
+      classificationRepository.findOne.mockResolvedValue({
+        id: 2,
+      } as Classification);
+      userRepository.findOne.mockResolvedValue({ id: 7 } as User);
+
+      await expect(
+        service.create(dto as unknown as CreatePropertyDto, 7),
+      ).rejects.toBeInstanceOf(BadRequestException);
+
+      expect(userRepository.findOne).not.toHaveBeenCalled();
+      expect(propertyRepository.save).not.toHaveBeenCalled();
+    },
+  );
 });
 
 describe('PropertyService.update installations (#47)', () => {
@@ -301,6 +326,27 @@ describe('PropertyService.update installations (#47)', () => {
     await service.update(5, { user: 8 });
 
     expect(manager.update).toHaveBeenCalledWith(Property, 5, { user });
+  });
+
+  // Bypasses the DTO: null in a `where` is dropped by TypeORM 0.3, so the
+  // lookup would return the first user and silently reassign the property (#65).
+  it('does not reassign the property when user is null', async () => {
+    userRepository.findOne.mockResolvedValue({ id: 1 } as User);
+
+    await expect(
+      service.update(5, { user: null } as UpdatePropertyDto),
+    ).rejects.toBeInstanceOf(BadRequestException);
+
+    expect(userRepository.findOne).not.toHaveBeenCalled();
+    expect(propertyRepository.manager.transaction).not.toHaveBeenCalled();
+  });
+
+  it('does not query when classification is null', async () => {
+    await expect(
+      service.update(5, { classification: null } as UpdatePropertyDto),
+    ).rejects.toBeInstanceOf(BadRequestException);
+
+    expect(propertyRepository.manager.transaction).not.toHaveBeenCalled();
   });
 
   it('saves the property fields inside the same transaction as the installations', async () => {
