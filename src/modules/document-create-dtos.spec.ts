@@ -408,6 +408,7 @@ describe('Document Create DTOs with the global ValidationPipe', () => {
         detailsMaintenance: 'None',
         description: 'Test property',
         classification: 2,
+        user: 7,
         [field]: sent,
       });
 

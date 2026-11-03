@@ -5,6 +5,7 @@ import { ReadInsuranceDto } from 'src/modules/insurance-record/dtos/read-insuran
 import { ReadPlanDto } from 'src/modules/plan-record/dtos/read-plan.dto';
 import { ReadRentedDto } from 'src/modules/rented-record/dtos/read-rented.dto';
 import { ReadWritingDto } from 'src/modules/writing-record/dtos/read-writing.dto';
+import { ReadPropertyUserDto } from './read-property-user.dto';
 export class ReadPropertyInstallationDto {
   @Expose()
   goodUseCode: number;
@@ -54,6 +55,10 @@ export class ReadPropertyInstallationDto {
   @Expose()
   @Type(() => ReadClassificationDto) // Mapeará automáticamente al sub-DTO
   classification: ReadClassificationDto;
+
+  @Expose()
+  @Type(() => ReadPropertyUserDto)
+  user?: ReadPropertyUserDto;
 
   @Expose()
   @Type(() => ReadInstallationDto) // Mapeará automáticamente al sub-DTO

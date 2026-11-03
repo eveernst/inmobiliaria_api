@@ -43,6 +43,7 @@ const editPayload = {
   description: 'Edited property',
   file: 'https://example.com/property.jpg',
   classification: 2,
+  user: 7,
   installations: [
     { id: 7, name: 'Gas', quantity: 2, file: '', details: 'Boiler' },
     { name: 'Agua', quantity: 1, details: 'Tank' },
@@ -62,7 +63,7 @@ describe('UpdatePropertyDto with the global ValidationPipe', () => {
     await expect(errorsFor({ description: 'Only this' })).resolves.toEqual([]);
   });
 
-  it.each(['id', 'insurances', 'plans', 'renteds', 'writings', 'user'])(
+  it.each(['id', 'insurances', 'plans', 'renteds', 'writings'])(
     'rejects the read-only key %s',
     async (field) => {
       const errors = await errorsFor({ ...editPayload, [field]: 1 });

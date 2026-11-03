@@ -11,12 +11,14 @@ import { Plan } from '../plan-record/entities/plan.entity';
 import { Rented } from '../rented-record/entities/rented.entity';
 import { Notification } from '../notification/entities/notification.entity';
 import { NotificationModule } from '../notification/notification.module';
+import { User } from '../users/entities/user.entity';
 
 @Module({
   imports: [
     NotificationModule,
     TypeOrmModule.forFeature([
       Property,
+      User,
       Classification,
       Installation,
       Insurance,

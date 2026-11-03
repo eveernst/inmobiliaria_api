@@ -22,6 +22,7 @@ import { Writing } from '../writing-record/entities/writing.entity';
 import { Notification } from '../notification/entities/notification.entity';
 import { PropertyFiltersDto } from './dtos/property-filters.dto';
 import { NotificationService } from '../notification/notification.service';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class PropertyService {
@@ -32,6 +33,8 @@ export class PropertyService {
     private readonly propertyRepository: Repository<Property>,
     @InjectRepository(Classification)
     private readonly classificationRepository: Repository<Classification>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     @InjectRepository(Installation)
     private readonly installationRepository: Repository<Installation>,
     @InjectRepository(Insurance)
@@ -50,6 +53,7 @@ export class PropertyService {
   async findAll(filters: PropertyFiltersDto = {}): Promise<ReadPropertyDto[]> {
     const relations = [
       'classification',
+      'user',
       'installations',
       'writings',
       'renteds',
@@ -69,6 +73,7 @@ export class PropertyService {
       const query = this.propertyRepository
         .createQueryBuilder('property')
         .leftJoinAndSelect('property.classification', 'classification')
+        .leftJoinAndSelect('property.user', 'user')
         .leftJoinAndSelect('property.installations', 'installations')
         .leftJoinAndSelect('property.writings', 'writings')
         .leftJoinAndSelect('property.renteds', 'renteds')
@@ -110,6 +115,7 @@ export class PropertyService {
       where: { id },
       relations: [
         'classification',
+        'user',
         'installations',
         'writings',
         'renteds',
@@ -139,12 +145,21 @@ export class PropertyService {
       throw new NotFoundException('Classification not found');
     }
 
+    const user = await this.userRepository.findOne({
+      where: { id: createPropertyDto.user },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Responsible user not found');
+    }
+
     const { installations: installationsData, ...propertyData } =
       createPropertyDto;
 
     const property = this.propertyRepository.create({
       ...propertyData,
       classification,
+      user,
     });
     await this.propertyRepository.save(property);
 
@@ -183,6 +198,7 @@ export class PropertyService {
       where: { id },
       relations: [
         'classification',
+        'user',
         'installations',
         'insurances',
         'plans',
@@ -198,6 +214,7 @@ export class PropertyService {
     const {
       installations,
       classification: classificationId,
+      user: userId,
       ...propertyFields
     } = propertyData;
 
@@ -223,9 +240,21 @@ export class PropertyService {
       }
     }
 
+    let userToSave: User | null = null;
+    if (userId !== undefined) {
+      userToSave = await this.userRepository.findOne({
+        where: { id: userId },
+      });
+
+      if (!userToSave) {
+        throw new NotFoundException('Responsible user not found');
+      }
+    }
+
     const fieldsToUpdate: Partial<Property> = {
       ...(propertyFields as Partial<Property>),
       ...(classificationToSave ? { classification: classificationToSave } : {}),
+      ...(userToSave ? { user: userToSave } : {}),
     };
 
     // Todo en una sola transaccion: si falla la sincronizacion de las
@@ -267,6 +296,7 @@ export class PropertyService {
       where: { id },
       relations: [
         'classification',
+        'user',
         'installations',
         'insurances',
         'plans',
