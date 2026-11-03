@@ -29,6 +29,28 @@ describe('UsersService', () => {
     service = new UsersService(repository as any);
   });
 
+  describe('findByEmail', () => {
+    // TypeORM drops `undefined` conditions, so `where: { email: undefined }`
+    // would match the first user in the table (#48).
+    it.each([undefined, ''])(
+      'returns null without querying when the email is %p',
+      async (email) => {
+        await expect(service.findByEmail(email)).resolves.toBeNull();
+        expect(repository.findOne).not.toHaveBeenCalled();
+      },
+    );
+
+    it('looks the user up by email', async () => {
+      repository.findOne.mockResolvedValue({ id: 1 });
+
+      await service.findByEmail('admin@aac.com');
+
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { email: 'admin@aac.com' },
+      });
+    });
+  });
+
   describe('update', () => {
     it('rejects demoting the only superuser', async () => {
       repository.findOne.mockResolvedValue({ id: 1, role: UserRole.SUPERUSER });
