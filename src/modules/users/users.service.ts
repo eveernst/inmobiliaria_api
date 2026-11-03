@@ -26,7 +26,12 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { id } });
   }
 
-  findByEmail(email: string): Promise<User> {
+  async findByEmail(email: string): Promise<User | null> {
+    // TypeORM ignores `undefined` conditions, so an empty email would match
+    // the first user in the table (#48).
+    if (!email) {
+      return null;
+    }
     return this.usersRepository.findOne({ where: { email } });
   }
 
