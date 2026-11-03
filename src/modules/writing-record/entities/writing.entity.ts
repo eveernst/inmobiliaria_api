@@ -65,7 +65,7 @@ export class Writing extends BaseEntity {
   actingNotary: string;
 
   @Column()
-  notaryContact: number;
+  notaryContact: string;
 
   @Column({ length: 1024, nullable: true })
   interiorImage: string;

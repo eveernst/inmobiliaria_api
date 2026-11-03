@@ -66,7 +66,7 @@ export class ReadWritingDto {
   actingNotary: string;
 
   @Expose()
-  notaryContact: number;
+  notaryContact: string;
 
   @Expose()
   interiorImage: string;
