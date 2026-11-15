@@ -33,7 +33,12 @@ export class UsersController {
     return new GenericResponse<ReadUserDto>(response);
   }
 
+  // ADMIN can read users because the property form needs the list to pick the
+  // responsible user (CU 1.2.1). Creating, updating and deleting stay
+  // SUPERUSER-only. This is two functions that need the list, not a role
+  // hierarchy (CLAUDE.md, Security Rules 1).
   @Get()
+  @Roles(UserRole.ADMIN, UserRole.SUPERUSER)
   async findAll(): Promise<ReadUserDto[]> {
     const users = await this.usersService.findAll();
     return plainToInstance(ReadUserDto, users, {
@@ -41,7 +46,10 @@ export class UsersController {
     });
   }
 
+  // Same access as findAll: ADMIN reads users to pick a property's responsible
+  // user; this is not a role hierarchy.
   @Get(':id')
+  @Roles(UserRole.ADMIN, UserRole.SUPERUSER)
   async findOne(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<GenericResponse<ReadUserDto>> {
