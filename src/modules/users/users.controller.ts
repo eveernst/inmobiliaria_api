@@ -34,6 +34,7 @@ export class UsersController {
   }
 
   @Get()
+  @Roles(UserRole.ADMIN, UserRole.SUPERUSER)
   async findAll(): Promise<ReadUserDto[]> {
     const users = await this.usersService.findAll();
     return plainToInstance(ReadUserDto, users, {
@@ -42,6 +43,7 @@ export class UsersController {
   }
 
   @Get(':id')
+  @Roles(UserRole.ADMIN, UserRole.SUPERUSER)
   async findOne(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<GenericResponse<ReadUserDto>> {
