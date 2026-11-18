@@ -103,6 +103,24 @@ describe('NotificationService', () => {
     );
   });
 
+  it.each([
+    ['property', 'Propiedad registrada correctamente'],
+    ['installation', 'Instalación registrada correctamente'],
+  ] as const)(
+    'words the %s registration notice in Spanish (#77)',
+    async (resource, message) => {
+      userRepository.findOne.mockResolvedValue({ id: 7 } as User);
+      notificationRepository.create.mockReturnValue({} as Notification);
+      notificationRepository.save.mockResolvedValue({} as Notification);
+
+      await service.createRegistrationNotification(7, resource, 11);
+
+      expect(notificationRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({ message, sourceType: resource }),
+      );
+    },
+  );
+
   it('does not duplicate a due-date notification', async () => {
     const property = { id: 11, user: { id: 7 } } as Property;
     const dueDate = new Date('2026-10-01T00:00:00.000Z');

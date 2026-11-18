@@ -8,6 +8,12 @@ import { UserRole } from 'src/shared/enums/user-role.enum';
 
 type NotificationResource = 'property' | 'installation';
 
+// `sourceType` keeps the resource key; only the stored text is Spanish.
+const REGISTRATION_MESSAGES: Record<NotificationResource, string> = {
+  property: 'Propiedad registrada correctamente',
+  installation: 'Instalación registrada correctamente',
+};
+
 interface DueDateNotificationData {
   sourceType: string;
   sourceId: number;
@@ -63,7 +69,7 @@ export class NotificationService {
     }
 
     const notification = this.notificationRepository.create({
-      message: `${resource} registrado correctamente`,
+      message: REGISTRATION_MESSAGES[resource],
       type: 'registration-success',
       date: new Date(),
       sourceType: resource,
