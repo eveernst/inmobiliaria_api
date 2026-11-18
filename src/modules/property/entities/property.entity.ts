@@ -71,6 +71,7 @@ export class Property extends BaseEntity {
   @ManyToOne(
     () => Classification,
     (classification) => classification.properties,
+    { nullable: false },
   )
   @JoinColumn({ name: 'classificationId' }) // Especifica el nombre de la FK en la tabla property
   classification: Classification;
