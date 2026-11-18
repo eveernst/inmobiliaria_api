@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Min,
 } from 'class-validator';
 import { PROVINCES } from 'src/shared/constants/provinces';
 import { IsRequired } from 'src/shared/decorators/is-required.decorator';
@@ -54,6 +55,7 @@ export class CreateRentedDto {
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(0)
   @IsRequired()
   price: number;
 
