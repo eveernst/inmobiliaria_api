@@ -4,7 +4,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Notification } from 'src/modules/notification/entities/notification.entity';
 import { CreateUserDto } from './dtos/create-user.dto';
@@ -41,7 +41,11 @@ export class UsersService {
       ...userData,
       password: hashedPassword,
     });
-    return await this.usersRepository.save(user);
+    try {
+      return await this.usersRepository.save(user);
+    } catch (error) {
+      throw this.translateEmailConflict(error);
+    }
   }
 
   async update(id: number, userData: Partial<User>): Promise<User> {
@@ -52,8 +56,31 @@ export class UsersService {
     if (userData.password) {
       userData.password = await bcrypt.hash(userData.password, 10);
     }
-    await this.usersRepository.update(id, userData);
+    try {
+      await this.usersRepository.update(id, userData);
+    } catch (error) {
+      throw this.translateEmailConflict(error);
+    }
     return this.findOne(id);
+  }
+
+  // user.email is UNIQUE: Postgres answers 23505 and, unhandled, the client
+  // would get a 500 instead of the message CU-1.3.1 asks for. Any other error
+  // is returned untouched.
+  private translateEmailConflict(error: unknown): unknown {
+    if (error instanceof QueryFailedError) {
+      const { code, detail } = error.driverError as {
+        code?: string;
+        detail?: string;
+      };
+      // `detail` reads: Key (email)=(x@y.com) already exists.
+      if (code === '23505' && detail?.includes('(email)')) {
+        return new ConflictException(
+          'Ya existe un usuario con ese correo electrónico.',
+        );
+      }
+    }
+    return error;
   }
 
   private async assertNotLastSuperuser(id: number): Promise<void> {
