@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { DataSource } from 'typeorm';
+import { resolveDbSchema } from './db-schema';
 
 const dbHost = process.env.DB_HOST;
 const isRemote = !['localhost', '127.0.0.1'].includes(dbHost ?? '');
@@ -11,7 +12,7 @@ export default new DataSource({
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  schema: process.env.DB_SCHEMA,
+  schema: resolveDbSchema(process.env.DB_SCHEMA),
   entities: ['src/**/*.entity.ts'],
   migrations: ['src/database/migrations/*.ts'],
   synchronize: false,

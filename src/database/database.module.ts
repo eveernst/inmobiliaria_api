@@ -10,6 +10,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { resolveDbSchema } from './db-schema';
 
 export function createDatabaseOptions(
   config: ConfigService,
@@ -24,6 +25,7 @@ export function createDatabaseOptions(
     username: config.get('DB_USER'),
     password: config.get('DB_PASSWORD'),
     database: config.get('DB_NAME'),
+    schema: resolveDbSchema(config.get<string>('DB_SCHEMA')),
     autoLoadEntities: true,
     migrations: [__dirname + '/migrations/*{.js,.ts}'],
     // synchronize is off, so pending migrations must run on every startup.
