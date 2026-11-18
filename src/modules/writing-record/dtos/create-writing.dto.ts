@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Min,
 } from 'class-validator';
 import { IsRequired } from '../../../shared/decorators/is-required.decorator';
 import { NumberToText } from '../../../shared/decorators/to-text.decorator';
@@ -15,11 +16,13 @@ export class CreateWritingDto {
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(0)
   @IsRequired()
   writingNumber: number;
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(0)
   @IsRequired()
   voteNumberJDAAC: number;
 
@@ -33,6 +36,7 @@ export class CreateWritingDto {
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(0)
   @IsRequired()
   voteNumberJDUA: number;
 
@@ -55,6 +59,7 @@ export class CreateWritingDto {
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(0)
   @IsRequired()
   year: number;
 
@@ -63,21 +68,25 @@ export class CreateWritingDto {
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(0)
   @IsRequired()
   totalSurface: number;
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(0)
   @IsRequired()
   coveredSurface: number;
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(0)
   @IsRequired()
   improvementSurface: number;
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(0)
   @IsRequired()
   improvementValue: number;
 

@@ -18,6 +18,7 @@ import { CreatePropertyInstallationDto } from './create-property-installation.dt
 export class CreatePropertyDto {
   @ToNumber()
   @IsNumber()
+  @Min(0)
   @IsRequired()
   goodUseCode: number;
 
@@ -43,6 +44,7 @@ export class CreatePropertyDto {
 
   @ToNumber()
   @IsNumber()
+  @Min(0)
   @IsRequired()
   postalCode: number;
 
@@ -60,11 +62,13 @@ export class CreatePropertyDto {
 
   @ToNumber()
   @IsNumber()
+  @Min(0)
   @IsRequired()
   destiny: number;
 
   @ToNumber()
   @IsNumber()
+  @Min(0)
   @IsRequired()
   state: number;
 

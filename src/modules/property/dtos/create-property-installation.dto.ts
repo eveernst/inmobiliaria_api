@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 import { IsRequired } from 'src/shared/decorators/is-required.decorator';
 
 // An installation created together with its property (POST /property).
@@ -12,6 +18,7 @@ export class CreatePropertyInstallationDto {
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(0)
   @IsRequired()
   quantity: number;
 

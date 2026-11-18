@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Min,
 } from 'class-validator';
 import { IsRequired } from 'src/shared/decorators/is-required.decorator';
 import { IsCalendarDate } from 'src/shared/decorators/is-calendar-date.decorator';
@@ -17,11 +18,13 @@ export class CreatePlanDto {
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(0)
   @IsRequired()
   planNumber: number;
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(0)
   @IsRequired()
   year: number;
 
@@ -91,11 +94,13 @@ export class CreatePlanDto {
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(0)
   @IsRequired()
   planNumberUpdate: number;
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(0)
   @IsRequired()
   yearUpdate: number;
 
@@ -120,6 +125,7 @@ export class CreatePlanDto {
 
   @IsNumber()
   @IsNotEmpty()
+  @Min(0)
   @IsRequired()
   numberVisado: number;
 
