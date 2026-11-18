@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { isSwaggerEnabled } from './shared/config/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,14 +22,16 @@ async function bootstrap() {
     credentials: true,
   });
 
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('Inmobiliaria API')
-    .setDescription('Documentacion de endpoints de la API')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-  const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api', app, swaggerDocument);
+  if (isSwaggerEnabled(process.env)) {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('Inmobiliaria API')
+      .setDescription('Documentacion de endpoints de la API')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
+    const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api', app, swaggerDocument);
+  }
 
   app.useGlobalPipes(
     new ValidationPipe({
